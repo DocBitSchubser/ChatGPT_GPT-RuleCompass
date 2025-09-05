@@ -79,4 +79,4 @@ Die Datei definiert verbindliche Vorgaben für:
 ---
 
 ## 5. Versionsbezug
-Aktueller Stand laut Änderungsvermerk in der Datei 'GPT-Rules.md': **v1.2.0** (Datum: 2025‑09‑04, TZ=Europe/Berlin).
+Aktueller Stand laut Änderungsvermerk in der Datei 'GPT-Rules.md': **v1.2.1** (Datum: 2025‑09‑05, TZ=Europe/Berlin).
