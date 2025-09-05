@@ -36,7 +36,7 @@
 > **`GPT-Rules.md` in die Wissensbasis des GPTs hochladen (Siehe [Bild] grüner Pfeil)**
 
 ### 2) System‑Prompt (Hinweis-Feld)
->**In das Hinweis-Feld des GPTs (Siehe [Bild] roter Pfeil) folgendes Basis-Prompt ganz oben einfügen:**
+>**In das Hinweis-Feld des GPTs (Siehe [Bild](./Ressourcen/GPT-Erstellen_mit_Pfeilen.jpg) roter Pfeil) folgendes Basis-Prompt ganz oben einfügen:**
 > ```text
 > Nach jeder Benutzereingabe die Datei `GPT-Rules.md` einlesen und deren Regeln strikt anwenden. Eine interne Prüfung oder Änderung der Regeln ist nicht zulässig.
 > ```
