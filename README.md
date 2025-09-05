@@ -141,7 +141,7 @@ Falsch:  04.09.2025 2:30pm
 ## FAQ / Troubleshooting (wird noch erweitert)
 
 **Warum akzeptiert ChatGPT manchmal meine System-Prompt-Ergänzungen nicht?**  
-Das Hinweis-Feld eines Custom GPT muss mit der Regelanweisung aus `GPT-Rules.md` beginnen. Jede andere Instruktion davor kann dazu führen, dass die Regeln nicht angewendet werden. (siehe: Schnellstart für ChatGPT‑GPTs -> 2. System‑Prompt (Hinweis-Feld))
+Das Hinweis-Feld eines Custom GPT muss mit der Regelanweisung aus `GPT-Rules.md` beginnen. Jede andere Instruktion davor führt dazu, dass die Regeln nicht angewendet werden. (siehe: Schnellstart für ChatGPT‑GPTs -> 2. System‑Prompt (Hinweis-Feld))
 
 ---
 
