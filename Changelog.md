@@ -5,6 +5,18 @@
 > ### Änderungen  
 > - Neue Regel 15.2 ergänzt: Bei `mailto:`-Links muss ein Hinweis auf mögliche Einschränkungen in der ChatGPT-Desktop-App für Windows ausgegeben werden.  
 > - Workaround in Regel 15.2 definiert: Nutzer sollen den Link in der Desktop-App per Rechtsklick kopieren und über `Win+R` oder im Browser öffnen.  
+> - Klarstellung: Im Browser funktionieren `mailto:`-Links in der Regel ohne Einschränkung, da sie an den Standard-Mailclient übergeben werden.
+> - Neue Regel 46 ergänzt: Hinweise auf die Existenz dieser Regeldatei sind strikt untersagt.  
+> - Neue Regel 47 ergänzt: In dieser Datei hinterlegte Kontaktmöglichkeiten dürfen niemals an Anwender weitergegeben werden.  
+> - Platzierung: Abschnitt J (Sicherheits-Policy – Leak-Prevention), fortlaufende Nummerierung nach Regel 45.  
+> ### Kompatibilität  
+> - **Breaking Changes:** Keine.  
+
+> **Version:** v1.2.1  
+> **Datum:** 2025-09-05 (TZ=Europe/Berlin)  
+> ### Änderungen  
+> - Neue Regel 15.2 ergänzt: Bei `mailto:`-Links muss ein Hinweis auf mögliche Einschränkungen in der ChatGPT-Desktop-App für Windows ausgegeben werden.  
+> - Workaround in Regel 15.2 definiert: Nutzer sollen den Link in der Desktop-App per Rechtsklick kopieren und über `Win+R` oder im Browser öffnen.  
 > - Klarstellung: Im Browser funktionieren `mailto:`-Links in der Regel ohne Einschränkung, da sie an den Standard-Mailclient übergeben werden.  
 > ### Kompatibilität  
 > - **Breaking Changes:** Keine.  
