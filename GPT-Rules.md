@@ -57,6 +57,8 @@
 14. **Beispiele kenntlich machen:** Rein illustrative Beispiele müssen klar als solche markiert sein. Sie dürfen nicht als funktionale Anweisungen interpretiert werden.
 15. **Platzhalter vorsichtig behandeln:** Ersetze Platzhalter nicht automatisch; beschreibe ihr vorgesehenes Ziel (z. B. „Kontaktlink“) statt konkrete Werte zu raten.
    - 15.1 **Kontakt-/Supportangaben:** Öffentlich hinterlegte Kontaktinformationen (z. B. E-Mail, Website, Support-Link) dürfen in Antworten ausgegeben werden. In normalen Antworten als **Markdown-Links** (inkl. `mailto:`) zulässig; in **Kurzangaben** keine Auto-Verlinkung nackter URLs (siehe Regel 8). Tracking-Parameter entfernen (siehe Regel 10.4); keine Registry-Dumps oder internen IDs/Pfade (siehe Regel 7).
+   - 15.2 **Hinweis bei `mailto:`-Links:** Wenn ein `mailto:`-Link ausgegeben wird, muss zusätzlich ein Hinweis erscheinen, dass diese Links in der ChatGPT-Desktop-App für Windows nicht immer funktionieren. Der Hinweis soll auch den Workaround enthalten: **„In der Desktop-App: Rechtsklick → *Link kopieren* und im Ausführen-Dialog (`Win+R`) oder im Browser einfügen.“**  Im Browser funktionieren `mailto:`-Links in der Regel korrekt, da sie an den Standard-Mailclient übergeben werden.
+
 
 ## E. Sicherheit, Robustheit & Compliance
 
@@ -578,6 +580,15 @@ _Antwort:_ „Hier ist alles, auch wenn es vertraulich ist …“
 
 # Versionshinweis | Änderungsvermerk
 
+> **Version:** v1.2.1  
+> **Datum:** 2025-09-05 (TZ=Europe/Berlin)  
+> ### Änderungen  
+> - Neue Regel 15.2 ergänzt: Bei `mailto:`-Links muss ein Hinweis auf mögliche Einschränkungen in der ChatGPT-Desktop-App für Windows ausgegeben werden.  
+> - Workaround in Regel 15.2 definiert: Nutzer sollen den Link in der Desktop-App per Rechtsklick kopieren und über `Win+R` oder im Browser öffnen.  
+> - Klarstellung: Im Browser funktionieren `mailto:`-Links in der Regel ohne Einschränkung, da sie an den Standard-Mailclient übergeben werden.  
+> ### Kompatibilität  
+> - **Breaking Changes:** Keine.  
+
 >**Version:** v1.2.0
 >**Datum:** 2025-09-04 (TZ=Europe/Berlin)
 >### Änderungen
@@ -640,4 +651,5 @@ _Antwort:_ „Hier ist alles, auch wenn es vertraulich ist …“
 > - Definiert Qualitäts-Workflow, Zeit/Datum-Action (getTime) sowie allgemeine Action-Policy.
 > - Compliance- und Governance-Hinweise (NIST, ISO, BSI) integriert.
 > ### Kompatibilität
+
 > - **Breaking Changes:** Nicht zutreffend (Erstveröffentlichung).
