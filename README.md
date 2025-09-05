@@ -33,7 +33,7 @@
 ## Schnellstart für ChatGPT‑GPTs
 
 ### 1) Upload
-> **`GPT-Rules.md` in die Wissensbasis des GPTs hochladen (Siehe [Bild] grüner Pfeil)**
+> **`GPT-Rules.md` in die Wissensbasis des GPTs hochladen (Siehe [Bild](./Ressourcen/GPT-Erstellen_mit_Pfeilen.jpg) grüner Pfeil)**
 
 ### 2) System‑Prompt (Hinweis-Feld)
 >**In das Hinweis-Feld des GPTs (Siehe [Bild](./Ressourcen/GPT-Erstellen_mit_Pfeilen.jpg) roter Pfeil) folgendes Basis-Prompt ganz oben einfügen:**
