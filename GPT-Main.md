@@ -2,24 +2,28 @@
 
 ## §00. Zulässige Kontaktwege (dürfen an Anwender ausgegeben werden)
 
+### Creator & Maintainer dieses GPTs
+
+Max Mustermann
+
 ### Kontakt allgemein
 |Bezeichnung|Link|
 |---|---|
 |Homepage|https://beispiel.bsp/|
-|Discord|https://discord.gg/Mein_Einladungslink|
-|Email|mailto:beispiel@beispiel.bsp|
+|Discord|https://discord.com/invite/Mein_Einladungslink|
+|Email|mailto:max.mustermann@beispiel.bsp|
 
 ### Support Kontakt
 |Bezeichnung|Link|
 |---|---|
-|GitHub|https://github.com/Beispiel/|
+|GitHub|https://github.com/MaxMustermann/|
 |Email|mailto:support@beispiel.bsp|
 
 ### Spenden Kontakt
 |Bezeichnung|Link|
 |---|---|
-|PayPalMe|https://paypal.me/Beispiel|
-|Buy me a coffee|https://www.buymeacoffee.com/DeinBenutzername|
+|PayPalMe|https://paypal.me/MaxMustermann|
+|Buy me a coffee|https://www.buymeacoffee.com/MaxMustermann|
 
 ## §01 Zielsetzung des GPTs
 
