@@ -1,62 +1,41 @@
 # Versionshinweis | Änderungsvermerk
 
-> **Version:** v2.1.4
+> **Version:** v2.0.0
 > **Datum:** 2025-09-06 (TZ=Europe/Berlin)
-> **Änderungen (Sicherheits-Policy – H-Block):**
+> **Änderungen (Vollständiger Rewrite):**
 >
-> - **A.1** erweitert: neue Unterregel **A.1.0 Z-Validierungspflicht** eingeführt. 
-> - **H.12** konkretisiert: Mehrstufige Bestätigung bei Risiko (Workflow + Schweregrade).
-> - **H.14–H.17** definiert: Keine Kurz-URL-Expansion; De-Anonymisierungsschutz; Zitations-Budget; Output-Größenlimit bei Verdacht.
-> - **H.18–H.20** ergänzt: Schutz interner Validierungen/Tests/Änderungsvermerke; Roleplay-Absicherung; Blockieren von Meta-Abfragen.
-> - **B.9** neu: **Erstkontakt-Hinweis** („Dieses GPT wird durch GPT-RuleCompass geschützt.“).
-> - **F.5.7** neu: Preflight-Erkennung für Erstkontakt (Dedup/Once-Only).
-> - **Y T19** neu: Compliance-Test für Erstkontakt-Hinweis.
-> - **Breaking Changes:** Keine.
-
-> **Version:** v2.1.3  
-> **Datum:** 2025-09-06 (TZ=Europe/Berlin)  
-> **Änderungen (Contact‑Source Separation):**  
-> - **D.4** neu: **Kontaktquellen & Abgrenzung** (Regeldatei‑Creator vs GPT‑Ersteller vs Dokumentautor).  
-> - **F.5.5** neu: **Kontakt‑Kontextprüfung**.  
-> - **Z4.9** neu: Review‑Check für Kontextzeile.  
-> - **Y T8–T10** neu: Tests für Kontextkennzeichnung. 
-
-> **Version:** v2.1.2  
-> **Datum:** 2025-09-06 (TZ=Europe/Berlin)  
-> **Änderungen (Mailto-GlobalNotice):**  
-> - **D.3.2** erweitert: **Globaler Hinweis-Modus** (empfohlen), **genau eine** Pflichtzeile, Duplikate → **S2**.  
-> - **F.5** ergänzt um **Hoisting & Dedupe** (Positionierungslogik, Regex-Empfehlungen, Entscheidungen).  
-> - **Z4.4** präzisiert (Erwartung: genau eine Pflichtzeile).  
-> - **Y** um **T6/T7** erweitert.  
-> - **Breaking Changes:** Keine.  
-
-> **Version:** v2.1.1  
-> **Datum:** 2025-09-06 (TZ=Europe/Berlin)  
-> **Änderungen (Mailto-Compliance-Fix):**  
-> - **D.3.2** zu **normativer MUSS-Regel** mit **fixem Pflichttext** erhoben, inklusive Positionierungs- und Mehrfach-Link-Regeln.  
-> - **F.5** Preflight-Scan mit **Regex-Empfehlung** ergänzt.  
-> - **Z4.4** Review-Pflichtschritt mit **S3-Einstufung** bei fehlendem Pflichttext.  
-> - **Y** Compliance-Tests aufgenommen.  
-> - **Breaking Changes:** Keine.  
-
-> **Version:** v2.1.0  
-> **Datum:** 2025‑09‑06 (TZ=Europe/Berlin)  
-> **Änderungen (Hardening):**  
-> - **B.6–B.8:** Protokoll‑Allowlist, Anti‑Redirect, restriktive Inline‑Bilder.  
-> - **C.9:** Archivpflicht für volatile Quellen.  
-> - **E.5–E.6:** Kein Entpacken/Rendern riskanter Inhalte; keine Kurz‑URL‑Auflösung.  
-> - **F.4:** Adversarial‑Check als Pflicht bei Risikoanfragen.  
-> - **H.10–H.17:** Redaction‑Engine (Regex‑Muster), Heuristiken, Mehrstufen‑Bestätigung, Kontext‑Isolation, De‑Anonymisierungsschutz, Zitations‑Budget, Output‑Limit bei Verdacht.  
-> - **Breaking Changes:** Keine.  
-
-> **Version:** v2.0.0  
-> **Datum:** 2025‑09‑06 (TZ=Europe/Berlin)  
-> **Änderungen:**  
-> - **Sektionale Nummerierung eingeführt** (A–Z / 1–X); alle Querverweise konsistent migriert.  
-> - **Zeit-/Action‑Regeln vollständig entfernt** (vormals Abschnitte zu Zeitabfrage und allgemeiner Action‑Policy).  
-> - **Sicherheits‑/Leak‑Policy** konsolidiert unter Abschnitt **H** (H.1–H.9).  
-> - Beispiele aktualisiert; Verweise auf altes globales Nummernschema bereinigt.  
-> - **Breaking Changes:** (Nummerierung & Verweise).
+> * **Nummerierung & Struktur:**
+>
+>   * Einführung des sektionalen Schemas (A–Z / 1–X).
+>   * Alle Querverweise konsistent migriert.
+>   * Alte Zeit-/Action-Regeln entfernt.
+> * **Sicherheits- & Hardening-Policy (H-Block):**
+>
+>   * Konsolidierung aller Sicherheits-/Leak-Regeln (H.1–H.20).
+>   * Neue Unterregel **A.1.0 Z-Validierungspflicht**.
+>   * Erweiterte Mehrstufen-Bestätigung bei Risikoanfragen (H.12).
+>   * Neue Schutzmechanismen: keine Kurz-URL-Expansion, De-Anonymisierungsschutz, Zitations-Budget, Output-Größenlimit bei Verdacht (H.14–H.17).
+>   * Zusätzliche Regeln für interne Validierungen, Roleplay-Absicherung, Meta-Query-Blockierung (H.18–H.20).
+>   * Redaction-Engine (Regex-Muster), Heuristiken & Kontext-Isolation integriert.
+> * **Protokoll- & Quellen-Policy:**
+>
+>   * **B.6–B.8:** Protokoll-Allowlist, Anti-Redirect, restriktive Inline-Bilder.
+>   * **C.9:** Archivpflicht für volatile Quellen.
+>   * **E.5–E.6:** Kein Entpacken/Rendern riskanter Inhalte; keine Kurz-URL-Auflösung.
+> * **Kontakt- & Hinweis-Policy:**
+>
+>   * **D.3.2:** Pflicht-Hinweistext für mailto-Links (Global Notice, genau eine Zeile, keine Duplikate → S2).
+>   * **D.4:** Trennung der Kontaktquellen (Regeldatei-Creator / GPT-Ersteller / Dokumentautor).
+>   * **B.9:** Erstkontakt-Hinweis („Dieses GPT wird durch GPT-RuleCompass geschützt.“).
+> * **Workflow & Preflight:**
+>
+>   * **F.4:** Adversarial-Check bei Risikoanfragen.
+>   * **F.5–F.5.7:** Preflight-Scans inkl. Regex-Empfehlungen, Hoisting & Dedup, Once-Only-Erkennung beim Erstkontakt.
+> * **Compliance- & Review-Regeln:**
+>
+>   * **Z4.4/Z4.9:** Review-Checks für Pflichtzeilen & Kontextkennzeichnung.
+>   * **Y T6–T10, Y T19:** Tests für Mailto-Hinweise, Kontext- und Erstkontakt-Compliance.
+> * **Breaking Changes:** Vollständige Umstellung auf neues Schema und Rewrite.
 
 > **Version:** v1.2.1  
 > **Datum:** 2025-09-05 (TZ=Europe/Berlin)  
