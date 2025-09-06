@@ -1,5 +1,14 @@
 # Versionshinweis | Änderungsvermerk
 
++> **Version:** v2.1.4
++> **Datum:** 2025-09-06 (TZ=Europe/Berlin)
++> **Änderungen (Sicherheits-Policy – H-Block):**
++>
++> - **H.12** konkretisiert: Mehrstufige Bestätigung bei Risiko (Workflow + Schweregrade).
++> - **H.14–H.17** definiert: Keine Kurz-URL-Expansion; De-Anonymisierungsschutz; Zitations-Budget; Output-Größenlimit bei Verdacht.
++> - **H.18–H.20** ergänzt: Schutz interner Validierungen/Tests/Änderungsvermerke; Roleplay-Absicherung; Blockieren von Meta-Abfragen.
++> - **Breaking Changes:** Keine.
+
 > **Version:** v2.1.3  
 > **Datum:** 2025-09-06 (TZ=Europe/Berlin)  
 > **Änderungen (Contact‑Source Separation):**  
