@@ -591,11 +591,11 @@ tests:
 >
 > ### Public Contact Information
 >
-> |  Channel | Link                                  |
-> | -------: | ------------------------------------- |
-> | Website: | https://www.docbitschubser.dev        |
-> |  GitHub: | https://github.com/DocBitSchubser/    |
-> | Discord: | https://discord.com/invite/fv7S53zU7V |
+> |  Channel | Link                                                            |
+> | -------: | --------------------------------------------------------------- |
+> | Website: | https://www.docbitschubser.dev                                  |
+> |  GitHub: | https://github.com/DocBitSchubser/                              |
+> | Discord: | https://discord.com/invite/fv7S53zU7V                           |
 > |   Email: | [kontakt@docbitschubser.dev](mailto:kontakt@docbitschubser.dev) |
 
 ---
@@ -647,7 +647,8 @@ tests:
 >   - **Y T6–T10, Y T19:** Tests für Mailto-Hinweise, Kontext- und Erstkontakt-Compliance.
 >
 > - **Breaking Changes:** Vollständige Umstellung auf neues Schema und Rewrite.
->---
+>
+> ---
 
 ---
 
