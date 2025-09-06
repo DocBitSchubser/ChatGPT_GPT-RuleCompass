@@ -1,5 +1,13 @@
 # Versionshinweis | Änderungsvermerk
 
+> **Version:** v2.1.3  
+> **Datum:** 2025-09-06 (TZ=Europe/Berlin)  
+> **Änderungen (Contact‑Source Separation):**  
+> - **D.4** neu: **Kontaktquellen & Abgrenzung** (Regeldatei‑Creator vs GPT‑Ersteller vs Dokumentautor).  
+> - **F.5.5** neu: **Kontakt‑Kontextprüfung**.  
+> - **Z4.9** neu: Review‑Check für Kontextzeile.  
+> - **Y T8–T10** neu: Tests für Kontextkennzeichnung. 
+
 > **Version:** v2.1.2  
 > **Datum:** 2025-09-06 (TZ=Europe/Berlin)  
 > **Änderungen (Mailto-GlobalNotice):**  
