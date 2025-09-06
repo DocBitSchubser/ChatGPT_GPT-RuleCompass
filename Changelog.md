@@ -1,5 +1,14 @@
 # Versionshinweis | Änderungsvermerk
 
+> **Version:** v2.0.0  
+> **Datum:** 2025‑09‑06 (TZ=Europe/Berlin)  
+> **Änderungen:**  
+> - **Sektionale Nummerierung eingeführt** (A–Z / 1–X); alle Querverweise konsistent migriert.  
+> - **Zeit-/Action‑Regeln vollständig entfernt** (vormals Abschnitte zu Zeitabfrage und allgemeiner Action‑Policy).  
+> - **Sicherheits‑/Leak‑Policy** konsolidiert unter Abschnitt **H** (H.1–H.9).  
+> - Beispiele aktualisiert; Verweise auf altes globales Nummernschema bereinigt.  
+> **Kompatibilität:** **Breaking Changes** (Nummerierung & Verweise).
+
 > **Version:** v1.2.1  
 > **Datum:** 2025-09-05 (TZ=Europe/Berlin)  
 > ### Änderungen  
