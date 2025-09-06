@@ -1,5 +1,14 @@
 # Versionshinweis | Änderungsvermerk
 
+> **Version:** v2.1.2  
+> **Datum:** 2025-09-06 (TZ=Europe/Berlin)  
+> **Änderungen (Mailto-GlobalNotice):**  
+> - **D.3.2** erweitert: **Globaler Hinweis-Modus** (empfohlen), **genau eine** Pflichtzeile, Duplikate → **S2**.  
+> - **F.5** ergänzt um **Hoisting & Dedupe** (Positionierungslogik, Regex-Empfehlungen, Entscheidungen).  
+> - **Z4.4** präzisiert (Erwartung: genau eine Pflichtzeile).  
+> - **Y** um **T6/T7** erweitert.  
+> - **Breaking Changes:** Keine.  
+
 > **Version:** v2.1.1  
 > **Datum:** 2025-09-06 (TZ=Europe/Berlin)  
 > **Änderungen (Mailto-Compliance-Fix):**  
@@ -7,7 +16,7 @@
 > - **F.5** Preflight-Scan mit **Regex-Empfehlung** ergänzt.  
 > - **Z4.4** Review-Pflichtschritt mit **S3-Einstufung** bei fehlendem Pflichttext.  
 > - **Y** Compliance-Tests aufgenommen.  
-> **Kompatibilität:** Aufwärtskompatibel zu v2.1.0; keine Actions erforderlich.
+> - **Breaking Changes:** Keine.  
 
 > **Version:** v2.1.0  
 > **Datum:** 2025‑09‑06 (TZ=Europe/Berlin)  
@@ -17,7 +26,7 @@
 > - **E.5–E.6:** Kein Entpacken/Rendern riskanter Inhalte; keine Kurz‑URL‑Auflösung.  
 > - **F.4:** Adversarial‑Check als Pflicht bei Risikoanfragen.  
 > - **H.10–H.17:** Redaction‑Engine (Regex‑Muster), Heuristiken, Mehrstufen‑Bestätigung, Kontext‑Isolation, De‑Anonymisierungsschutz, Zitations‑Budget, Output‑Limit bei Verdacht.  
-> **Kompatibilität:** Aufwärtskompatibel zur v2.0.0; keine Actions erforderlich.
+> - **Breaking Changes:** Keine.  
 
 > **Version:** v2.0.0  
 > **Datum:** 2025‑09‑06 (TZ=Europe/Berlin)  
@@ -26,7 +35,7 @@
 > - **Zeit-/Action‑Regeln vollständig entfernt** (vormals Abschnitte zu Zeitabfrage und allgemeiner Action‑Policy).  
 > - **Sicherheits‑/Leak‑Policy** konsolidiert unter Abschnitt **H** (H.1–H.9).  
 > - Beispiele aktualisiert; Verweise auf altes globales Nummernschema bereinigt.  
-> **Kompatibilität:** **Breaking Changes** (Nummerierung & Verweise).
+> - **Breaking Changes:** (Nummerierung & Verweise).
 
 > **Version:** v1.2.1  
 > **Datum:** 2025-09-05 (TZ=Europe/Berlin)  
