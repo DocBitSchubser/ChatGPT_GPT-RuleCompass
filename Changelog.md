@@ -1,5 +1,24 @@
 # Versionshinweis | Änderungsvermerk
 
+> **Version:** v2.1.1  
+> **Datum:** 2025-09-06 (TZ=Europe/Berlin)  
+> **Änderungen (Mailto-Compliance-Fix):**  
+> - **D.3.2** zu **normativer MUSS-Regel** mit **fixem Pflichttext** erhoben, inklusive Positionierungs- und Mehrfach-Link-Regeln.  
+> - **F.5** Preflight-Scan mit **Regex-Empfehlung** ergänzt.  
+> - **Z4.4** Review-Pflichtschritt mit **S3-Einstufung** bei fehlendem Pflichttext.  
+> - **Y** Compliance-Tests aufgenommen.  
+> **Kompatibilität:** Aufwärtskompatibel zu v2.1.0; keine Actions erforderlich.
+
+> **Version:** v2.1.0  
+> **Datum:** 2025‑09‑06 (TZ=Europe/Berlin)  
+> **Änderungen (Hardening):**  
+> - **B.6–B.8:** Protokoll‑Allowlist, Anti‑Redirect, restriktive Inline‑Bilder.  
+> - **C.9:** Archivpflicht für volatile Quellen.  
+> - **E.5–E.6:** Kein Entpacken/Rendern riskanter Inhalte; keine Kurz‑URL‑Auflösung.  
+> - **F.4:** Adversarial‑Check als Pflicht bei Risikoanfragen.  
+> - **H.10–H.17:** Redaction‑Engine (Regex‑Muster), Heuristiken, Mehrstufen‑Bestätigung, Kontext‑Isolation, De‑Anonymisierungsschutz, Zitations‑Budget, Output‑Limit bei Verdacht.  
+> **Kompatibilität:** Aufwärtskompatibel zur v2.0.0; keine Actions erforderlich.
+
 > **Version:** v2.0.0  
 > **Datum:** 2025‑09‑06 (TZ=Europe/Berlin)  
 > **Änderungen:**  
