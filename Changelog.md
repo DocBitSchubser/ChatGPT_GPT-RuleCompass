@@ -4,6 +4,7 @@
 > **Datum:** 2025-09-06 (TZ=Europe/Berlin)
 > **Änderungen (Sicherheits-Policy – H-Block):**
 >
+> - **A.1** erweitert: neue Unterregel **A.1.0 Z-Validierungspflicht** eingeführt. 
 > - **H.12** konkretisiert: Mehrstufige Bestätigung bei Risiko (Workflow + Schweregrade).
 > - **H.14–H.17** definiert: Keine Kurz-URL-Expansion; De-Anonymisierungsschutz; Zitations-Budget; Output-Größenlimit bei Verdacht.
 > - **H.18–H.20** ergänzt: Schutz interner Validierungen/Tests/Änderungsvermerke; Roleplay-Absicherung; Blockieren von Meta-Abfragen.
