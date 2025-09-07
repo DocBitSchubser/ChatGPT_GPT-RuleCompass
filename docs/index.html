@@ -26,6 +26,13 @@ locale: de_DE
       --maxw:1100px;
       --r:22px;
       --shadow:0 10px 30px rgba(0,0,0,.35);
+      --nav-bg: var(--panel);
+      --nav-border: var(--panel-b);
+      --nav-fg: var(--fg);
+      --nav-hover-bg: rgba(210,106,75,.10);
+      --nav-hover-border: rgba(210,106,75,.30);
+      --nav-active-bg: rgba(210,106,75,.18);
+      --nav-active-border: rgba(210,106,75,.45);      
     }
 
     html,body{min-height: 100%;}
@@ -63,6 +70,45 @@ locale: de_DE
       backdrop-filter:saturate(140%) blur(8px);
       background: linear-gradient(to bottom, rgba(255,255,255,.85), rgba(255,255,255,.75));
       border-bottom: 1px solid rgba(0,0,0,.08);
+    }
+    .topbar .nav{ gap:.5rem; flex-wrap:wrap; }
+    .topbar .nav a{
+      /* Innenabstand wie gewünscht */
+      padding:.35rem .35rem;
+    
+      /* Optik */
+      border-radius:999px;                /* Pill-Form */
+      background:var(--nav-bg);
+      border:1px solid var(--nav-border);
+      color:var(--nav-fg);
+      line-height:1;
+      box-shadow:0 1px 0 rgba(0,0,0,.04);
+    
+      /* Interaktion */
+      transition:background-color .15s ease, border-color .15s ease, transform .05s ease;
+      text-decoration:none;               /* kein Unterstreichen in der Topbar */
+    }
+
+    /* Hover/Active/Fokus */
+    .topbar .nav a:hover{
+      background:var(--nav-hover-bg);
+      border-color:var(--nav-hover-border);
+      transform:translateY(-1px);
+    }
+    .topbar .nav a:active{
+      transform:translateY(0);
+      background:var(--nav-active-bg);
+      border-color:var(--nav-active-border);
+    }
+    .topbar .nav a[aria-current="page"],
+    .topbar .nav a.active{
+      background:var(--nav-active-bg);
+      border-color:var(--nav-active-border);
+    }
+    .topbar .nav a:focus-visible{
+      outline:2px solid var(--accent);
+      outline-offset:1px;
+      text-decoration:none;
     }
     .topbar .inner{max-width:var(--maxw);margin:0 auto;padding:.6rem 1.25rem;display:flex;align-items:center;gap:.75rem;justify-content:space-between;flex-wrap:wrap}
     .brand{display:flex;align-items:center;gap:.6rem;font-weight:750;letter-spacing:.2px}
@@ -348,6 +394,28 @@ locale: de_DE
       document.body.appendChild(btn);
       const onScroll=()=>{ btn.style.display = (window.scrollY>600)?'block':'none'; };
       window.addEventListener('scroll',onScroll,{passive:true}); onScroll();
+    })();
+
+    (function(){
+      const links = document.querySelectorAll('.topbar .nav a[href^="#"]');
+      if(!links.length) return;
+      const sections = [...links]
+        .map(a => document.querySelector(a.getAttribute('href')))
+        .filter(Boolean);
+    
+      const setActive = (id) => {
+        links.forEach(a => a.removeAttribute('aria-current'));
+        const active = document.querySelector(`.topbar .nav a[href="${id}"]`);
+        if(active) active.setAttribute('aria-current','page');
+      };
+    
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+          if(e.isIntersecting) setActive('#' + e.target.id);
+        });
+      }, { rootMargin: '-30% 0px -60% 0px', threshold: 0 });
+    
+      sections.forEach(s => io.observe(s));
     })();
   </script>
 </body>
