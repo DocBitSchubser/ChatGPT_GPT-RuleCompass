@@ -123,7 +123,6 @@ locale: de_DE
         <a href="#wissensdaten">Wissensdaten</a>
         <a href="#kontakt">Kontakt</a>
         <a href="#pruefkette">Prüfkette</a>
-        <a href="#leitfaden">Leitfaden</a>
         <a href="#faq">FAQ</a>
       </nav>
     </div>
@@ -163,7 +162,6 @@ locale: de_DE
         <li><a href="#wissensdaten">Wissensdaten-Sicherheit</a></li>
         <li><a href="#kontakt">Kontakt-Management</a></li>
         <li><a href="#pruefkette">Prüfkette &amp; Compliance</a></li>
-        <li><a href="#leitfaden">Implementierung im Custom GPT</a></li>
         <li><a href="#nutzen">Nutzen auf einen Blick</a></li>
         <li><a href="#faq">FAQ</a></li>
       </ul>
@@ -224,16 +222,7 @@ locale: de_DE
       </div>
     </section>
 
-    <section id="leitfaden">
-      <h2>Implementierung im Custom GPT (Kurzleitfaden)</h2>
-      <div class="card steps">
-        <p class="step"><strong>Regeln laden &amp; priorisieren:</strong> Sicherheits-Policies bei jeder Benutzereingabe aktiv anwenden.</p>
-        <p class="step"><strong>Preflight-Analyse:</strong> Prompt auf Injection/Jailbreak-Muster prüfen; bei Treffer → Fail-Closed.</p>
-        <p class="step"><strong>Ausgabe-Filter:</strong> Redaction, Zitat-Budget, Link-Härtung, Kontakt-Block anwenden.</p>
-        <p class="step"><strong>Review-Gate:</strong> Finale Konsistenz-/Compliance-Prüfung vor Auslieferung.</p>
-      </div>
-
-      <h3 id="nutzen">Nutzen auf einen Blick</h3>
+     <h3 id="nutzen">Nutzen auf einen Blick</h3>
       <div class="grid cols-3">
         <div class="card"><h3>Risiko-Reduktion</h3><p>Schutz vor Prompt-Injection, Dataleakage und unautorisierten Kontaktangaben.</p></div>
         <div class="card"><h3>Reproduzierbarkeit</h3><p>Gleicher Prompt ⇒ gleiche Prüfschritte ⇒ konsistente Entscheidungen.</p></div>
