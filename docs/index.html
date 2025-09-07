@@ -1,4 +1,4 @@
----
++---
 layout: none
 title: "Custom GPT unter ChatGPT absichern"
 description: "Jailbreak-Resistenz, Prompt-Injection-Schutz, Wissensdaten-Sicherheit und strenges Kontakt-Management mit Fail-Closed-Prüfkette."
@@ -43,6 +43,8 @@ locale: de_DE
       --maxw:1100px;
       --r:22px;
       --shadow:0 10px 30px rgba(0,0,0,.35);
+      
+
     }
 
     /* System Dark, wenn kein explizites data-theme gesetzt ist */
@@ -114,6 +116,48 @@ locale: de_DE
     .topbar .inner{ max-width:var(--maxw); margin:0 auto; padding:.6rem 1.25rem; display:flex; align-items:center; gap:.75rem; justify-content:space-between; flex-wrap:wrap }
     .brand{ display:flex; align-items:center; gap:.6rem; font-weight:750; letter-spacing:.2px }
     .chip{ display:inline-flex; align-items:center; gap:.4rem; border:1px solid var(--panel-b); padding:.2rem .55rem; border-radius:999px; color:var(--muted); font-size:.85rem; background:var(--panel) }
+    /* Tooltip-Logik */
+.has-tooltip{ position:relative; }
+.has-tooltip::after{
+  content: attr(data-tooltip);
+  position:absolute;
+  left:50%;
+  bottom: calc(100% + 10px);               /* Abstand zum Chip */
+  transform: translateX(-50%) translateY(-6px);
+  background: var(--tt-bg, rgba(0,0,0,.9));
+  color: var(--tt-fg, #fff);
+  border: 1px solid var(--tt-b, rgba(255,255,255,.2));
+  border-radius: 8px;
+  padding: .35rem .55rem;
+  font-size: .85rem;
+  line-height: 1.2;
+  white-space: nowrap;
+  box-shadow: 0 6px 18px rgba(0,0,0,.20);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .12s ease, transform .12s ease;
+  z-index: 2000;
+}
+.has-tooltip::before{
+  content: "";
+  position:absolute;
+  left:50%;
+  bottom: calc(100% + 2px);
+  transform: translateX(-50%) translateY(4px);
+  border: 6px solid transparent;           /* kleiner Pfeil */
+  border-top-color: var(--tt-bg, rgba(0,0,0,.9));
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .12s ease, transform .12s ease;
+}
+/* Sichtbar bei Hover oder Tastaturfokus */
+.has-tooltip:hover::after,
+.has-tooltip:hover::before,
+.has-tooltip:focus-visible::after,
+.has-tooltip:focus-visible::before{
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
 
     .topbar .right{ display:flex; align-items:center; gap:.5rem; flex-wrap:wrap }
 
@@ -249,7 +293,7 @@ locale: de_DE
     <div class="inner">
       <div class="brand">
         <span>🔒 Custom&nbsp;GPT&nbsp;Absichern</span>
-        <span class="chip">Fail-Closed · Policy-First</span>
+        <span class="chip has-tooltip" data-tooltip="by: DocBitSchubser" aria-label="by: DocBitSchubser" tabindex="0">by: DBS</span>
         <button id="theme-toggle" class="theme-toggle" aria-label="Theme wechseln" aria-pressed="false" title="Theme wechseln">🖥️</button>
       </div>
       <div class="right">
