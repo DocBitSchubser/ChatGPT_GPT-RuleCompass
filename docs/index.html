@@ -1,128 +1,309 @@
 ---
-layout: default
+layout: none
 title: "Custom GPT unter ChatGPT absichern"
 description: "Jailbreak-Resistenz, Prompt-Injection-Schutz, Wissensdaten-Sicherheit und strenges Kontakt-Management mit Fail-Closed-Prüfkette."
-image: /Custom_GPT_absichern.png
+image: /Custom_GPT_unter_ChatGPT_absichern.png
 locale: de_DE
 ---
 
 <!doctype html>
 <html lang="de">
 <head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  {% comment %} Optional, falls jekyll-seo-tag aktiv ist {% endcomment %}
   {%- seo -%}
+  <title>{{ page.title }}</title>
   <style>
-    :root {
-      --bg: #0e1116;
-      --fg: #e6e9ef;
-      --muted: #aab2bf;
-      --accent: #62d6e8;
-      --maxw: 1000px;
+    /* ===== Design-Tokens ===== */
+    :root{
+      --bg:#0e1116;
+      --panel:#10151d;
+      --panel-2:#0b0f15;
+      --fg:#e7e9ef;
+      --muted:#aab2bf;
+      --accent:#62d6e8;
+      --accent-2:#86efac;
+      --danger:#ff6b6b;
+      --maxw:1100px;
+      --r:16px;
+      --shadow:0 10px 30px rgba(0,0,0,.35);
     }
-    html, body { height: 100%; }
-    body {
-      margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, "Apple Color Emoji", "Segoe UI Emoji";
-      background: var(--bg); color: var(--fg); line-height: 1.55; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+    @media (prefers-color-scheme: light){
+      :root{ --bg:#f6f8fb; --panel:#ffffff; --panel-2:#f3f5f9; --fg:#0e1116; --muted:#4b5563; --shadow:0 12px 28px rgba(0,0,0,.08); }
     }
-    .container { max-width: var(--maxw); margin: 0 auto; padding: 2rem 1.25rem; }
-    /* Float-Lead-Image */
-    .lead-figure { float: left; width: 341px; margin: 0 1.5rem 1rem 0; }
-    .lead-figure img { display: block; width: 100%; height: auto; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,.35); }
-    .lead-figure figcaption { font-size: .9rem; color: var(--muted); margin-top: .5rem; }
-    header h1 { font-size: clamp(1.8rem, 2.6vw + 1rem, 2.6rem); line-height: 1.2; margin: 0 0 .5rem; }
-    header .sub { color: var(--muted); margin: 0 0 1.25rem; font-size: 1rem; }
-    h2 { margin-top: 2rem; font-size: 1.5rem; }
-    h3 { margin-top: 1.5rem; font-size: 1.25rem; }
-    ul { padding-left: 1.2rem; }
-    li + li { margin-top: .35rem; }
-    a { color: var(--accent); text-decoration: none; }
-    a:hover { text-decoration: underline; }
-    /* Clear float at end of document flow */
-    .clearfix::after { content: ""; display: table; clear: both; }
-    /* Content card look */
-    .card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 1.25rem; }
-    /* Responsive: Stack the image above text on narrow screens */
-    @media (max-width: 760px) {
-      .lead-figure { float: none; width: 100%; margin: 0 0 1rem 0; }
+
+    /* ===== Base ===== */
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,Arial,"Apple Color Emoji","Segoe UI Emoji";
+      background: radial-gradient(1200px 800px at 80% -10%, rgba(98,214,232,.15), transparent 70%),
+                  radial-gradient(1000px 700px at 0% 20%, rgba(134,239,172,.10), transparent 60%),
+                  var(--bg);
+      color:var(--fg);
+      line-height:1.6;
+      -webkit-font-smoothing:antialiased;
+      text-rendering:optimizeLegibility;
     }
+    a{color:var(--accent);text-decoration:none}
+    a:hover{text-decoration:underline}
+    img{max-width:100%;height:auto;border-radius:12px;box-shadow:var(--shadow)}
+    .container{max-width:var(--maxw);margin:0 auto;padding:2rem 1.25rem}
+    .visually-hidden{position:absolute!important;height:1px;width:1px;overflow:hidden;clip:rect(1px,1px,1px,1px);white-space:nowrap}
+
+    /* ===== Topbar ===== */
+    .topbar{
+      position:sticky;top:0;z-index:10;
+      backdrop-filter:saturate(140%) blur(8px);
+      background:linear-gradient(to bottom, rgba(16,21,29,.85), rgba(16,21,29,.55));
+      border-bottom:1px solid rgba(255,255,255,.07);
+    }
+    .topbar .inner{display:flex;align-items:center;gap:.75rem;justify-content:space-between}
+    .brand{display:flex;align-items:center;gap:.75rem;font-weight:700;letter-spacing:.2px}
+    .chip{display:inline-flex;align-items:center;gap:.4rem;border:1px solid rgba(255,255,255,.12);padding:.25rem .6rem;border-radius:999px;color:var(--muted);font-size:.85rem}
+
+    .nav{display:flex;gap:.75rem;flex-wrap:wrap}
+    .nav a{display:inline-block;padding:.45rem .7rem;border-radius:10px;border:1px solid rgba(255,255,255,.09)}
+    .nav a:hover{background:rgba(255,255,255,.06)}
+
+    /* ===== Hero ===== */
+    .hero{display:grid;grid-template-columns:1.1fr .9fr;gap:2rem;align-items:center;margin-top:1.5rem}
+    .hero h1{font-size:clamp(1.9rem,1.2rem + 2.2vw,3rem);line-height:1.15;margin:.25rem 0 .75rem}
+    .hero .sub{color:var(--muted);margin:0 0 1rem}
+    .hero .actions{display:flex;gap:.75rem;flex-wrap:wrap;margin-top:.75rem}
+    .btn{
+      display:inline-flex;align-items:center;gap:.5rem;
+      padding:.7rem 1rem;border-radius:12px;font-weight:600;
+      border:1px solid rgba(255,255,255,.1);background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.02));
+    }
+    .btn.primary{background:linear-gradient(180deg, rgba(98,214,232,.25), rgba(98,214,232,.15));border-color:rgba(98,214,232,.45)}
+    .btn.secondary{background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02))}
+    .badge-row{display:flex;gap:.5rem;flex-wrap:wrap;margin:.75rem 0}
+    .badge{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:999px;padding:.35rem .7rem;font-size:.85rem;color:var(--muted)}
+
+    /* ===== Sections / Cards ===== */
+    section{scroll-margin-top:90px}
+    .grid{display:grid;gap:1rem}
+    .grid.cols-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+    .grid.cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+    @media (max-width: 960px){ .hero{grid-template-columns:1fr} .grid.cols-3{grid-template-columns:1fr 1fr} }
+    @media (max-width: 680px){ .grid.cols-3, .grid.cols-2{grid-template-columns:1fr} }
+
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.02));
+      border:1px solid rgba(255,255,255,.1);border-radius:var(--r);padding:1.1rem;
+      box-shadow:var(--shadow);
+      transition:transform .2s ease, border-color .2s ease;
+    }
+    .card:hover{transform:translateY(-2px);border-color:rgba(98,214,232,.4)}
+    h2{font-size:1.45rem;margin:1.7rem 0 .6rem}
+    h3{font-size:1.15rem;margin:1.15rem 0 .35rem}
+    ul{padding-left:1.1rem;margin:.4rem 0}
+    li + li{margin-top:.3rem}
+
+    /* Steps (nummerierte Kette) */
+    .steps{counter-reset:step}
+    .step{counter-increment:step;position:relative;padding-left:2.4rem}
+    .step::before{
+      content:counter(step);position:absolute;left:0;top:.1rem;
+      width:1.6rem;height:1.6rem;border-radius:50%;
+      display:grid;place-items:center;font-weight:700;
+      background:rgba(98,214,232,.25); border:1px solid rgba(98,214,232,.55);
+    }
+
+    /* Callout */
+    .callout{border-left:3px solid var(--accent);padding:.75rem 1rem;margin:1rem 0;background:rgba(98,214,232,.06);border-radius:8px}
+
+    /* FAQ */
+    details{border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:.6rem .9rem;background:rgba(255,255,255,.03)}
+    details + details{margin-top:.5rem}
+    details>summary{cursor:pointer;font-weight:600}
+    details[open]{background:rgba(255,255,255,.045)}
+
+    /* TOC */
+    .toc{border:1px dashed rgba(255,255,255,.18);border-radius:12px;padding:.9rem;background:rgba(255,255,255,.025);color:var(--muted)}
+    .toc a{color:inherit}
+    .toc ul{margin:.2rem 0 0 .9rem}
+
+    /* Reduced motion */
+    @media (prefers-reduced-motion: reduce){
+      .card,.btn{transition:none}
+    }
+    /* Focus */
+    :focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
   </style>
 </head>
 <body>
-  <main class="container clearfix">
-    <figure class="lead-figure">
-      <!-- Hinweis: Der Dateiname enthält ein Leerzeichen. Entweder URL-encoden (%20) oder besser umbenennen (siehe README/Deployment-Hinweise). -->
-      <img src="./Custom_GPT_unter_ChatGPT_absichern.png" width="341" height="512" alt="Custom GPT unter ChatGPT absichern – Visual" loading="eager" decoding="async" />
-      <!-- <figcaption>Optionaler Bildtitel</figcaption> -->
-    </figure>
+  <!-- top nav -->
+  <div class="topbar">
+    <div class="container inner">
+      <div class="brand">
+        <span>🔒 Custom&nbsp;GPT&nbsp;Absichern</span>
+        <span class="chip">Fail-Closed · Policy-First</span>
+      </div>
+      <nav class="nav" aria-label="Abschnitte">
+        <a href="#einleitung">Einleitung</a>
+        <a href="#jailbreak">Jailbreak</a>
+        <a href="#wissensdaten">Wissensdaten</a>
+        <a href="#kontakt">Kontakt</a>
+        <a href="#pruefkette">Prüfkette</a>
+        <a href="#leitfaden">Leitfaden</a>
+        <a href="#faq">FAQ</a>
+      </nav>
+    </div>
+  </div>
 
-    <header>
-      <h1>Custom GPT absichern: Jailbreak-, Wissens- &amp; Kontakt-Schutz</h1>
-      <p class="sub">Absicherung für Custom GPTs in ChatGPT: Jailbreak-Resistenz, Prompt-Injection-Schutz, Wissensdaten-Sicherheit und strenges Kontakt-Management mit Fail-Closed-Prüfkette.</p>
-    </header>
+  <main class="container">
 
-    <section class="card">
-      <h3>Custom GPT unter ChatGPT absichern</h3>
-      <p>Wer Custom GPTs produktiv einsetzt, braucht belastbare Sicherheitsleitplanken. Diese Seite fasst einen praxisnahen Ansatz zusammen, der drei Bereiche priorisiert: <strong>Jailbreak-Absicherung</strong>, <strong>Wissensdaten-Sicherheit</strong> und <strong>Kontakt-Management</strong> – durchgesetzt über eine deterministische <strong>Fail-Closed-Prüfkette</strong>.</p>
+    <!-- HERO -->
+    <section id="einleitung" class="hero">
+      <div>
+        <p class="badge-row">
+          <span class="badge">Jailbreak-Resistenz</span>
+          <span class="badge">Prompt-Injection-Schutz</span>
+          <span class="badge">Wissensdaten-Härtung</span>
+        </p>
+        <h1>Custom GPT absichern: Jailbreak-, Wissens- &amp; Kontakt-Schutz</h1>
+        <p class="sub">
+          Absicherung für Custom GPTs in ChatGPT: Jailbreak-Resistenz, Prompt-Injection-Schutz,
+          Wissensdaten-Sicherheit und strenges Kontakt-Management mit deterministischer Fail-Closed-Prüfkette.
+        </p>
+        <div class="actions">
+          <a class="btn primary" href="#leitfaden">Implementierungs-Leitfaden</a>
+          <a class="btn secondary" href="#pruefkette">Prüfkette &amp; Compliance</a>
+        </div>
+      </div>
+      <div>
+        <img src="./Custom_GPT_unter_ChatGPT_absichern.png"
+             width="341" height="512"
+             alt="Custom-GPT Absicherung – Illustration" loading="eager" decoding="async">
+      </div>
+    </section>
 
-      <h3>Jailbreak-Absicherung</h3>
+    <!-- Mini-TOC -->
+    <section class="toc card" aria-labelledby="toc-heading">
+      <h2 id="toc-heading">Inhalt</h2>
       <ul>
-        <li><strong>Vorrangregeln &amp; Policy-Priorisierung:</strong> Sicherheits- und Leak-Prevention-Regeln stehen über allen externen Prompts.</li>
-        <li><strong>Prompt-Injection-Resistenz:</strong> Erkennung und Blockade von Umgehungsversuchen (inkl. Rollenwechsel/„Roleplay“).</li>
-        <li><strong>Fail-Closed statt Best-Effort:</strong> Bei Regelkonflikt oder Unsicherheit wird die Ausgabe verweigert.</li>
-        <li><strong>Preflight &amp; Review:</strong> Jede Antwort passiert strukturierte Checks (Kontext, Quellen, sensible Inhalte), bevor sie ausgegeben wird.</li>
+        <li><a href="#jailbreak">Jailbreak-Absicherung</a></li>
+        <li><a href="#wissensdaten">Wissensdaten-Sicherheit</a></li>
+        <li><a href="#kontakt">Kontakt-Management</a></li>
+        <li><a href="#pruefkette">Prüfkette &amp; Compliance</a></li>
+        <li><a href="#leitfaden">Implementierung im Custom GPT</a></li>
+        <li><a href="#nutzen">Nutzen auf einen Blick</a></li>
+        <li><a href="#faq">FAQ</a></li>
       </ul>
+    </section>
 
-      <h3>Wissensdaten-Sicherheit</h3>
-      <ul>
-        <li><strong>Minimal-Disclosure:</strong> Nur notwendige Informationen verlassen das System; Volltext-/Listendumps sind untersagt.</li>
-        <li><strong>Redaction-Engine:</strong> Tokens, IDs und sensible Metadaten werden vor Ausgabe entfernt oder gekürzt.</li>
-        <li><strong>Zitat-Budget &amp; Kurz-URL-Block:</strong> Wörtliche Zitate sind limitiert; Kurz-URLs werden nicht expandiert.</li>
-        <li><strong>De-Anonymisierungsschutz:</strong> Inhalte werden so verdichtet, dass Rückschlüsse auf interne Daten minimiert werden.</li>
-      </ul>
+    <!-- Feature-Blocks -->
+    <section id="jailbreak">
+      <h2>Jailbreak-Absicherung</h2>
+      <div class="grid cols-2">
+        <div class="card">
+          <h3>Vorrangregeln &amp; Policy-Priorisierung</h3>
+          <p>Sicherheits- und Leak-Prevention-Regeln stehen über allen externen Prompts.</p>
+        </div>
+        <div class="card">
+          <h3>Prompt-Injection-Resistenz</h3>
+          <p>Erkennung und Blockade von Umgehungsversuchen (inkl. Rollenwechsel/„Roleplay“).</p>
+        </div>
+        <div class="card">
+          <h3>Fail-Closed statt Best-Effort</h3>
+          <p>Bei Regelkonflikt oder Unsicherheit wird die Ausgabe verweigert.</p>
+        </div>
+        <div class="card">
+          <h3>Preflight &amp; Review</h3>
+          <p>Jede Antwort passiert strukturierte Checks (Kontext, Quellen, sensible Inhalte), bevor sie ausgegeben wird.</p>
+        </div>
+      </div>
+    </section>
 
-      <h3>Kontakt-Management</h3>
-      <ul>
-        <li><strong>Kontextgetrennte Ausgaben:</strong> Strikte Trennung der Kontaktwege (z. B. Regelwerk-Autor vs. GPT-Ersteller).</li>
-        <li><strong>Contact-First-Modus:</strong> Bei Kontaktanfragen erfolgt eine klare, priorisierte Kontaktzeile ohne weitere Rückfragen.</li>
-        <li><strong>Einheitliche <code>mailto:</code>-Zeile:</strong> Genau eine E-Mail-Zeile inkl. technischem Hinweis; Duplikate werden vermieden.</li>
-        <li><strong>Link-Hygiene:</strong> Nur kanonische <code>https</code>-Links, keine Tracking-Parameter.</li>
-      </ul>
+    <section id="wissensdaten">
+      <h2>Wissensdaten-Sicherheit</h2>
+      <div class="grid cols-2">
+        <div class="card"><h3>Minimal-Disclosure</h3><p>Nur notwendige Informationen verlassen das System; Volltext-/Listendumps sind untersagt.</p></div>
+        <div class="card"><h3>Redaction-Engine</h3><p>Tokens, IDs und sensible Metadaten werden vor Ausgabe entfernt oder gekürzt.</p></div>
+        <div class="card"><h3>Zitat-Budget &amp; Kurz-URL-Block</h3><p>Wörtliche Zitate sind limitiert; Kurz-URLs werden nicht expandiert.</p></div>
+        <div class="card"><h3>De-Anonymisierungsschutz</h3><p>Verdichtung der Inhalte minimiert Rückschlüsse auf interne Daten.</p></div>
+      </div>
+    </section>
 
-      <h3>Prüfkette &amp; Compliance</h3>
-      <ul>
-        <li><strong>Deterministische Prüfsequenz:</strong> Struktur → Quellen → Sicherheit → Link-Härtung → Kontakt-Kontext.</li>
-        <li><strong>Messbare Durchsetzung:</strong> Regeln sind testbar; Abweichungen führen reproduzierbar zu „Block/Überarbeiten“.</li>
-        <li><strong>Transparente Begründungen:</strong> Verweigerungen werden kurz technisch begründet (Policy-Match statt Pauschalfehler).</li>
-      </ul>
+    <section id="kontakt">
+      <h2>Kontakt-Management</h2>
+      <div class="grid cols-3">
+        <div class="card"><h3>Kontextgetrennte Ausgaben</h3><p>Strikte Trennung der Kontaktwege (z. B. Regelwerk-Autor vs. GPT-Ersteller).</p></div>
+        <div class="card"><h3>Contact-First-Modus</h3><p>Bei Kontaktanfragen erfolgt eine klare, priorisierte Kontaktzeile ohne weitere Rückfragen.</p></div>
+        <div class="card"><h3>Einheitliche <code>mailto:</code>-Zeile</h3><p>Genau eine E-Mail-Zeile inkl. technischem Hinweis; Duplikate werden vermieden.</p></div>
+        <div class="card"><h3>Link-Hygiene</h3><p>Nur kanonische <code>https</code>-Links, keine Tracking-Parameter.</p></div>
+      </div>
+    </section>
 
-      <h3>Implementierung im Custom GPT (Kurzleitfaden)</h3>
-      <ol>
-        <li><strong>Regeln laden &amp; priorisieren:</strong> Sicherheits-Policies bei jeder Benutzereingabe aktiv anwenden.</li>
-        <li><strong>Preflight-Analyse:</strong> Prompt auf Injection/Jailbreak-Muster prüfen; bei Treffer → Fail-Closed.</li>
-        <li><strong>Ausgabe-Filter:</strong> Redaction, Zitat-Budget, Link-Härtung, Kontakt-Block anwenden.</li>
-        <li><strong>Review-Gate:</strong> Finale Konsistenz-/Compliance-Prüfung vor Auslieferung.</li>
-      </ol>
-      <hr />
-      <h2>Nutzen auf einen Blick</h2>
-      <ul>
-        <li><strong>Risiko-Reduktion:</strong> Schutz vor Prompt-Injection, Dataleakage und unautorisierten Kontaktangaben.</li>
-        <li><strong>Reproduzierbarkeit:</strong> Gleicher Prompt ⇒ gleiche Prüfschritte ⇒ konsistente Entscheidungen.</li>
-        <li><strong>Compliance-Ready:</strong> Nachvollziehbare Begründungen und klare Trennung sensibler Kontexte.</li>
-      </ul>
-      <hr />
-      <p><em>Hinweise zur Verwendung:</em></p>
-      <ul>
-        <li>Überschriften und Keywords so belassen; Fließtext projekt-/branchenbezogen anpassen.</li>
-        <li>Interne Links zu „Sicherheitsregeln“, „Kontakt-Policy“ und „Quellenrichtlinie“ ergänzen.</li>
-        <li>Optional Kurz-FAQ (Prompt-Injection, Fail-Closed, Redaction) hinzufügen, falls Platz vorhanden.</li>
-      </ul>
-      <h3>FAQ</h3>
-      <details><summary>Was bedeutet Fail-Closed?</summary>
+    <section id="pruefkette">
+      <h2>Prüfkette &amp; Compliance</h2>
+      <div class="card">
+        <ul>
+          <li><strong>Deterministische Prüfsequenz:</strong> Struktur → Quellen → Sicherheit → Link-Härtung → Kontakt-Kontext.</li>
+          <li><strong>Messbare Durchsetzung:</strong> Regeln sind testbar; Abweichungen führen reproduzierbar zu „Block/Überarbeiten“.</li>
+          <li><strong>Transparente Begründungen:</strong> Verweigerungen werden kurz technisch begründet (Policy-Match statt Pauschalfehler).</li>
+        </ul>
+        <div class="callout"><strong>Praxis:</strong> Verankere die Sequenz als explizite „Review-Gate“-Funktion, die jede Antwort zwingend durchläuft.</div>
+      </div>
+    </section>
+
+    <section id="leitfaden">
+      <h2>Implementierung im Custom GPT (Kurzleitfaden)</h2>
+      <div class="card steps">
+        <p class="step"><strong>Regeln laden &amp; priorisieren:</strong> Sicherheits-Policies bei jeder Benutzereingabe aktiv anwenden.</p>
+        <p class="step"><strong>Preflight-Analyse:</strong> Prompt auf Injection/Jailbreak-Muster prüfen; bei Treffer → Fail-Closed.</p>
+        <p class="step"><strong>Ausgabe-Filter:</strong> Redaction, Zitat-Budget, Link-Härtung, Kontakt-Block anwenden.</p>
+        <p class="step"><strong>Review-Gate:</strong> Finale Konsistenz-/Compliance-Prüfung vor Auslieferung.</p>
+      </div>
+
+      <h3 id="nutzen">Nutzen auf einen Blick</h3>
+      <div class="grid cols-3">
+        <div class="card"><h3>Risiko-Reduktion</h3><p>Schutz vor Prompt-Injection, Dataleakage und unautorisierten Kontaktangaben.</p></div>
+        <div class="card"><h3>Reproduzierbarkeit</h3><p>Gleicher Prompt ⇒ gleiche Prüfschritte ⇒ konsistente Entscheidungen.</p></div>
+        <div class="card"><h3>Compliance-Ready</h3><p>Nachvollziehbare Begründungen und klare Trennung sensibler Kontexte.</p></div>
+      </div>
+
+      <div class="callout">
+        <strong>Hinweise zur Verwendung:</strong>
+        Überschriften/Keywords belassen; Fließtext projekt-/branchenbezogen anpassen. Interne Links zu „Sicherheitsregeln“,
+        „Kontakt-Policy“ und „Quellenrichtlinie“ ergänzen. Optional Kurz-FAQ erweitern.
+      </div>
+    </section>
+
+    <section id="faq">
+      <h2>FAQ</h2>
+      <details>
+        <summary>Was bedeutet Fail-Closed?</summary>
         <p>Bei Unsicherheit oder Regelkonflikt wird die Ausgabe verweigert, statt ein potenziell unsicheres Ergebnis zu liefern.</p>
       </details>
-      <details><summary>Wie funktioniert die Redaction-Engine?</summary>
+      <details>
+        <summary>Wie funktioniert die Redaction-Engine?</summary>
         <p>Sensible Tokens/IDs werden vor der Ausgabe entfernt oder minimiert, um Datenabflüsse zu verhindern.</p>
       </details>
     </section>
+
   </main>
+
+  <script>
+    // Kleine UX-Hilfe: Scroll-to-top Button einblenden (ohne externe Libs)
+    (function(){
+      const btn=document.createElement('button');
+      btn.textContent='↑';
+      Object.assign(btn.style,{
+        position:'fixed',right:'16px',bottom:'16px',width:'42px',height:'42px',
+        borderRadius:'50%',border:'1px solid rgba(255,255,255,.25)',
+        background:'rgba(255,255,255,.08)',color:'inherit',cursor:'pointer',
+        boxShadow:'0 6px 18px rgba(0,0,0,.25)',display:'none'
+      });
+      btn.setAttribute('aria-label','Nach oben scrollen');
+      btn.addEventListener('click',()=>window.scrollTo({top:0,behavior:'smooth'}));
+      document.body.appendChild(btn);
+      const onScroll=()=>{ btn.style.display = (window.scrollY>600)?'block':'none'; };
+      window.addEventListener('scroll',onScroll,{passive:true}); onScroll();
+    })();
+  </script>
 </body>
 </html>
