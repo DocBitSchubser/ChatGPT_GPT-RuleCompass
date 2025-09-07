@@ -33,7 +33,6 @@
 | [GPT-Rules.md](./GPT-Rules.md)                                 | Vollständiges Regelwerk (Rewrite v2.0.0)      |
 | [GPT-Rules-Zusammenfassung.md](./GPT-Rules-Zusammenfassung.md) | Komprimierte Übersicht der Regeln             |
 | [GPT-Main.md](./GPT-Main.md)                                   | Beispiel für GPT‑Definition (Ziele/Verhalten) |
-| [Custom GPT unter ChatGPT absichern.md](https://github.com/DocBitSchubser/ChatGPT_GPT-RuleCompass/blob/main/Custom_GPT_unter_ChatGPT_absichern.md) | Entwurf für einen Blogtext |
 | [LICENSE](./LICENSE)                                           | Lizenzhinweise (CC BY 4.0)                    |
 | [Copyright.md](./Copyright.md)                                 | Urheberrechtsangaben                          |
 | [Changelog.md](./Changelog.md)                                 | Versionshistorie und Änderungen               |
