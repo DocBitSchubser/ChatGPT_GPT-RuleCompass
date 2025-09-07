@@ -29,6 +29,10 @@ locale: de_DE
     }
 
     html,body{height:100%}
+    html { font-size: 20px; }          /* oder 100% */
+    @media (max-width: 680px) {
+      html { font-size: 15px; }        /* leichte Verdichtung auf kleineren Screens */
+    }    
     body{
       margin:0;
       font-family: system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,Arial,"Apple Color Emoji","Segoe UI Emoji";
@@ -38,6 +42,7 @@ locale: de_DE
       line-height:1.6;
       -webkit-font-smoothing:antialiased;
       text-rendering:optimizeLegibility;
+      font-size: 1rem;
     }
     a{color:var(--accent);text-decoration:none}
     a:hover{text-decoration:underline}
