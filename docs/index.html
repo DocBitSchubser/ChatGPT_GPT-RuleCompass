@@ -17,12 +17,12 @@ locale: de_DE
     :root{
       --bg-top: #f4eada;  /* heller Start */
       --bg-bot: #e0c392;  /* wärmerer, etwas dunklerer Fuß */
-      --fg:#efe7da;       /* warmes Beige für Text */
-      --muted:#bfb4a6;    /* entsättigtes Beige */
-      --accent:#d26a4b;   /* Terracotta (Rotbraun) */
-      --accent-2:#e7c89a; /* Sand/Beige-Highlight */
-      --panel:rgba(255,255,255,.03);
-      --panel-b:rgba(255,255,255,.08);
+      --fg: #201b16;          /* dunkler Fließtext */
+      --muted: #5a5146;       /* dezenter Text */
+      --accent: #d26a4b;
+      --accent-2: #a85b41;
+      --panel: rgba(0,0,0,.04);
+      --panel-b: rgba(0,0,0,.12);
       --maxw:1100px;
       --r:22px;
       --shadow:0 10px 30px rgba(0,0,0,.35);
@@ -37,8 +37,8 @@ locale: de_DE
       margin:0;
       font-family: system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,Arial,"Apple Color Emoji","Segoe UI Emoji";
       color:var(--fg);
-      background:
-        linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bot) 100%); /* gleichmäßiger Verlauf */
+      background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bot) 100%);
+      color: var(--fg);
       line-height:1.6;
       -webkit-font-smoothing:antialiased;
       text-rendering:optimizeLegibility;
@@ -46,7 +46,7 @@ locale: de_DE
     }
     a{color:var(--accent);text-decoration:none}
     a:hover{text-decoration:underline}
-    img{max-width:100%;height:auto;border-radius:12px;box-shadow:var(--shadow);margin-bottom: --r}
+    img{max-width:100%;height:auto;border-radius:12px;box-shadow:var(--shadow);margin-bottom:22px}
     .container{max-width:var(--maxw);margin:0 auto;padding:2rem 1.25rem}
     .visually-hidden{position:absolute!important;height:1px;width:1px;overflow:hidden;clip:rect(1px,1px,1px,1px);white-space:nowrap}
 
@@ -54,59 +54,63 @@ locale: de_DE
     .topbar{
       position:fixed; inset:0 0 auto 0; z-index:1000;
       backdrop-filter:saturate(140%) blur(8px);
-      background:linear-gradient(to bottom, rgba(32,27,22,.92), rgba(32,27,22,.75));
-      border-bottom:1px solid rgba(255,255,255,.09);
+      background: linear-gradient(to bottom, rgba(255,255,255,.85), rgba(255,255,255,.75));
+      border-bottom: 1px solid rgba(0,0,0,.08);
     }
     .topbar .inner{max-width:var(--maxw);margin:0 auto;padding:.6rem 1.25rem;display:flex;align-items:center;gap:.75rem;justify-content:space-between;flex-wrap:wrap}
     .brand{display:flex;align-items:center;gap:.6rem;font-weight:750;letter-spacing:.2px}
     .chip{display:inline-flex;align-items:center;gap:.4rem;border:1px solid var(--panel-b);padding:.2rem .55rem;border-radius:999px;color:var(--muted);font-size:.85rem;background:var(--panel)}
     .nav{display:flex;gap:.6rem;flex-wrap:wrap}
-    .nav a{display:inline-block;padding:.45rem .7rem;border-radius:10px;border:1px solid var(--panel-b);background:var(--panel);color:var(--fg)}
-    .nav a:hover{background:rgba(255,255,255,.06)}
+    .nav a {
+      color: var(--fg);
+      background: var(--panel);
+      border: 1px solid var(--panel-b);
+    }
+    a { color: var(--accent); }
 
     /* TOC */
     .toc{border:1px dashed rgba(255,255,255,.18);border-radius:12px;padding:.9rem;background:rgba(255,255,255,.025);color:var(--muted)}
     .toc a{color:inherit}
     .toc ul{margin:.2rem 0 0 .9rem}
 
-/* Codeblöcke: eingerückt, Rahmen, heller Hintergrund, automatischer Zeilenumbruch */
-.toc pre {
-  /* 20px Einrückung links/rechts */
-  margin: 0 20px 1rem 20px;
-
-  /* Hintergrund & Rahmen – abgestimmt auf dein Braun/Terracotta-Design */
-  background: var(--code-bg, rgba(255,255,255,.06));          /* heller als --panel */
-  border: 1px solid var(--panel-b, rgba(255,255,255,.12));
-  border-left: 3px solid var(--accent, #d26a4b);              /* dezentes Akzentband */
-
-  /* Layout & Typografie */
-  padding: 0.85rem 1rem;
-  border-radius: 12px;
-  color: var(--fg, #efe7da);
-  line-height: 1.5;
-
-  /* Umbruch (kein horizontaler Scroll) */
-  white-space: pre-wrap;       /* respektiert \n, bricht lange Zeilen */
-  overflow-wrap: anywhere;     /* bricht lange Tokens */
-  word-break: break-word;      /* Fallback für ältere Browser */
-  overflow-x: hidden;          /* verhindert horizontales Scrollen */
-}
-
-.toc pre > code {
-  /* vom <pre> erben, damit der Umbruch greift */
-  white-space: inherit;
-  display: block;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
-  font-size: .95rem;
-}
-
-/* Optional: Inline-Code an den Look anpassen */
-.toc :not(pre) > code {
-  background: var(--panel, rgba(255,255,255,.04));
-  border: 1px solid var(--panel-b, rgba(255,255,255,.12));
-  padding: .1rem .35rem;
-  border-radius: 6px;
-}
+    /* Codeblöcke: eingerückt, Rahmen, heller Hintergrund, automatischer Zeilenumbruch */
+    .toc pre {
+      /* 20px Einrückung links/rechts */
+      margin: 0 20px 1rem 20px;
+    
+      /* Hintergrund & Rahmen – abgestimmt auf dein Braun/Terracotta-Design */
+      background: var(--code-bg, rgba(255,255,255,.06));          /* heller als --panel */
+      border: 1px solid var(--panel-b, rgba(255,255,255,.12));
+      border-left: 3px solid var(--accent, #d26a4b);              /* dezentes Akzentband */
+    
+      /* Layout & Typografie */
+      padding: 0.85rem 1rem;
+      border-radius: 12px;
+      color: var(--fg, #efe7da);
+      line-height: 1.5;
+    
+      /* Umbruch (kein horizontaler Scroll) */
+      white-space: pre-wrap;       /* respektiert \n, bricht lange Zeilen */
+      overflow-wrap: anywhere;     /* bricht lange Tokens */
+      word-break: break-word;      /* Fallback für ältere Browser */
+      overflow-x: hidden;          /* verhindert horizontales Scrollen */
+    }
+    
+    .toc pre > code {
+      /* vom <pre> erben, damit der Umbruch greift */
+      white-space: inherit;
+      display: block;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+      font-size: .95rem;
+    }
+    
+    /* Optional: Inline-Code an den Look anpassen */
+    .toc :not(pre) > code {
+      background: var(--panel, rgba(255,255,255,.04));
+      border: 1px solid var(--panel-b, rgba(255,255,255,.12));
+      padding: .1rem .35rem;
+      border-radius: 6px;
+    }
     
     /* ===== Hero / Inhalt ===== */
     main{ /* Abstand wird per JS dynamisch ergänzt (s.u.) */ }
@@ -119,7 +123,11 @@ locale: de_DE
       padding:.7rem 1rem;border-radius:12px;font-weight:650;
       border:1px solid var(--panel-b);background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.02));color:var(--fg)
     }
-    .btn.primary{background:linear-gradient(180deg, rgba(210,106,75,.28), rgba(210,106,75,.16));border-color:rgba(210,106,75,.5)}
+    .btn.primary {
+      background: linear-gradient(180deg, rgba(210,106,75,.18), rgba(210,106,75,.12));
+      border-color: rgba(210,106,75,.35);
+      color: var(--fg);
+    }
     .badge-row{display:flex;gap:.5rem;flex-wrap:wrap;margin:.75rem 0}
     .badge{background:var(--panel);border:1px solid var(--panel-b);border-radius:999px;padding:.35rem .7rem;font-size:.85rem;color:var(--muted)}
 
