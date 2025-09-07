@@ -7,7 +7,7 @@ locale: de_DE
 
 # Wichtig: Projektseite → url + baseurl setzen
 url: "https://docbitschubser.github.io"
-baseurl: "./ChatGPT_GPT-RuleCompass"
+baseurl: "/ChatGPT_GPT-RuleCompass"
 
 plugins:
   - jekyll-seo-tag
