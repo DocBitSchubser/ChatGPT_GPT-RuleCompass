@@ -59,6 +59,11 @@ locale: de_DE
     .nav a{display:inline-block;padding:.45rem .7rem;border-radius:10px;border:1px solid var(--panel-b);background:var(--panel);color:var(--fg)}
     .nav a:hover{background:rgba(255,255,255,.06)}
 
+    /* TOC */
+    .toc{border:1px dashed rgba(255,255,255,.18);border-radius:12px;padding:.9rem;background:rgba(255,255,255,.025);color:var(--muted)}
+    .toc a{color:inherit}
+    .toc ul{margin:.2rem 0 0 .9rem}
+    
     /* ===== Hero / Inhalt ===== */
     main{ /* Abstand wird per JS dynamisch ergänzt (s.u.) */ }
     .hero{display:grid;grid-template-columns:1.1fr .9fr;gap:2rem;align-items:center;margin-top:1.2rem}
@@ -91,7 +96,7 @@ locale: de_DE
     h2{font-size:1.45rem;margin:.7rem 0 .6rem}
     h3{font-size:1.15rem;margin:1.15rem 0 .35rem}
     ul{padding-left:1.1rem;margin:.4rem 0}
-    li + li{margin-top:.3rem}
+    li + li{margin-top:.3rem; margin-left: .75rem}
 
     .steps{counter-reset:step}
     .step{counter-increment:step;position:relative;padding-left:2.4rem}
