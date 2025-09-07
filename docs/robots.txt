@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://docbitschubser.github.io/ChatGPT_GPT-RuleCompass/sitemap.xml
+Sitemap: {{ site.url }}{{ site.baseurl }}/sitemap.xml
