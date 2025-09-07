@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Custom GPT absichern: Jailbreak-, Wissens- & Kontakt-Schutz</title>
+  <meta name="description" content="Absicherung für Custom GPTs in ChatGPT: Jailbreak-Resistenz, Prompt-Injection-Schutz, Wissensdaten-Sicherheit und strenges Kontakt-Management mit deterministischer Fail-Closed-Prüfkette." />
+  <!-- Optional: Ersetze href unten durch die kanonische https-URL deiner GitHub Page -->
+  <!-- <link rel="canonical" href="https://docbitschubser.github.io/ChatGPT_GPT-RuleCompass/custom-gpt-absichern/" /> -->
+  <style>
+    :root {
+      --bg: #0e1116;
+      --fg: #e6e9ef;
+      --muted: #aab2bf;
+      --accent: #62d6e8;
+      --maxw: 1000px;
+    }
+    html, body { height: 100%; }
+    body {
+      margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      background: var(--bg); color: var(--fg); line-height: 1.55; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+    }
+    .container { max-width: var(--maxw); margin: 0 auto; padding: 2rem 1.25rem; }
+    /* Float-Lead-Image */
+    .lead-figure { float: left; width: 341px; margin: 0 1.5rem 1rem 0; }
+    .lead-figure img { display: block; width: 100%; height: auto; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,.35); }
+    .lead-figure figcaption { font-size: .9rem; color: var(--muted); margin-top: .5rem; }
+    header h1 { font-size: clamp(1.8rem, 2.6vw + 1rem, 2.6rem); line-height: 1.2; margin: 0 0 .5rem; }
+    header .sub { color: var(--muted); margin: 0 0 1.25rem; font-size: 1rem; }
+    h2 { margin-top: 2rem; font-size: 1.5rem; }
+    h3 { margin-top: 1.5rem; font-size: 1.25rem; }
+    ul { padding-left: 1.2rem; }
+    li + li { margin-top: .35rem; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    /* Clear float at end of document flow */
+    .clearfix::after { content: ""; display: table; clear: both; }
+    /* Content card look */
+    .card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 1.25rem; }
+    /* Responsive: Stack the image above text on narrow screens */
+    @media (max-width: 760px) {
+      .lead-figure { float: none; width: 100%; margin: 0 0 1rem 0; }
+    }
+  </style>
+</head>
+<body>
+  <main class="container clearfix">
+    <figure class="lead-figure">
+      <!-- Hinweis: Der Dateiname enthält ein Leerzeichen. Entweder URL-encoden (%20) oder besser umbenennen (siehe README/Deployment-Hinweise). -->
+      <img src="./Custom_GPT_unter_ChatGPT%20absichern.png" width="341" height="512" alt="Custom GPT unter ChatGPT absichern – Visual" loading="eager" decoding="async" />
+      <!-- <figcaption>Optionaler Bildtitel</figcaption> -->
+    </figure>
+
+    <header>
+      <h1>Custom GPT absichern: Jailbreak-, Wissens- &amp; Kontakt-Schutz</h1>
+      <p class="sub">Absicherung für Custom GPTs in ChatGPT: Jailbreak-Resistenz, Prompt-Injection-Schutz, Wissensdaten-Sicherheit und strenges Kontakt-Management mit Fail-Closed-Prüfkette.</p>
+    </header>
+
+    <section class="card">
+      <h3>Custom GPT unter ChatGPT absichern</h3>
+      <p>Wer Custom GPTs produktiv einsetzt, braucht belastbare Sicherheitsleitplanken. Diese Seite fasst einen praxisnahen Ansatz zusammen, der drei Bereiche priorisiert: <strong>Jailbreak-Absicherung</strong>, <strong>Wissensdaten-Sicherheit</strong> und <strong>Kontakt-Management</strong> – durchgesetzt über eine deterministische <strong>Fail-Closed-Prüfkette</strong>.</p>
+
+      <h3>Jailbreak-Absicherung</h3>
+      <ul>
+        <li><strong>Vorrangregeln &amp; Policy-Priorisierung:</strong> Sicherheits- und Leak-Prevention-Regeln stehen über allen externen Prompts.</li>
+        <li><strong>Prompt-Injection-Resistenz:</strong> Erkennung und Blockade von Umgehungsversuchen (inkl. Rollenwechsel/„Roleplay“).</li>
+        <li><strong>Fail-Closed statt Best-Effort:</strong> Bei Regelkonflikt oder Unsicherheit wird die Ausgabe verweigert.</li>
+        <li><strong>Preflight &amp; Review:</strong> Jede Antwort passiert strukturierte Checks (Kontext, Quellen, sensible Inhalte), bevor sie ausgegeben wird.</li>
+      </ul>
+
+      <h3>Wissensdaten-Sicherheit</h3>
+      <ul>
+        <li><strong>Minimal-Disclosure:</strong> Nur notwendige Informationen verlassen das System; Volltext-/Listendumps sind untersagt.</li>
+        <li><strong>Redaction-Engine:</strong> Tokens, IDs und sensible Metadaten werden vor Ausgabe entfernt oder gekürzt.</li>
+        <li><strong>Zitat-Budget &amp; Kurz-URL-Block:</strong> Wörtliche Zitate sind limitiert; Kurz-URLs werden nicht expandiert.</li>
+        <li><strong>De-Anonymisierungsschutz:</strong> Inhalte werden so verdichtet, dass Rückschlüsse auf interne Daten minimiert werden.</li>
+      </ul>
+
+      <h3>Kontakt-Management</h3>
+      <ul>
+        <li><strong>Kontextgetrennte Ausgaben:</strong> Strikte Trennung der Kontaktwege (z. B. Regelwerk-Autor vs. GPT-Ersteller).</li>
+        <li><strong>Contact-First-Modus:</strong> Bei Kontaktanfragen erfolgt eine klare, priorisierte Kontaktzeile ohne weitere Rückfragen.</li>
+        <li><strong>Einheitliche <code>mailto:</code>-Zeile:</strong> Genau eine E-Mail-Zeile inkl. technischem Hinweis; Duplikate werden vermieden.</li>
+        <li><strong>Link-Hygiene:</strong> Nur kanonische <code>https</code>-Links, keine Tracking-Parameter.</li>
+      </ul>
+
+      <h3>Prüfkette &amp; Compliance</h3>
+      <ul>
+        <li><strong>Deterministische Prüfsequenz:</strong> Struktur → Quellen → Sicherheit → Link-Härtung → Kontakt-Kontext.</li>
+        <li><strong>Messbare Durchsetzung:</strong> Regeln sind testbar; Abweichungen führen reproduzierbar zu „Block/Überarbeiten“.</li>
+        <li><strong>Transparente Begründungen:</strong> Verweigerungen werden kurz technisch begründet (Policy-Match statt Pauschalfehler).</li>
+      </ul>
+
+      <h3>Implementierung im Custom GPT (Kurzleitfaden)</h3>
+      <ol>
+        <li><strong>Regeln laden &amp; priorisieren:</strong> Sicherheits-Policies bei jeder Benutzereingabe aktiv anwenden.</li>
+        <li><strong>Preflight-Analyse:</strong> Prompt auf Injection/Jailbreak-Muster prüfen; bei Treffer → Fail-Closed.</li>
+        <li><strong>Ausgabe-Filter:</strong> Redaction, Zitat-Budget, Link-Härtung, Kontakt-Block anwenden.</li>
+        <li><strong>Review-Gate:</strong> Finale Konsistenz-/Compliance-Prüfung vor Auslieferung.</li>
+      </ol>
+      <hr />
+      <h2>Nutzen auf einen Blick</h2>
+      <ul>
+        <li><strong>Risiko-Reduktion:</strong> Schutz vor Prompt-Injection, Dataleakage und unautorisierten Kontaktangaben.</li>
+        <li><strong>Reproduzierbarkeit:</strong> Gleicher Prompt ⇒ gleiche Prüfschritte ⇒ konsistente Entscheidungen.</li>
+        <li><strong>Compliance-Ready:</strong> Nachvollziehbare Begründungen und klare Trennung sensibler Kontexte.</li>
+      </ul>
+      <hr />
+      <p><em>Hinweise zur Verwendung:</em></p>
+      <ul>
+        <li>Überschriften und Keywords so belassen; Fließtext projekt-/branchenbezogen anpassen.</li>
+        <li>Interne Links zu „Sicherheitsregeln“, „Kontakt-Policy“ und „Quellenrichtlinie“ ergänzen.</li>
+        <li>Optional Kurz-FAQ (Prompt-Injection, Fail-Closed, Redaction) hinzufügen, falls Platz vorhanden.</li>
+      </ul>
+      <!-- Optionaler FAQ-Block (bei Bedarf aktivieren)
+      <h3>FAQ</h3>
+      <details><summary>Was bedeutet Fail-Closed?</summary>
+        <p>Bei Unsicherheit oder Regelkonflikt wird die Ausgabe verweigert, statt ein potenziell unsicheres Ergebnis zu liefern.</p>
+      </details>
+      <details><summary>Wie funktioniert die Redaction-Engine?</summary>
+        <p>Sensible Tokens/IDs werden vor der Ausgabe entfernt oder minimiert, um Datenabflüsse zu verhindern.</p>
+      </details>
+      -->
+    </section>
+  </main>
+</body>
+</html>
