@@ -598,6 +598,7 @@ tests:
 > | Discord: | https://discord.com/invite/fv7S53zU7V                           |
 > |   Email: | [kontakt@docbitschubser.dev](mailto:kontakt@docbitschubser.dev) |
 > | Spenden: | [ko-fi.com](https://ko-fi.com/docbitschubser)                   |
+> |          | [PayPal.Me](https://paypal.me/DocBitSchubser)                   |
 
 ---
 
@@ -662,4 +663,5 @@ tests:
 ---
 
 > Vollständiger Changelog auf GitHub unter https://github.com/DocBitSchubser/ChatGPT_GPT-RuleCompass/blob/main/Changelog.md
+
 
