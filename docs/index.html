@@ -122,8 +122,8 @@ locale: de_DE
   content: attr(data-tooltip);
   position:absolute;
   left:50%;
-  bottom: calc(100% + 10px);               /* Abstand zum Chip */
-  transform: translateX(-50%) translateY(-6px);
+  top: calc(100% + 10px);               /* Abstand zum Chip */
+  transform: translateX(-50%) translateY(6px);
   background: var(--tt-bg, rgba(0,0,0,.9));
   color: var(--tt-fg, #fff);
   border: 1px solid var(--tt-b, rgba(255,255,255,.2));
@@ -142,10 +142,10 @@ locale: de_DE
   content: "";
   position:absolute;
   left:50%;
-  bottom: calc(100% + 2px);
-  transform: translateX(-50%) translateY(4px);
+  top: calc(100% + 2px); 
+  transform: translateX(-50%) translateY(6px)
   border: 6px solid transparent;           /* kleiner Pfeil */
-  border-top-color: var(--tt-bg, rgba(0,0,0,.9));
+  border-bottom-color: var(--tt-bg, rgba(0,0,0,.9)); /* Pfeil zeigt nach unten */
   opacity: 0;
   pointer-events: none;
   transition: opacity .12s ease, transform .12s ease;
