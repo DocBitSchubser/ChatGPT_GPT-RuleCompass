@@ -64,6 +64,45 @@ locale: de_DE
     .toc a{color:inherit}
     .toc ul{margin:.2rem 0 0 .9rem}
 
+/* Codeblöcke: eingerückt, Rahmen, heller Hintergrund, automatischer Zeilenumbruch */
+.toc pre {
+  /* 20px Einrückung links/rechts */
+  margin: 0 20px 1rem 20px;
+
+  /* Hintergrund & Rahmen – abgestimmt auf dein Braun/Terracotta-Design */
+  background: var(--code-bg, rgba(255,255,255,.06));          /* heller als --panel */
+  border: 1px solid var(--panel-b, rgba(255,255,255,.12));
+  border-left: 3px solid var(--accent, #d26a4b);              /* dezentes Akzentband */
+
+  /* Layout & Typografie */
+  padding: 0.85rem 1rem;
+  border-radius: 12px;
+  color: var(--fg, #efe7da);
+  line-height: 1.5;
+
+  /* Umbruch (kein horizontaler Scroll) */
+  white-space: pre-wrap;       /* respektiert \n, bricht lange Zeilen */
+  overflow-wrap: anywhere;     /* bricht lange Tokens */
+  word-break: break-word;      /* Fallback für ältere Browser */
+  overflow-x: hidden;          /* verhindert horizontales Scrollen */
+}
+
+.toc pre > code {
+  /* vom <pre> erben, damit der Umbruch greift */
+  white-space: inherit;
+  display: block;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  font-size: .95rem;
+}
+
+/* Optional: Inline-Code an den Look anpassen */
+.toc :not(pre) > code {
+  background: var(--panel, rgba(255,255,255,.04));
+  border: 1px solid var(--panel-b, rgba(255,255,255,.12));
+  padding: .1rem .35rem;
+  border-radius: 6px;
+}
+    
     /* ===== Hero / Inhalt ===== */
     main{ /* Abstand wird per JS dynamisch ergänzt (s.u.) */ }
     .hero{display:grid;grid-template-columns:1.1fr .9fr;gap:2rem;align-items:center;margin-top:1.2rem}
