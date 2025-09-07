@@ -233,9 +233,10 @@ locale: de_DE
           <a href="#wissensdaten">Wissensdaten</a>
           <a href="#kontakt">Kontakt</a>
           <a href="#pruefkette">Prüfkette</a>
+          <a href="#spenden">Spenden</a>
           <a href="#faq">FAQ</a>
         </nav>
-        <button id="theme-toggle" class="theme-toggle" aria-label="Theme wechseln" aria-pressed="false" title="Theme wechseln">🖥️</button>
+        <button id="theme-toggle" class="theme-toggle" aria-label="Theme wechseln" aria-pressed="false" title="Theme wechseln">🖥️ Theme Auto</button>
       </div>
     </div>
   </div>
@@ -376,11 +377,11 @@ locale: de_DE
       if(!$btn) return;
 
       function apply(theme){            // theme: 'light' | 'dark' | 'auto'
-        if(theme === 'light'){ $html.setAttribute('data-theme','light'); $btn.textContent='☀️'; $btn.setAttribute('aria-pressed','true'); }
-        else if(theme === 'dark'){ $html.setAttribute('data-theme','dark'); $btn.textContent='🌙'; $btn.setAttribute('aria-pressed','true'); }
+        if(theme === 'light'){ $html.setAttribute('data-theme','light'); $btn.textContent='☀️ Light'; $btn.setAttribute('aria-pressed','true'); }
+        else if(theme === 'dark'){ $html.setAttribute('data-theme','dark'); $btn.textContent='🌙 Dark'; $btn.setAttribute('aria-pressed','true'); }
         else { // auto
           $html.removeAttribute('data-theme');
-          $btn.textContent='🖥️';
+          $btn.textContent='🖥️ Theme Auto';
           $btn.setAttribute('aria-pressed','false');
         }
       }
