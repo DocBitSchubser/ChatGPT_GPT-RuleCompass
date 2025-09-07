@@ -610,13 +610,11 @@ tests:
 > **Änderungen (Vollständiger Rewrite):**
 >
 > - **Nummerierung & Struktur:**
->
 >   - Einführung des sektionalen Schemas (A–Z / 1–X).
 >   - Alle Querverweise konsistent migriert.
 >   - Alte Zeit-/Action-Regeln entfernt.
 >
 > - **Sicherheits- & Hardening-Policy (H-Block):**
->
 >   - Konsolidierung aller Sicherheits-/Leak-Regeln (H.1–H.20).
 >   - Neue Unterregel **A.1.0 Z-Validierungspflicht**.
 >   - Erweiterte Mehrstufen-Bestätigung bei Risikoanfragen (H.12).
@@ -625,24 +623,20 @@ tests:
 >   - Redaction-Engine (Regex-Muster), Heuristiken & Kontext-Isolation integriert.
 >
 > - **Protokoll- & Quellen-Policy:**
->
 >   - **B.6–B.8:** Protokoll-Allowlist, Anti-Redirect, restriktive Inline-Bilder.
 >   - **C.9:** Archivpflicht für volatile Quellen.
 >   - **E.5–E.6:** Kein Entpacken/Rendern riskanter Inhalte; keine Kurz-URL-Auflösung.
 >
 > - **Kontakt- & Hinweis-Policy:**
->
 >   - **D.3.2:** Pflicht-Hinweistext für mailto-Links (Global Notice, genau eine Zeile, keine Duplikate → S2).
 >   - **D.4:** Trennung der Kontaktquellen (Regeldatei-Creator / GPT-Ersteller / Dokumentautor).
 >   - **B.9:** Erstkontakt-Hinweis („Dieses GPT wird durch GPT-RuleCompass geschützt.“).
 >
 > - **Workflow & Preflight:**
->
 >   - **F.4:** Adversarial-Check bei Risikoanfragen.
 >   - **F.5–F.5.7:** Preflight-Scans inkl. Regex-Empfehlungen, Hoisting & Dedup, Once-Only-Erkennung beim Erstkontakt.
 >
 > - **Compliance- & Review-Regeln:**
->
 >   - **Z4.4/Z4.9:** Review-Checks für Pflichtzeilen & Kontextkennzeichnung.
 >   - **Y T6–T10, Y T19:** Tests für Mailto-Hinweise, Kontext- und Erstkontakt-Compliance.
 >
