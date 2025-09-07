@@ -158,8 +158,14 @@ Lizenz: **Creative Commons Attribution 4.0 International (CC BY 4.0)** – [http
 
 ## FAQ / Troubleshooting (wird noch erweitert)
 
-**Warum akzeptiert ChatGPT manchmal meine System-Prompt-Ergänzungen nicht?**  
-Das Hinweis-Feld eines Custom GPT muss mit der Regelanweisung aus _'Schnellstart für ChatGPT‑GPTs -> 2) System‑Prompt (Hinweis-Feld)'_ beginnen. Jede andere Instruktion davor kann dazu führen, dass die Regeln nicht angewendet werden.
+> **Warum wendet ChatGPT manchmal die hochgeladene Regeldatei nicht zuverlässig an?**<br>
+> Das Hinweis-Feld eines Custom GPT muss mit der Regelanweisung aus _'Schnellstart für ChatGPT‑GPTs -> 2) System‑Prompt (Hinweis-Feld)'_ beginnen. Jede andere Instruktion davor kann dazu führen, dass die Regeln nicht angewendet werden.
+
+> **Was bedeutet Fail-Closed?**<br>
+> Bei Unsicherheit oder Regelkonflikt wird die Ausgabe verweigert, statt ein potenziell unsicheres Ergebnis zu liefern.
+
+> **Wie funktioniert die Redaction-Engine?**<br>
+> Sensible Tokens/IDs werden vor der Ausgabe entfernt oder minimiert, um Datenabflüsse zu verhindern.
 
 ---
 
