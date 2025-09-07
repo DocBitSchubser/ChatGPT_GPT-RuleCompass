@@ -1,0 +1,23 @@
+# _config.yml
+title: "ChatGPT – GPT-RuleCompass"
+tagline: "Custom GPT absichern: Jailbreak-, Wissens- & Kontakt-Schutz"
+description: "Absicherung für Custom GPTs in ChatGPT: Jailbreak-Resistenz, Prompt-Injection-Schutz, Wissensdaten-Sicherheit und strenges Kontakt-Management mit Fail-Closed-Prüfkette."
+lang: de
+locale: de_DE
+
+# Wichtig: Projektseite → url + baseurl setzen
+url: "https://docbitschubser.github.io"
+baseurl: "/ChatGPT_GPT-RuleCompass"
+
+plugins:
+  - jekyll-seo-tag
+  - jekyll-sitemap
+
+logo: "/assets/img/logo.png"     # existierende Datei verwenden
+twitter:
+  username: "DocBitSchubser"
+  card: "summary_large_image"
+social:
+  name: "DocBitSchubser"
+  links:
+    - "https://github.com/DocBitSchubser"
