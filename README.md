@@ -1,6 +1,4 @@
 # ChatGPT_GPT-RuleCompass
-## Saubere Quellen. Klare Entscheidungen.  
-**Regeln für Zitieren, URL‑Policy, PDF‑Handling, Konfliktmatrix und K‑Review in ChatGPT‑GPTs.**
 
 ## Saubere Quellen. Klare Entscheidungen.
 
@@ -15,8 +13,11 @@
 
 ## Kurzfassung
 
-* **Einsatzbereich:** In **ChatGPT‑GPTs (Custom GPTs)** als Systemvorgabe; für Inhalte, Antworten und Dokumente verbindlich.
-* **Kompatibilität:** Getestet mit **ChatGPT 5.0** (Web & Desktop, Stand 2025‑09).
+- **Einsatzbereich:** In **ChatGPT‑GPTs (Custom GPTs)** als Systemvorgabe; für Inhalte, Antworten und Dokumente verbindlich.
+  - **Jailbreak-Absicherung:** Vorrangregeln, Prompt-Injection-Resistenz, Fail-Closed, Roleplay-Schutz, Preflight/Review-Checks. 
+  - **Wissensdaten-Sicherheit:** striktes Exportverbot interner Inhalte, Redaction-Engine, Zitat-Budget, De-Anonymisierungsschutz. 
+  - **Kontakt-Management:** klare Trennung von Kontaktquellen, „Contact-First“-Ausgabe mit Kontextzeilen und mailto:-Pflicht-Hinweis. 
+- **Kompatibilität:** Getestet mit **ChatGPT 5.0** (Web & Desktop, Stand 2025‑09).
 
 ## Aktuelle Version
 
@@ -60,6 +61,22 @@
 >```
 
 ---
+
+## Beschreibung
+
+### Jailbreak-Absicherung
+Das Regelwerk priorisiert Sicherheits- und Leak-Prevention-Regeln gegenüber allen externen Anweisungen und blockiert Umgehungsversuche („Jailbreaks“) deterministisch. Kernmechanismen sind u. a. Prompt-Injection-Resistenz, ein Fail-Closed-Verhalten bei Verstößen, Roleplay-Absicherung gegen Rollen-/Szenario-Tricks sowie obligatorische Preflight- und Review-Checks, die jede Ausgabe vor der Veröffentlichung validieren. Dadurch werden risikobehaftete Antworten entweder minimiert oder vollständig verweigert. 
+
+### Wissensdaten-Sicherheit
+Interne Wissensbestände und Metadaten werden konsequent geschützt: Volltext-/Listen-Dumps sind untersagt, sensible Tokens/IDs werden vor Ausgabe redigiert, Kurz-URL-Expansion ist verboten, und wörtliche Zitate unterliegen einem dynamischen Budget. Ergänzend verhindert ein De-Anonymisierungsschutz Re-Identifikation; bei erhöhtem Risiko wird der Ausgabenumfang strikt begrenzt (Outline/Summary). Ergebnis: nur das notwendige Minimum verlässt das System – nachvollziehbar, belegbar, ohne preisgegebene Interna. 
+
+### Kontakt-Management
+Kontaktangaben werden kontrolliert und kontextgetrennt ausgegeben: getrennte Blöcke für Regelwerk-Ersteller, GPT-Ersteller und Dokumentautoren, jeweils mit verpflichtender Kontextzeile. Bei Kontaktanfragen greift ein „Contact-First“-Modus (ohne Rückfrage), inklusive genau einer mailto:-Pflichtzeile (Workaround-Hinweis) und automatischem Hoisting/Dedupe dieser Zeile. Tracking-Parameter werden entfernt, nur kanonische https-Links sind erlaubt. 
+
+### Durchgängige Qualitätssicherung
+Sämtliche Vorgaben werden über eine fest definierte Prüfsequenz (Struktur, Quellen, Sicherheit, Link-Härtung, Kontakt-Kontext) sowie begleitende Testfälle abgedeckt, wodurch die Einhaltung der Policies reproduzierbar überprüfbar ist. 
+
+GPT-Rules
 
 ## Kernprinzipien (v2.0.0)
 
