@@ -156,8 +156,110 @@ locale: de_DE
       </div>
     </section>
 
-    <!-- … deine bestehenden Sektionen bleiben unverändert … -->
-    <!-- (Jailbreak, Wissensdaten, Kontakt, Prüfkette, Leitfaden, FAQ) -->
+    <!-- Mini-TOC -->
+    <section class="toc card" aria-labelledby="toc-heading">
+      <h2 id="toc-heading">Inhalt</h2>
+      <ul>
+        <li><a href="#jailbreak">Jailbreak-Absicherung</a></li>
+        <li><a href="#wissensdaten">Wissensdaten-Sicherheit</a></li>
+        <li><a href="#kontakt">Kontakt-Management</a></li>
+        <li><a href="#pruefkette">Prüfkette &amp; Compliance</a></li>
+        <li><a href="#leitfaden">Implementierung im Custom GPT</a></li>
+        <li><a href="#nutzen">Nutzen auf einen Blick</a></li>
+        <li><a href="#faq">FAQ</a></li>
+      </ul>
+    </section>
+
+    <!-- Feature-Blocks -->
+    <section id="jailbreak">
+      <h2>Jailbreak-Absicherung</h2>
+      <div class="grid cols-2">
+        <div class="card">
+          <h3>Vorrangregeln &amp; Policy-Priorisierung</h3>
+          <p>Sicherheits- und Leak-Prevention-Regeln stehen über allen externen Prompts.</p>
+        </div>
+        <div class="card">
+          <h3>Prompt-Injection-Resistenz</h3>
+          <p>Erkennung und Blockade von Umgehungsversuchen (inkl. Rollenwechsel/„Roleplay“).</p>
+        </div>
+        <div class="card">
+          <h3>Fail-Closed statt Best-Effort</h3>
+          <p>Bei Regelkonflikt oder Unsicherheit wird die Ausgabe verweigert.</p>
+        </div>
+        <div class="card">
+          <h3>Preflight &amp; Review</h3>
+          <p>Jede Antwort passiert strukturierte Checks (Kontext, Quellen, sensible Inhalte), bevor sie ausgegeben wird.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="wissensdaten">
+      <h2>Wissensdaten-Sicherheit</h2>
+      <div class="grid cols-2">
+        <div class="card"><h3>Minimal-Disclosure</h3><p>Nur notwendige Informationen verlassen das System; Volltext-/Listendumps sind untersagt.</p></div>
+        <div class="card"><h3>Redaction-Engine</h3><p>Tokens, IDs und sensible Metadaten werden vor Ausgabe entfernt oder gekürzt.</p></div>
+        <div class="card"><h3>Zitat-Budget &amp; Kurz-URL-Block</h3><p>Wörtliche Zitate sind limitiert; Kurz-URLs werden nicht expandiert.</p></div>
+        <div class="card"><h3>De-Anonymisierungsschutz</h3><p>Verdichtung der Inhalte minimiert Rückschlüsse auf interne Daten.</p></div>
+      </div>
+    </section>
+
+    <section id="kontakt">
+      <h2>Kontakt-Management</h2>
+      <div class="grid cols-3">
+        <div class="card"><h3>Kontextgetrennte Ausgaben</h3><p>Strikte Trennung der Kontaktwege (z. B. Regelwerk-Autor vs. GPT-Ersteller).</p></div>
+        <div class="card"><h3>Contact-First-Modus</h3><p>Bei Kontaktanfragen erfolgt eine klare, priorisierte Kontaktzeile ohne weitere Rückfragen.</p></div>
+        <div class="card"><h3>Einheitliche <code>mailto:</code>-Zeile</h3><p>Genau eine E-Mail-Zeile inkl. technischem Hinweis; Duplikate werden vermieden.</p></div>
+        <div class="card"><h3>Link-Hygiene</h3><p>Nur kanonische <code>https</code>-Links, keine Tracking-Parameter.</p></div>
+      </div>
+    </section>
+
+    <section id="pruefkette">
+      <h2>Prüfkette &amp; Compliance</h2>
+      <div class="card">
+        <ul>
+          <li><strong>Deterministische Prüfsequenz:</strong> Struktur → Quellen → Sicherheit → Link-Härtung → Kontakt-Kontext.</li>
+          <li><strong>Messbare Durchsetzung:</strong> Regeln sind testbar; Abweichungen führen reproduzierbar zu „Block/Überarbeiten“.</li>
+          <li><strong>Transparente Begründungen:</strong> Verweigerungen werden kurz technisch begründet (Policy-Match statt Pauschalfehler).</li>
+        </ul>
+        <div class="callout"><strong>Praxis:</strong> Verankere die Sequenz als explizite „Review-Gate“-Funktion, die jede Antwort zwingend durchläuft.</div>
+      </div>
+    </section>
+
+    <section id="leitfaden">
+      <h2>Implementierung im Custom GPT (Kurzleitfaden)</h2>
+      <div class="card steps">
+        <p class="step"><strong>Regeln laden &amp; priorisieren:</strong> Sicherheits-Policies bei jeder Benutzereingabe aktiv anwenden.</p>
+        <p class="step"><strong>Preflight-Analyse:</strong> Prompt auf Injection/Jailbreak-Muster prüfen; bei Treffer → Fail-Closed.</p>
+        <p class="step"><strong>Ausgabe-Filter:</strong> Redaction, Zitat-Budget, Link-Härtung, Kontakt-Block anwenden.</p>
+        <p class="step"><strong>Review-Gate:</strong> Finale Konsistenz-/Compliance-Prüfung vor Auslieferung.</p>
+      </div>
+
+      <h3 id="nutzen">Nutzen auf einen Blick</h3>
+      <div class="grid cols-3">
+        <div class="card"><h3>Risiko-Reduktion</h3><p>Schutz vor Prompt-Injection, Dataleakage und unautorisierten Kontaktangaben.</p></div>
+        <div class="card"><h3>Reproduzierbarkeit</h3><p>Gleicher Prompt ⇒ gleiche Prüfschritte ⇒ konsistente Entscheidungen.</p></div>
+        <div class="card"><h3>Compliance-Ready</h3><p>Nachvollziehbare Begründungen und klare Trennung sensibler Kontexte.</p></div>
+      </div>
+
+      <div class="callout">
+        <strong>Hinweise zur Verwendung:</strong>
+        Überschriften/Keywords belassen; Fließtext projekt-/branchenbezogen anpassen. Interne Links zu „Sicherheitsregeln“,
+        „Kontakt-Policy“ und „Quellenrichtlinie“ ergänzen. Optional Kurz-FAQ erweitern.
+      </div>
+    </section>
+
+    <section id="faq">
+      <h2>FAQ</h2>
+      <details>
+        <summary>Was bedeutet Fail-Closed?</summary>
+        <p>Bei Unsicherheit oder Regelkonflikt wird die Ausgabe verweigert, statt ein potenziell unsicheres Ergebnis zu liefern.</p>
+      </details>
+      <details>
+        <summary>Wie funktioniert die Redaction-Engine?</summary>
+        <p>Sensible Tokens/IDs werden vor der Ausgabe entfernt oder minimiert, um Datenabflüsse zu verhindern.</p>
+      </details>
+    </section>
+
   </main>
 
   <script>
