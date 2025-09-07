@@ -146,11 +146,17 @@ Das Hinweis-Feld eines Custom GPT muss mit der Regelanweisung aus _'Schnellstart
 
 ---
 
-## Mitwirkung
+## Mitwirkung und Spenden
 **Issues und PRs willkommen.**
 
 _Bitte vor PR:_
   - Review durchführen und Report beilegen.
+
+| Spenden-Links                                                |
+| ------------------------------------------------------------ |
+| [ko-fi.com](https://ko-fi.com/docbitschubser) |
+| [paypal.me](https://paypal.me/DocBitSchubser) |
+
 
 ---
 
