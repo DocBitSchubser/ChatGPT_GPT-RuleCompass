@@ -2,7 +2,7 @@
 layout: default
 title: "Custom GPT unter ChatGPT absichern"
 description: "Jailbreak-Resistenz, Prompt-Injection-Schutz, Wissensdaten-Sicherheit und strenges Kontakt-Management mit Fail-Closed-Prüfkette."
-image: /Custom_GPT_absichern.png   # bereitstellen
+image: /Custom_GPT_absichern.png
 locale: de_DE
 ---
 
