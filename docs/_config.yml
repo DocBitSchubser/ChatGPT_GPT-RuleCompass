@@ -13,7 +13,7 @@ plugins:
   - jekyll-seo-tag
   - jekyll-sitemap
 
-logo: "/assets/img/logo.png"     # existierende Datei verwenden
+logo: "/Custom_GPT_absichern.png"     # existierende Datei verwenden
 twitter:
   username: "DocBitSchubser"
   card: "summary_large_image"
