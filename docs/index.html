@@ -11,8 +11,8 @@ locale: de_DE
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    {%- seo -%}
     <title>{{ page.title }}</title>
+    {%- seo -%}
     <style>
       /* === THEME-TOKENS ===================================================== */
       :root {
@@ -281,7 +281,12 @@ locale: de_DE
 
       .toc pre {
         margin: 0 20px 1rem 20px;
-        background: color-mix(in srgb, var(--panel) 60%, white);
+      /* Fallback für Parser/Browserversionen ohne color-mix */
+      background: var(--panel);
+      
+      /* Moderne Browser überschreiben mit gemischter Farbe */
+      background: color-mix(in srgb, var(--panel) 60%, white);
+
         border: 1px solid var(--panel-b);
         border-left: 3px solid var(--accent);
         padding: 0.85rem 1rem; border-radius: 12px;
@@ -526,6 +531,7 @@ locale: de_DE
           <div class="card"><h3>Reproduzierbarkeit</h3><p>Gleicher Prompt ⇒ gleiche Prüfschritte ⇒ konsistente Entscheidungen.</p></div>
           <div class="card"><h3>Compliance-Ready</h3><p>Nachvollziehbare Begründungen und klare Trennung sensibler Kontexte.</p></div>
         </div>
+      </section>
 
       <section id="kontakt-und-spenden" aria-labelledby="kontakt-und-spenden-heading">
         <h2 id="kontakt-und-spenden-heading">Kontakt &amp; Unterstützung</h2>
