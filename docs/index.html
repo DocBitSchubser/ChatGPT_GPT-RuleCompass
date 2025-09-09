@@ -851,6 +851,10 @@ locale: de_DE
 
     <script>
 
+      // Fallback für ältere Safari-Versionen beim Theme-Auto
+      mq.addEventListener?.("change", () => { if (state === "auto") apply("auto"); });
+      mq.addListener?.(() => { if (state === "auto") apply("auto"); }); // Safari < 14
+      
       // Jahr im Footer aktualisieren
       const y = document.getElementById("y");
       if (y) y.textContent = new Date().getFullYear();
