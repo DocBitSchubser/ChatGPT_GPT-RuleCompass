@@ -743,8 +743,41 @@ locale: de_DE
           <summary>Wie funktioniert die Redaction-Engine?</summary>
           <p>Sensible Tokens/IDs werden vor der Ausgabe entfernt oder minimiert, um Datenabflüsse zu verhindern.</p>
         </details>
+        <section id="Impressum-und-Streitbeilegung" aria-labelledby="kontakt-und-spenden-heading">
+          <h2 id="impressum-und-streitbeilegung-heading">Impressum &amp; Streitbeilegung</h2>
+          <div class="grid cols-2">
+            <div class="card">
+              <h3>Impressum</h3>
+            <address style="font-style: normal;">
+              <strong>Verantwortlich nach § 5 TMG / § 18 Abs. 2 MStV:</strong><br />
+              Jutta Bender<br />
+              c/o Block Services<br />
+              Stuttgarter Str. 106<br />
+              70736 Fellbach<br />
+              <br />
+              <strong>Kontakt:<br />
+              <a href="mailto:kontakt@docbitschubser.dev">kontakt@docbitschubser.dev</a></strong>
+            </address>
+            </div>
+            <div class="card">
+              <h3>Streitbeilegung</h3>
+              <p>Unterstütze die Arbeit:</p>
+              <p class="help">
+                Zur Vermeidung unnötiger Rechtsstreitigkeiten bitten wir darum, bei rechtlichen Angelegenheiten zunächst
+                den Erstkontakt per E-Mail herzustellen. Wir sichern eine zeitnahe Prüfung und Rückmeldung zu.
+              </p>
+              <p>
+                Wir nehmen nicht an einem Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teil, sind aber
+                bemüht, eventuelle Meinungsverschiedenheiten einvernehmlich zu lösen.
+              </p>
+            </div>
+          </div>
+        </section>
         <div class="callout">
-          <strong>© 2025 DocBitSchubser</strong>
+            Grafik/Design, Programmierung und Texte © <span id="y">2025</span> by:
+            <a href="https://docbitschubser.dev/" target="_blank" rel="noopener">
+              <strong>DocBitSchubser.dev</strong>
+            </a>
            <P>Design, Layout, Stylesheets und Skripte dieser Seite (HTML/CSS/JavaScript) wurden von DocBitSchubser erstellt und unter der Creative Commons Attribution 4.0 International (CC BY 4.0) veröffentlicht. Sie dürfen diesen Quellcode vervielfältigen, verbreiten und remixen – auch kommerziell –, sofern eine angemessene Urheberangabe („DocBitSchubser“) erfolgt, ein Link zur Lizenz beigefügt wird und Änderungen kenntlich gemacht werden.</P><br>
            <p><strong>Hinweis:</strong> Diese Lizenz gilt ausschließlich für den Quellcode (HTML/CSS/JS) dieser Seite. Alle übrigen Inhalte – insbesondere Texte, Bilder, Grafiken und sonstige Medien – bleiben urheberrechtlich bei DocBitSchubser und dürfen ohne vorherige Zustimmung nicht genutzt werden, sofern nicht anders gekennzeichnet.</P>
         </div>
@@ -752,6 +785,11 @@ locale: de_DE
     </main>
 
     <script>
+
+      // Jahr im Footer aktualisieren
+      const y = document.getElementById("y");
+      if (y) y.textContent = new Date().getFullYear();
+      
       /* Theme-Toggle: 'auto' (System) → 'light' → 'dark' → ... */
       (function () {
         const KEY = "theme";
