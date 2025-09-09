@@ -932,7 +932,12 @@ locale: de_DE
   if (!$btn) return;
 
   function apply(mode) {
-    $html.setAttribute('data-motion', mode);
+    // In AUTO kein Attribut setzen → DOM sauber halten
+    if (mode === 'auto') {
+      $html.removeAttribute('data-motion');
+    } else {
+      $html.setAttribute('data-motion', mode);
+    }
     if (mode === 'on') {
       $btn.textContent = '🌀 Scroll ON';
       $btn.dataset.tooltip = 'Sanftes Scrollen: an';
@@ -995,8 +1000,16 @@ locale: de_DE
     background: 'rgba(255,255,255,.45)', color: 'inherit', cursor: 'pointer',
     boxShadow: '0 6px 18px rgba(0,0,0,.25)', display: 'none', zIndex: 999
   });
-  btn.setAttribute('aria-label', 'Nach oben scrollen');
-  btn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+  // Verhalten an den Motion-Modus koppeln (AUTO/ON/OFF)
+  btn.addEventListener('click', () => {
+    const mode =
+      localStorage.getItem('motion') ||
+      document.documentElement.getAttribute('data-motion') ||
+      'auto';
+    const reduce = (mode === 'off') ||
+                   (mode === 'auto' && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+    window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
+  });
   document.body.appendChild(btn);
   const onScroll = () => { btn.style.display = window.scrollY > 600 ? 'block' : 'none'; };
   window.addEventListener('scroll', onScroll, { passive: true });
