@@ -868,10 +868,6 @@ locale: de_DE
           img.setAttribute('fetchpriority', 'low');
         });
       })();
-
-      /* Fallback für ältere Safari-Versionen beim Theme-Auto */
-      mq.addEventListener?.("change", () => { if (state === "auto") apply("auto"); });
-      mq.addListener?.(() => { if (state === "auto") apply("auto"); }); // Safari < 14
       
       /* Jahr im Footer aktualisieren */
       const y = document.getElementById("y");
@@ -898,7 +894,9 @@ locale: de_DE
 
         if (window.matchMedia) {
           const mq = window.matchMedia("(prefers-color-scheme: dark)");
-          mq.addEventListener?.("change", () => { if (state === "auto") apply("auto"); });
+          const onChange = () => { if (state === "auto") apply("auto"); };
+          mq.addEventListener?.("change", onChange);
+          mq.addListener?.(onChange); // Safari < 14
         }
       })();
 
@@ -906,10 +904,11 @@ locale: de_DE
       (function () {
         const tb = document.querySelector(".topbar");
         const set = () => {
-          const h = tb.offsetHeight;
+          const h = tb?.offsetHeight || 0;
           document.body.style.paddingTop = h + "px";
           document.documentElement.style.setProperty("--tb-h", h + "px");
         };
+        set();
         window.addEventListener("load", set);
         window.addEventListener("resize", set);
       })();
