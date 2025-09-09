@@ -851,11 +851,29 @@ locale: de_DE
 
     <script>
 
-      // Fallback für ältere Safari-Versionen beim Theme-Auto
+      /* Lazy-Loading */
+      (function () {
+        const imgs = document.querySelectorAll('img');
+        imgs.forEach((img) => {
+          // Hero-Bild: bewusst früh laden
+          if (img.closest('.hero')) {
+            img.setAttribute('loading', 'eager');
+            img.setAttribute('fetchpriority', 'high');
+            img.setAttribute('decoding', 'async');
+            return;
+          }
+          // alles andere: lazy
+          if (!img.hasAttribute('loading')) img.setAttribute('loading', 'lazy');
+          img.setAttribute('decoding', 'async');
+          img.setAttribute('fetchpriority', 'low');
+        });
+      })();
+
+      /* Fallback für ältere Safari-Versionen beim Theme-Auto */
       mq.addEventListener?.("change", () => { if (state === "auto") apply("auto"); });
       mq.addListener?.(() => { if (state === "auto") apply("auto"); }); // Safari < 14
       
-      // Jahr im Footer aktualisieren
+      /* Jahr im Footer aktualisieren */
       const y = document.getElementById("y");
       if (y) y.textContent = new Date().getFullYear();
       
