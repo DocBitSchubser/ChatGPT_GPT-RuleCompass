@@ -850,309 +850,375 @@ locale: de_DE
         </main>
 
     <script>
-
-      /* Lazy-Loading */
-      (function () {
-        const imgs = document.querySelectorAll('img');
-        imgs.forEach((img) => {
-          // Hero-Bild: bewusst früh laden
-          if (img.closest('.hero')) {
-            img.setAttribute('loading', 'eager');
-            img.setAttribute('fetchpriority', 'high');
+        
+        /* =======================
+           Lazy-Loading für Bilder
+           ======================= */
+        (function () {
+          const imgs = document.querySelectorAll('img');
+          imgs.forEach((img) => {
+            // Hero-Bild: bewusst früh laden
+            if (img.closest('.hero')) {
+              img.setAttribute('loading', 'eager');
+              img.setAttribute('fetchpriority', 'high');
+              img.setAttribute('decoding', 'async');
+              return;
+            }
+            // alles andere: lazy
+            if (!img.hasAttribute('loading')) img.setAttribute('loading', 'lazy');
             img.setAttribute('decoding', 'async');
-            return;
-          }
-          // alles andere: lazy
-          if (!img.hasAttribute('loading')) img.setAttribute('loading', 'lazy');
-          img.setAttribute('decoding', 'async');
-          img.setAttribute('fetchpriority', 'low');
-        });
-      })();
-      
-      /* Jahr im Footer aktualisieren */
-      const y = document.getElementById("y");
-      if (y) y.textContent = new Date().getFullYear();
-      
-      /* Theme-Toggle: 'auto' (System) → 'light' → 'dark' → ... */
-      (function () {
-        const KEY = "theme";
-        const $html = document.documentElement;
-        const $btn = document.getElementById("theme-toggle");
-        if (!$btn) return;
-
-        function apply(theme) {
-          if (theme === "light") { $html.setAttribute("data-theme", "light"); $btn.textContent = "☀️ Theme LIGHT"; $btn.setAttribute("aria-pressed", "true"); }
-          else if (theme === "dark") { $html.setAttribute("data-theme", "dark"); $btn.textContent = "🌙 Theme DARK"; $btn.setAttribute("aria-pressed", "true"); }
-          else { $html.removeAttribute("data-theme"); $btn.textContent = "🖥️ Theme AUTO"; $btn.setAttribute("aria-pressed", "false"); }
-        }
-        function next(state) { return state === "auto" ? "light" : state === "light" ? "dark" : "auto"; }
-
-        let state = localStorage.getItem(KEY) || "auto";
-        apply(state);
-
-        $btn.addEventListener("click", () => { state = next(state); localStorage.setItem(KEY, state); apply(state); });
-
-        if (window.matchMedia) {
-          const mq = window.matchMedia("(prefers-color-scheme: dark)");
-          const mq = window.matchMedia("(prefers-color-scheme: dark)");
-          // Fallback-Handler sauber im Scope registrieren:
-          const onChange = () => { if (state === "auto") apply("auto"); };
-          mq.addEventListener?.("change", onChange);
-          mq.addListener?.(onChange); // Safari < 14
-        }
-      })();
-
-      /* Abstand unter der fixierten Topbar dynamisch setzen (verhindert Überdeckung bei Zeilenumbruch) */
-      (function () {
-        const tb = document.querySelector(".topbar");
-        const set = () => {
-          const h = tb?.offsetHeight || 0;
-          document.body.style.paddingTop = h + "px";
-          document.documentElement.style.setProperty("--tb-h", h + "px");
-        };
-        set();
-        window.addEventListener("load", set);
-        window.addEventListener("resize", set);
-      })();
-
-      /* Optional: kleiner Scroll-Up-Button */
-      (function () {
-        const btn = document.createElement("button");
-        btn.textContent = "↑";
-        Object.assign(btn.style, {
-          position: "fixed", right: "16px", bottom: "16px", width: "42px", height: "42px",
-          borderRadius: "50%", border: "1px solid rgba(0,0,0,.25)",
-          background: "rgba(255,255,255,.45)", color: "inherit", cursor: "pointer",
-          boxShadow: "0 6px 18px rgba(0,0,0,.25)", display: "none", zIndex: 999,
-        });
-        btn.setAttribute("aria-label", "Nach oben scrollen");
-        btn.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
-        document.body.appendChild(btn);
-        const onScroll = () => { btn.style.display = window.scrollY > 600 ? "block" : "none"; };
-        window.addEventListener("scroll", onScroll, { passive: true }); onScroll();
-      })();
-
-      /* Active-Link-Markierung beim Scrollen (Desktop-Nav) */
-      (function () {
-        const links = document.querySelectorAll('.topbar .nav a[href^="#"]');
-        if (!links.length) return;
-        const sections = [...links].map((a) => document.querySelector(a.getAttribute("href"))).filter(Boolean);
-        const setActive = (id) => {
-          links.forEach((a) => a.removeAttribute("aria-current"));
-          const active = document.querySelector(`.topbar .nav a[href="${id}"]`);
-          if (active) active.setAttribute("aria-current", "page");
-        };
-        const io = new IntersectionObserver(
-          (entries) => { entries.forEach((e) => { if (e.isIntersecting) setActive("#" + e.target.id); }); },
-          { rootMargin: "-30% 0px -60% 0px", threshold: 0 }
-        );
-        sections.forEach((s) => io.observe(s));
-      })();
-
-      /* Lightbox */
-      (function () {
-        const overlay = document.createElement("div");
-        overlay.className = "lb-overlay";
-        overlay.setAttribute("aria-hidden", "true");
-
-        const dialog = document.createElement("div");
-        dialog.className = "lb-dialog";
-        dialog.setAttribute("role", "dialog");
-        dialog.setAttribute("aria-modal", "true");
-        dialog.setAttribute("aria-label", "Bildanzeige");
-
-        const img = document.createElement("img");
-        img.className = "lb-img";
-        img.setAttribute("alt", "");
-
-        const caption = document.createElement("div");
-        caption.className = "lb-caption";
-
-        const closeBtn = document.createElement("button");
-        closeBtn.className = "lb-close";
-        closeBtn.setAttribute("aria-label", "Schließen");
-        closeBtn.innerHTML = "&times;";
-
-        dialog.appendChild(closeBtn);
-        dialog.appendChild(img);
-        dialog.appendChild(caption);
-        overlay.appendChild(dialog);
-        document.body.appendChild(overlay);
-
-        let lastFocus = null;
-        function openLightbox(href, text, alt) {
-          lastFocus = document.activeElement;
-          img.src = href;
-          img.alt = alt || text || "";
-          caption.textContent = text || "";
-          overlay.setAttribute("aria-hidden", "false");
-          document.body.classList.add("lb-lock");
-          closeBtn.focus();
-        }
-        function closeLightbox() {
-          overlay.setAttribute("aria-hidden", "true");
-          document.body.classList.remove("lb-lock");
-          img.removeAttribute("src");
-          if (lastFocus && document.contains(lastFocus)) lastFocus.focus();
-        }
-        overlay.addEventListener("click", (e) => { if (e.target === overlay || e.target === closeBtn) closeLightbox(); });
-        document.addEventListener("keydown", (e) => {
-          if (overlay.getAttribute("aria-hidden") === "false" && e.key === "Escape") closeLightbox();
-        });
-        document.addEventListener("click", (e) => {
-          const a = e.target.closest("a");
-          if (!a) return;
-          const href = a.getAttribute("href") || "";
-          const isImageHref = /\.(png|jpe?g|webp|gif|svg)(\?.*)?$/i.test(href);
-          const wantsLb = a.hasAttribute("data-lightbox") || isImageHref;
-          if (!wantsLb) return;
-          e.preventDefault();
-          const alt = a.querySelector("img")?.getAttribute("alt") || "";
-          const title = a.getAttribute("title") || a.dataset.caption || a.textContent.trim();
-          openLightbox(a.href || href, title, alt);
-        }, { passive: false });
-      })();
-
-      /* MOBILE NAV: Inhalte klonen, öffnen/schließen, Fokus-Management */
-      (function () {
-        const btn = document.getElementById("menu-toggle");
-        const overlay = document.getElementById("mobile-nav");
-        const panel = overlay.querySelector(".mnav");
-        const closeBtn = overlay.querySelector(".mnav-close");
-        const linksContainer = overlay.querySelector(".mnav-links");
-        const desktopNav = document.querySelector(".topbar .nav");
-        let lastFocus = null;
-
-        function syncLinks() { linksContainer.innerHTML = desktopNav ? desktopNav.innerHTML : ""; }
-        syncLinks();
-
-        function open() {
-          lastFocus = document.activeElement;
-          overlay.classList.add("open");
-          overlay.setAttribute("aria-hidden", "false");
-          btn.setAttribute("aria-expanded", "true");
-          document.body.classList.add("lb-lock");
-          const firstLink = linksContainer.querySelector("a");
-          (firstLink || closeBtn).focus();
-        }
-        function close() {
-          overlay.classList.remove("open");
-          overlay.setAttribute("aria-hidden", "true");
-          btn.setAttribute("aria-expanded", "false");
-          document.body.classList.remove("lb-lock");
-          if (lastFocus && document.contains(lastFocus)) lastFocus.focus();
-        }
-
-        btn?.addEventListener("click", () => { overlay.classList.contains("open") ? close() : open(); });
-        closeBtn?.addEventListener("click", close);
-        overlay.addEventListener("click", (e) => { if (e.target === overlay) close(); });
-        document.addEventListener("keydown", (e) => { if (e.key === "Escape" && overlay.classList.contains("open")) close(); });
-
-        overlay.addEventListener("click", (e) => { const a = e.target.closest("a"); if (!a) return; close(); });
-
-        let w = window.innerWidth;
-        window.addEventListener("resize", () => {
-          if (window.innerWidth !== w) {
-            w = window.innerWidth;
-            syncLinks();
-            if (w > 860) close();
-          }
-        });
-      })();
-
-      /* Smooth-Scroll */
-      (function () {
-        const prefersReduced =
-          window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      
-        function headerOffset() {
-          const cs = getComputedStyle(document.documentElement);
-          const v = cs.getPropertyValue("--tb-h").trim();
-          const h = parseFloat(v);
-          return (Number.isFinite(h) ? h : (document.querySelector(".topbar")?.offsetHeight || 0)) + 8;
-        }
-      
-        // sanftes, aber knackiges Easing
-        function easeInOutCubic(t) { return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
-      
-        let rafId = null;
-        function scrollToY(targetY, duration) {
-          if (prefersReduced) { window.scrollTo(0, targetY); return; }
-      
-          const startY = window.pageYOffset;
-          const dist = targetY - startY;
-          const start = performance.now();
-          const dur = duration ?? Math.min(900, Math.max(300, Math.abs(dist) * 0.5)); // 0.5 ms/px, 300–900 ms
-      
-          cancelAnimationFrame(rafId);
-          const cancel = () => cancelAnimationFrame(rafId);
-          window.addEventListener("wheel", cancel, { passive: true, once: true });
-          window.addEventListener("keydown", cancel, { once: true });
-      
-          function step(now) {
-            const t = Math.min(1, (now - start) / dur);
-            const y = startY + dist * easeInOutCubic(t);
-            window.scrollTo(0, Math.round(y));
-            if (t < 1) rafId = requestAnimationFrame(step);
-          }
-          rafId = requestAnimationFrame(step);
-        }
-      
-        function focusAfterScroll(el) {
-          if (!el) return;
-          const had = el.hasAttribute("tabindex");
-          el.setAttribute("tabindex", "-1");
-          el.focus({ preventScroll: true });
-          if (!had) el.removeAttribute("tabindex");
-        }
-      
-        // Anklickbare In-Page-Links abfangen (Desktop & Mobile)
-        document.addEventListener("click", (e) => {
-          const a = e.target.closest('a[href^="#"]');
-          if (!a) return;
-      
-          const url = new URL(a.getAttribute("href"), location.href);
-          if (url.pathname !== location.pathname || !url.hash) return;
-      
-          const target = document.querySelector(url.hash);
-          if (!target) return;
-          e.preventDefault();
-      
-          // Mobile-Overlay schließen, falls offen
-          const overlay = document.getElementById("mobile-nav");
-          if (overlay?.classList.contains("open")) {
-            overlay.classList.remove("open");
-            overlay.setAttribute("aria-hidden", "true");
-            document.getElementById("menu-toggle")?.setAttribute("aria-expanded", "false");
-            document.body.classList.remove("lb-lock");
-          }
-      
-          const y = Math.max(0, target.getBoundingClientRect().top + window.pageYOffset - headerOffset());
-          scrollToY(y);
-          history.pushState(null, "", url.hash);   // URL aktualisieren ohne Sprung
-          setTimeout(() => focusAfterScroll(target), 10);
-        });
-      
-        // Beim Laden mit Hash direkt korrekt offsetten
-        window.addEventListener("load", () => {
-          if (location.hash) {
-            const t = document.querySelector(location.hash);
-            if (t) {
-              const y = Math.max(0, t.getBoundingClientRect().top + window.pageYOffset - headerOffset());
-              window.scrollTo(0, y);
+            img.setAttribute('fetchpriority', 'low');
+          });
+        })();
+        
+        /* ============================
+           Jahr im Footer aktualisieren
+           ============================ */
+        (function () {
+          const y = document.getElementById('y');
+          if (y) y.textContent = new Date().getFullYear();
+        })();
+        
+        /* =================================
+           Theme-Toggle: auto → light → dark
+           (mit Safari-Fallback-Listener)
+           ================================= */
+        (function () {
+          const KEY = 'theme';
+          const $html = document.documentElement;
+          const $btn = document.getElementById('theme-toggle');
+          if (!$btn) return;
+        
+          function apply(theme) {
+            if (theme === 'light') {
+              $html.setAttribute('data-theme', 'light');
+              $btn.textContent = '☀️ Theme LIGHT';
+              $btn.setAttribute('aria-pressed', 'true');
+            } else if (theme === 'dark') {
+              $html.setAttribute('data-theme', 'dark');
+              $btn.textContent = '🌙 Theme DARK';
+              $btn.setAttribute('aria-pressed', 'true');
+            } else {
+              $html.removeAttribute('data-theme');
+              $btn.textContent = '🖥️ Theme AUTO';
+              $btn.setAttribute('aria-pressed', 'false');
             }
           }
-        });
-      
-        // Zurück/Vorwärts mit Hash: ebenfalls sanft & offset
-        window.addEventListener("hashchange", () => {
-          const t = document.querySelector(location.hash);
-          if (!t) return;
-          const y = Math.max(0, t.getBoundingClientRect().top + window.pageYOffset - headerOffset());
-          scrollToY(y, 400);
-          focusAfterScroll(t);
-        });
-      })();      
+        
+          function next(state) {
+            return state === 'auto' ? 'light' : state === 'light' ? 'dark' : 'auto';
+          }
+        
+          let state = localStorage.getItem(KEY) || 'auto';
+          apply(state);
+        
+          $btn.addEventListener('click', () => {
+            state = next(state);
+            localStorage.setItem(KEY, state);
+            apply(state);
+          });
+        
+          if (window.matchMedia) {
+            const mq = window.matchMedia('(prefers-color-scheme: dark)');
+            const onChange = () => {
+              if (state === 'auto') apply('auto');
+            };
+            mq.addEventListener?.('change', onChange);
+            mq.addListener?.(onChange); // Safari < 14
+          }
+        })();
+        
+        /* ===================================================
+           Topbar-Höhe → Body-Padding (verhindert Überdeckung)
+           =================================================== */
+        (function () {
+          const tb = document.querySelector('.topbar');
+          const set = () => {
+            const h = tb?.offsetHeight || 0;
+            document.body.style.paddingTop = h + 'px';
+            document.documentElement.style.setProperty('--tb-h', h + 'px');
+          };
+          set();
+          window.addEventListener('load', set);
+          window.addEventListener('resize', set);
+        })();
+        
+        /* ========================
+           Kleiner Scroll-Up-Button
+           ======================== */
+        (function () {
+          const btn = document.createElement('button');
+          btn.textContent = '↑';
+          Object.assign(btn.style, {
+            position: 'fixed', right: '16px', bottom: '16px', width: '42px', height: '42px',
+            borderRadius: '50%', border: '1px solid rgba(0,0,0,.25)',
+            background: 'rgba(255,255,255,.45)', color: 'inherit', cursor: 'pointer',
+            boxShadow: '0 6px 18px rgba(0,0,0,.25)', display: 'none', zIndex: 999
+          });
+          btn.setAttribute('aria-label', 'Nach oben scrollen');
+          btn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+          document.body.appendChild(btn);
+          const onScroll = () => { btn.style.display = window.scrollY > 600 ? 'block' : 'none'; };
+          window.addEventListener('scroll', onScroll, { passive: true });
+          onScroll();
+        })();
+        
+        /* ====================================
+           Active-Link-Markierung (Desktop-Nav)
+           ==================================== */
+        (function () {
+          const links = document.querySelectorAll('.topbar .nav a[href^="#"]');
+          if (!links.length) return;
+          const sections = [...links]
+            .map((a) => document.querySelector(a.getAttribute('href')))
+            .filter(Boolean);
+        
+          const setActive = (id) => {
+            links.forEach((a) => a.removeAttribute('aria-current'));
+            const active = document.querySelector(`.topbar .nav a[href="${id}"]`);
+            if (active) active.setAttribute('aria-current', 'page');
+          };
+        
+          const io = new IntersectionObserver(
+            (entries) => {
+              entries.forEach((e) => {
+                if (e.isIntersecting) setActive('#' + e.target.id);
+              });
+            },
+            { rootMargin: '-30% 0px -60% 0px', threshold: 0 }
+          );
+          sections.forEach((s) => io.observe(s));
+        })();
+        
+        /* =========================
+           Lightbox (für Bild-Links)
+           ========================= */
+        (function () {
+          const overlay = document.createElement('div');
+          overlay.className = 'lb-overlay';
+          overlay.setAttribute('aria-hidden', 'true');
+        
+          const dialog = document.createElement('div');
+          dialog.className = 'lb-dialog';
+          dialog.setAttribute('role', 'dialog');
+          dialog.setAttribute('aria-modal', 'true');
+          dialog.setAttribute('aria-label', 'Bildanzeige');
+        
+          const img = document.createElement('img');
+          img.className = 'lb-img';
+          img.setAttribute('alt', '');
+        
+          const caption = document.createElement('div');
+          caption.className = 'lb-caption';
+        
+          const closeBtn = document.createElement('button');
+          closeBtn.className = 'lb-close';
+          closeBtn.setAttribute('aria-label', 'Schließen');
+          closeBtn.innerHTML = '&times;';
+        
+          dialog.appendChild(closeBtn);
+          dialog.appendChild(img);
+          dialog.appendChild(caption);
+          overlay.appendChild(dialog);
+          document.body.appendChild(overlay);
+        
+          let lastFocus = null;
+          function openLightbox(href, text, alt) {
+            lastFocus = document.activeElement;
+            img.src = href;
+            img.alt = alt || text || '';
+            caption.textContent = text || '';
+            overlay.setAttribute('aria-hidden', 'false');
+            document.body.classList.add('lb-lock');
+            closeBtn.focus();
+          }
+          function closeLightbox() {
+            overlay.setAttribute('aria-hidden', 'true');
+            document.body.classList.remove('lb-lock');
+            img.removeAttribute('src');
+            if (lastFocus && document.contains(lastFocus)) lastFocus.focus();
+          }
+        
+          overlay.addEventListener('click', (e) => {
+            if (e.target === overlay || e.target === closeBtn) closeLightbox();
+          });
+          document.addEventListener('keydown', (e) => {
+            if (overlay.getAttribute('aria-hidden') === 'false' && e.key === 'Escape') closeLightbox();
+          });
+        
+          document.addEventListener('click', (e) => {
+            const a = e.target.closest('a');
+            if (!a) return;
+            const href = a.getAttribute('href') || '';
+            const isImageHref = /\.(png|jpe?g|webp|gif|svg)(\?.*)?$/i.test(href);
+            const wantsLb = a.hasAttribute('data-lightbox') || isImageHref;
+            if (!wantsLb) return;
+            e.preventDefault();
+            const alt = a.querySelector('img')?.getAttribute('alt') || '';
+            const title = a.getAttribute('title') || a.dataset.caption || a.textContent.trim();
+            openLightbox(a.href || href, title, alt);
+          }, { passive: false });
+        })();
+        
+        /* ===========================
+           Mobile Navigation (Overlay)
+           =========================== */
+        (function () {
+          const btn = document.getElementById('menu-toggle');
+          const overlay = document.getElementById('mobile-nav');
+          const closeBtn = overlay?.querySelector('.mnav-close');
+          const linksContainer = overlay?.querySelector('.mnav-links');
+          const desktopNav = document.querySelector('.topbar .nav');
+          let lastFocus = null;
+        
+          function syncLinks() { if (linksContainer) linksContainer.innerHTML = desktopNav ? desktopNav.innerHTML : ''; }
+          syncLinks();
+        
+          function open() {
+            lastFocus = document.activeElement;
+            overlay?.classList.add('open');
+            overlay?.setAttribute('aria-hidden', 'false');
+            btn?.setAttribute('aria-expanded', 'true');
+            document.body.classList.add('lb-lock');
+            const firstLink = linksContainer?.querySelector('a');
+            (firstLink || closeBtn)?.focus();
+          }
+          function close() {
+            overlay?.classList.remove('open');
+            overlay?.setAttribute('aria-hidden', 'true');
+            btn?.setAttribute('aria-expanded', 'false');
+            document.body.classList.remove('lb-lock');
+            if (lastFocus && document.contains(lastFocus)) lastFocus.focus();
+          }
+        
+          btn?.addEventListener('click', () => { overlay?.classList.contains('open') ? close() : open(); });
+          closeBtn?.addEventListener('click', close);
+          overlay?.addEventListener('click', (e) => { if (e.target === overlay) close(); });
+          document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && overlay?.classList.contains('open')) close(); });
+          overlay?.addEventListener('click', (e) => { const a = e.target.closest('a'); if (!a) return; close(); });
+        
+          let w = window.innerWidth;
+          window.addEventListener('resize', () => {
+            if (window.innerWidth !== w) {
+              w = window.innerWidth;
+              syncLinks();
+              if (w > 860) close();
+            }
+          });
+        })();
+        
+        /* =================================
+           Smooth-Scroll mit Offset & Guards
+           ================================= */
+        (function () {
+          const prefersReduced =
+            window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        
+          function headerOffset() {
+            const cs = getComputedStyle(document.documentElement);
+            const v = cs.getPropertyValue('--tb-h').trim();
+            const h = parseFloat(v);
+            return (Number.isFinite(h) ? h : (document.querySelector('.topbar')?.offsetHeight || 0)) + 8;
+          }
+        
+          function easeInOutCubic(t) {
+            return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+          }
+        
+          let rafId = null;
+          function scrollToY(targetY, duration) {
+            if (prefersReduced) { window.scrollTo(0, targetY); return; }
+        
+            const startY = window.pageYOffset;
+            const dist = targetY - startY;
+            const start = performance.now();
+            const dur = duration ?? Math.min(900, Math.max(300, Math.abs(dist) * 0.5)); // 0.5 ms/px, 300–900 ms
+        
+            cancelAnimationFrame(rafId);
+            const cancel = () => cancelAnimationFrame(rafId);
+            window.addEventListener('wheel', cancel, { passive: true, once: true });
+            window.addEventListener('keydown', cancel, { once: true });
+        
+            function step(now) {
+              const t = Math.min(1, (now - start) / dur);
+              const y = startY + dist * easeInOutCubic(t);
+              window.scrollTo(0, Math.round(y));
+              if (t < 1) rafId = requestAnimationFrame(step);
+            }
+            rafId = requestAnimationFrame(step);
+          }
+        
+          function focusAfterScroll(el) {
+            if (!el) return;
+            const had = el.hasAttribute('tabindex');
+            el.setAttribute('tabindex', '-1');
+            el.focus({ preventScroll: true });
+            if (!had) el.removeAttribute('tabindex');
+          }
+        
+          function handleTopHashClick(e, a) {
+            const raw = a.getAttribute('href');
+            if (raw === '#' || raw === '#top') {
+              e.preventDefault();
+              scrollToY(0);
+              history.pushState(null, '', '#');
+              return true;
+            }
+            return false;
+          }
+        
+          // In-Page-Links abfangen (Desktop & Mobile)
+          document.addEventListener('click', (e) => {
+            const a = e.target.closest('a[href^="#"]');
+            if (!a) return;
+        
+            // Platzhalter (# / #top) → ganz nach oben
+            if (handleTopHashClick(e, a)) return;
+        
+            const url = new URL(a.getAttribute('href'), location.href);
+            if (url.pathname !== location.pathname || !url.hash) return;
+        
+            const target = document.querySelector(url.hash);
+            if (!target) return;
+            e.preventDefault();
+        
+            // Mobile-Overlay schließen, falls offen
+            const overlay = document.getElementById('mobile-nav');
+            if (overlay?.classList.contains('open')) {
+              overlay.classList.remove('open');
+              overlay.setAttribute('aria-hidden', 'true');
+              document.getElementById('menu-toggle')?.setAttribute('aria-expanded', 'false');
+              document.body.classList.remove('lb-lock');
+            }
+        
+            const y = Math.max(0, target.getBoundingClientRect().top + window.pageYOffset - headerOffset());
+            scrollToY(y);
+            history.pushState(null, '', url.hash); // URL aktualisieren ohne Sprung
+            setTimeout(() => focusAfterScroll(target), 10);
+          });
+        
+          // Beim Laden mit Hash: direkt korrekt offsetten
+          window.addEventListener('load', () => {
+            if (location.hash) {
+              const t = document.querySelector(location.hash);
+              if (t) {
+                const y = Math.max(0, t.getBoundingClientRect().top + window.pageYOffset - headerOffset());
+                // Keine Animation beim initialen Laden
+                window.scrollTo(0, y);
+              }
+            }
+          });
+        
+          // Vor/Zurück mit Hash: sanft & mit Offset
+          window.addEventListener('hashchange', () => {
+            const t = document.querySelector(location.hash);
+            if (!t) return;
+            const y = Math.max(0, t.getBoundingClientRect().top + window.pageYOffset - headerOffset());
+            scrollToY(y, 400);
+            focusAfterScroll(t);
+          });
+        })();
+
     </script>
   </body>
 </html>
