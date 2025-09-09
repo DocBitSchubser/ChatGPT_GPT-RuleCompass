@@ -140,7 +140,7 @@ locale: de_DE
       /* === BASE ============================================================= */
       html,
       body { min-height: 100%; }
-      html { font-size: 19px; }
+      html { font-size: 19px; scroll-behavior: smooth; }
       @media (max-width: 680px) { html { font-size: 16px; } }
 
       /* Hintergrund-Verlauf an html binden */
@@ -326,6 +326,18 @@ locale: de_DE
       .hero .sub { color: var(--muted); margin: 0 0 1rem; }
       .hero .actions { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 0.75rem; }
 
+      .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.2rem 0.55rem;
+      border-radius: 999px;
+      background: var(--panel);
+      border: 1px solid var(--panel-b);
+      color: var(--muted);
+      font-size: 0.85rem;
+      margin-right: 0.35rem;
+    }
+
       .btn {
         display: inline-flex; align-items: center; gap: 0.5rem;
         padding: 0.7rem 1rem; border-radius: 12px; font-weight: 650;
@@ -338,7 +350,7 @@ locale: de_DE
         border-color: rgba(210,106,75,.35); color: var(--fg);
       }
 
-      section { scroll-margin-top: 96px; }
+      section { scroll-margin-top: calc(var(--tb-h, 96px) + 8px); }
       .grid { display: grid; gap: 1rem; }
       .grid.cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
       .grid.cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -516,6 +528,7 @@ locale: de_DE
         <div class="right">
           <nav class="nav">
             <a href="#einleitung">Einleitung</a>
+            <a href="#Impressum-und-Streitbeilegung">Impressum</a>
             <a href="#jailbreak">Jailbreak</a>
             <a href="#wissensdaten">Wissensdaten</a>
             <a href="#pruefkette">Prüfkette</a>
@@ -743,7 +756,7 @@ locale: de_DE
           <summary>Wie funktioniert die Redaction-Engine?</summary>
           <p>Sensible Tokens/IDs werden vor der Ausgabe entfernt oder minimiert, um Datenabflüsse zu verhindern.</p>
         </details>
-        <section id="Impressum-und-Streitbeilegung" aria-labelledby="kontakt-und-spenden-heading">
+        <section id="Impressum-und-Streitbeilegung" aria-labelledby="impressum-und-streitbeilegung-heading">
           <h2 id="impressum-und-streitbeilegung-heading">Impressum &amp; Streitbeilegung</h2>
           <div class="grid cols-2">
             <div class="card">
@@ -770,7 +783,6 @@ locale: de_DE
                 bemüht, eventuelle Meinungsverschiedenheiten einvernehmlich zu lösen.
               </p>
             </div>
-          </div>
         </section>
 
         <!-- Datenschutzhinweis für GitHub Pages (Kurzfassung, DSGVO-konform) -->
@@ -815,6 +827,7 @@ locale: de_DE
             <p style="color: var(--muted, inherit); font-size: 0.95em;">
               Stand: 2025‑09‑09
             </p>
+          </div>
           </section>
 
           <h3>Grafik/Design, Programmierung und Texte © <span id="y">2025</span> by:
