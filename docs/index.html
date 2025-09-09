@@ -894,6 +894,8 @@ locale: de_DE
 
         if (window.matchMedia) {
           const mq = window.matchMedia("(prefers-color-scheme: dark)");
+          const mq = window.matchMedia("(prefers-color-scheme: dark)");
+          // Fallback-Handler sauber im Scope registrieren:
           const onChange = () => { if (state === "auto") apply("auto"); };
           mq.addEventListener?.("change", onChange);
           mq.addListener?.(onChange); // Safari < 14
