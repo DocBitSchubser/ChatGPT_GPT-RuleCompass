@@ -1040,6 +1040,100 @@ locale: de_DE
           }
         });
       })();
+
+      /* Smooth-Scroll */
+      (function () {
+        const prefersReduced =
+          window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      
+        function headerOffset() {
+          const cs = getComputedStyle(document.documentElement);
+          const v = cs.getPropertyValue("--tb-h").trim();
+          const h = parseFloat(v);
+          return (Number.isFinite(h) ? h : (document.querySelector(".topbar")?.offsetHeight || 0)) + 8;
+        }
+      
+        // sanftes, aber knackiges Easing
+        function easeInOutCubic(t) { return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
+      
+        let rafId = null;
+        function scrollToY(targetY, duration) {
+          if (prefersReduced) { window.scrollTo(0, targetY); return; }
+      
+          const startY = window.pageYOffset;
+          const dist = targetY - startY;
+          const start = performance.now();
+          const dur = duration ?? Math.min(900, Math.max(300, Math.abs(dist) * 0.5)); // 0.5 ms/px, 300–900 ms
+      
+          cancelAnimationFrame(rafId);
+          const cancel = () => cancelAnimationFrame(rafId);
+          window.addEventListener("wheel", cancel, { passive: true, once: true });
+          window.addEventListener("keydown", cancel, { once: true });
+      
+          function step(now) {
+            const t = Math.min(1, (now - start) / dur);
+            const y = startY + dist * easeInOutCubic(t);
+            window.scrollTo(0, Math.round(y));
+            if (t < 1) rafId = requestAnimationFrame(step);
+          }
+          rafId = requestAnimationFrame(step);
+        }
+      
+        function focusAfterScroll(el) {
+          if (!el) return;
+          const had = el.hasAttribute("tabindex");
+          el.setAttribute("tabindex", "-1");
+          el.focus({ preventScroll: true });
+          if (!had) el.removeAttribute("tabindex");
+        }
+      
+        // Anklickbare In-Page-Links abfangen (Desktop & Mobile)
+        document.addEventListener("click", (e) => {
+          const a = e.target.closest('a[href^="#"]');
+          if (!a) return;
+      
+          const url = new URL(a.getAttribute("href"), location.href);
+          if (url.pathname !== location.pathname || !url.hash) return;
+      
+          const target = document.querySelector(url.hash);
+          if (!target) return;
+          e.preventDefault();
+      
+          // Mobile-Overlay schließen, falls offen
+          const overlay = document.getElementById("mobile-nav");
+          if (overlay?.classList.contains("open")) {
+            overlay.classList.remove("open");
+            overlay.setAttribute("aria-hidden", "true");
+            document.getElementById("menu-toggle")?.setAttribute("aria-expanded", "false");
+            document.body.classList.remove("lb-lock");
+          }
+      
+          const y = Math.max(0, target.getBoundingClientRect().top + window.pageYOffset - headerOffset());
+          scrollToY(y);
+          history.pushState(null, "", url.hash);   // URL aktualisieren ohne Sprung
+          setTimeout(() => focusAfterScroll(target), 10);
+        });
+      
+        // Beim Laden mit Hash direkt korrekt offsetten
+        window.addEventListener("load", () => {
+          if (location.hash) {
+            const t = document.querySelector(location.hash);
+            if (t) {
+              const y = Math.max(0, t.getBoundingClientRect().top + window.pageYOffset - headerOffset());
+              window.scrollTo(0, y);
+            }
+          }
+        });
+      
+        // Zurück/Vorwärts mit Hash: ebenfalls sanft & offset
+        window.addEventListener("hashchange", () => {
+          const t = document.querySelector(location.hash);
+          if (!t) return;
+          const y = Math.max(0, t.getBoundingClientRect().top + window.pageYOffset - headerOffset());
+          scrollToY(y, 400);
+          focusAfterScroll(t);
+        });
+      })();      
     </script>
   </body>
 </html>
