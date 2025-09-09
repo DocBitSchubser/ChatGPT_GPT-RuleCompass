@@ -7,7 +7,7 @@ locale: de_DE
 ---
 
 <!DOCTYPE html>
-<html lang="de" data-motion="on">
+<html lang="de">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
@@ -142,10 +142,7 @@ locale: de_DE
       /* === BASE ============================================================= */
       html,
       body { min-height: 100%; }
-      html {   
-        font-size: 19px; 
-        scroll-behavior: smooth; 
-      }
+      html { font-size: 19px; }
       @media (max-width: 680px) { html { font-size: 16px; } }
 
       /* Hintergrund-Verlauf an html binden */
@@ -524,6 +521,7 @@ locale: de_DE
           <span>🔒 Custom&nbsp;GPT&nbsp;Absichern</span>
           <span class="chip has-tooltip" data-tooltip="by: DocBitSchubser">by: DBS</span>
           <button id="theme-toggle" class="theme-toggle has-tooltip" data-tooltip="Theme wechseln" aria-label="Theme wechseln" aria-pressed="false">🖥️</button>
+          <button id="motion-toggle" class="theme-toggle has-tooltip" data-tooltip="Scroll-Modus wechseln" aria-label="Scroll-Modus wechseln" aria-pressed="false">🖥️ Scroll AUTO</button>
         </div>
       </div>
     </div>
@@ -924,6 +922,52 @@ locale: de_DE
   }
 })();
 
+/* ==========================================
+   Motion-Toggle: auto → on → off (wie Theme)
+   ========================================== */
+(function () {
+  const KEY = 'motion';
+  const $html = document.documentElement;
+  const $btn  = document.getElementById('motion-toggle');
+  if (!$btn) return;
+
+  function apply(mode) {
+    $html.setAttribute('data-motion', mode);
+    if (mode === 'on') {
+      $btn.textContent = '🌀 Scroll ON';
+      $btn.dataset.tooltip = 'Sanftes Scrollen: an';
+      $btn.setAttribute('aria-pressed', 'true');
+    } else if (mode === 'off') {
+      $btn.textContent = '⏩ Scroll OFF';
+      $btn.dataset.tooltip = 'Sanftes Scrollen: aus';
+      $btn.setAttribute('aria-pressed', 'true');
+    } else {
+      $btn.textContent = '🖥️ Scroll AUTO';
+      $btn.dataset.tooltip = 'Systemvorgabe';
+      $btn.setAttribute('aria-pressed', 'false');
+    }
+  }
+
+  function next(mode) { return mode === 'auto' ? 'on' : mode === 'on' ? 'off' : 'auto'; }
+
+  let state = localStorage.getItem(KEY) || $html.getAttribute('data-motion') || 'auto';
+  apply(state);
+
+  $btn.addEventListener('click', () => {
+    state = next(state);
+    localStorage.setItem(KEY, state);
+    apply(state);
+  });
+
+  // Reagiert auf Systemwechsel, solange AUTO aktiv ist
+  if (window.matchMedia) {
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const onChange = () => { if ((localStorage.getItem(KEY) || 'auto') === 'auto') apply('auto'); };
+    mq.addEventListener?.('change', onChange);
+    mq.addListener?.(onChange); // Safari < 14
+  }
+})();      
+
 /* ===================================================
    Topbar-Höhe → Body-Padding (verhindert Überdeckung)
    =================================================== */
@@ -1104,36 +1148,43 @@ locale: de_DE
 })();
 
 /* =================================
-   Smooth-Scroll mit Offset & Guards
+   Smooth-Scroll mit Offset & Toggle
    ================================= */
 (function () {
-  const root = document.documentElement;
-  // Override per <html data-motion="on|off|auto">; Default = 'on' (smoothe Nav-Links erzwingen)
-  const MOTION = (root.dataset.motion || 'on');
-  const prefersReduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
-  const allowMotion = MOTION === 'on' || (MOTION === 'auto' && !prefersReduce);
+  // Modus lesen: 'auto' | 'on' | 'off'
+  function motionMode() {
+    return localStorage.getItem('motion')
+        || document.documentElement.getAttribute('data-motion')
+        || 'auto';
+  }
+  function isReducedMotion() {
+    const m = motionMode();
+    if (m === 'on')  return false;
+    if (m === 'off') return true;
+    return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  }
 
   function headerOffset() {
-    const cs = getComputedStyle(root);
-    const v = cs.getPropertyValue('--tb-h').trim();
-    const h = parseFloat(v);
+    const cs = getComputedStyle(document.documentElement);
+    const v  = cs.getPropertyValue('--tb-h').trim();
+    const h  = parseFloat(v);
     return (Number.isFinite(h) ? h : (document.querySelector('.topbar')?.offsetHeight || 0)) + 8;
   }
 
-  function easeInOutCubic(t) {
-    return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-  }
+  function easeInOutCubic(t) { return t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t + 2, 3)/2; }
 
-  let rafId = null;
-  function animateTo(targetY, duration) {
+  let rafId = 0;
+  function scrollToY(targetY, duration) {
+    if (isReducedMotion()) { window.scrollTo(0, targetY); return; }
+
     const startY = window.pageYOffset;
-    const dist = targetY - startY;
-    const start = performance.now();
-    const dur = duration ?? Math.min(900, Math.max(300, Math.abs(dist) * 0.5));
+    const dist   = targetY - startY;
+    const start  = performance.now();
+    const dur    = duration ?? Math.min(900, Math.max(300, Math.abs(dist) * 0.5)); // 0.5 ms/px, 300–900 ms
 
     cancelAnimationFrame(rafId);
     const cancel = () => cancelAnimationFrame(rafId);
-    window.addEventListener('wheel', cancel, { passive: true, once: true });
+    window.addEventListener('wheel', cancel,   { passive: true, once: true });
     window.addEventListener('keydown', cancel, { once: true });
 
     function step(now) {
@@ -1144,9 +1195,6 @@ locale: de_DE
     }
     rafId = requestAnimationFrame(step);
   }
-
-  function jumpTo(y) { window.scrollTo(0, y); }
-  function smoothTo(y, duration) { allowMotion ? animateTo(y, duration) : jumpTo(y); }
 
   function focusAfterScroll(el) {
     if (!el) return;
@@ -1160,32 +1208,25 @@ locale: de_DE
     const raw = a.getAttribute('href');
     if (raw === '#' || raw === '#top') {
       e.preventDefault();
-      smoothTo(0, 400);
+      scrollToY(0);
       history.pushState(null, '', '#');
       return true;
     }
     return false;
   }
 
-  function goToHash(hash, duration) {
-    const t = document.querySelector(hash);
-    if (!t) return;
-    const y = Math.max(0, t.getBoundingClientRect().top + window.pageYOffset - headerOffset());
-    smoothTo(y, duration);
-    setTimeout(() => focusAfterScroll(t), 10);
-  }
-
-  // In-Page-Links abfangen – in der Capture-Phase, damit kein Default-Sprung passiert
+  // In-Page-Links in der Capture-Phase abfangen → kein Browser-Sprung
   document.addEventListener('click', (e) => {
     const a = e.target.closest('a[href^="#"]');
     if (!a) return;
 
     if (handleTopHashClick(e, a)) return;
 
-    const href = a.getAttribute('href');
-    const url = new URL(href, location.href);
-    if (url.pathname !== location.pathname || !url.hash) return; // extern oder leer
+    const url = new URL(a.getAttribute('href'), location.href);
+    if (url.pathname !== location.pathname || !url.hash) return;
 
+    const target = document.querySelector(url.hash);
+    if (!target) return;
     e.preventDefault();
 
     // Mobile-Overlay schließen, falls offen
@@ -1197,9 +1238,11 @@ locale: de_DE
       document.body.classList.remove('lb-lock');
     }
 
-    goToHash(url.hash);
+    const y = Math.max(0, target.getBoundingClientRect().top + window.pageYOffset - headerOffset());
+    scrollToY(y);
     history.pushState(null, '', url.hash); // URL aktualisieren ohne Sprung
-  }, true); // ← capture!
+    setTimeout(() => focusAfterScroll(target), 10);
+  }, true); // ← capture=true
 
   // Beim Laden mit Hash: korrekt offsetten (ohne Animation)
   window.addEventListener('load', () => {
@@ -1207,16 +1250,18 @@ locale: de_DE
       const t = document.querySelector(location.hash);
       if (t) {
         const y = Math.max(0, t.getBoundingClientRect().top + window.pageYOffset - headerOffset());
-        jumpTo(y);
-        focusAfterScroll(t);
+        window.scrollTo(0, y);
       }
     }
   });
 
   // Vor/Zurück mit Hash: sanft & mit Offset
   window.addEventListener('hashchange', () => {
-    if (!location.hash) { smoothTo(0, 400); return; }
-    goToHash(location.hash, 400);
+    const t = document.querySelector(location.hash);
+    if (!t) return;
+    const y = Math.max(0, t.getBoundingClientRect().top + window.pageYOffset - headerOffset());
+    scrollToY(y, 400);
+    focusAfterScroll(t);
   });
 })();
 
