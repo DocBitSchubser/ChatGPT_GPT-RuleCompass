@@ -71,28 +71,32 @@ locale: de_DE
       /* System Dark, wenn kein explizites data-theme gesetzt ist */
       @media (prefers-color-scheme: dark) {
         :root {
-          --bg-top: #201b16;
-          --bg-bot: #2a241e;
-          --fg: #efe7da;
-          --muted: #bfb4a6;
-          --panel: rgba(255, 255, 255, 0.06);
-          --panel-b: rgba(255, 255, 255, 0.14);
-
-          --topbar1-bg-start: rgba(32,27,22,.98);
-          --topbar1-bg-end:   rgba(32,27,22,.88);
-          --topbar2-bg-start: rgba(32,27,22,.90);
-          --topbar2-bg-end:   rgba(32,27,22,.80);
-          --topbar-border: rgba(255, 255, 255, 0.09);
-
-          --nav-bg: rgba(255, 255, 255, 0.06);
-          --nav-border: rgba(255, 255, 255, 0.12);
-          --nav-fg: var(--fg);
-          --nav-hover-bg: rgba(210, 106, 75, 0.18);
-          --nav-hover-border: rgba(210, 106, 75, 0.35);
-          --nav-active-bg: rgba(210, 106, 75, 0.28);
-          --nav-active-border: rgba(210, 106, 75, 0.45);
+          /* Cooler Slate-Night Look */
+          --bg-top: #0f172a;   /* slate-900 */
+          --bg-bot: #111827;   /* gray-900 */
+          --fg:     #e6e9ef;   /* helles Grau */
+          --muted:  #a7b0c0;   /* blau-grau */
+          --panel:  rgba(255,255,255,.06);
+          --panel-b:rgba(255,255,255,.16);
+      
+          /* Topbar mit kühlem, dunklem Verlauf */
+          --topbar1-bg-start: rgba(10,14,23,.98);
+          --topbar1-bg-end:   rgba(10,14,23,.88);
+          --topbar2-bg-start: rgba(14,20,33,.90);
+          --topbar2-bg-end:   rgba(14,20,33,.80);
+          --topbar-border:    rgba(255,255,255,.10);
+      
+          /* Navigation behält Terracotta-Akzent, aber auf kühlem Grund */
+          --nav-bg:           rgba(255,255,255,.06);
+          --nav-border:       rgba(255,255,255,.16);
+          --nav-fg:           var(--fg);
+          --nav-hover-bg:     rgba(210,106,75,.16);
+          --nav-hover-border: rgba(210,106,75,.35);
+          --nav-active-bg:    rgba(210,106,75,.26);
+          --nav-active-border:rgba(210,106,75,.45);
         }
       }
+      
       /* Explizite User-Overrides per data-theme (gewinnt gegen Media Query) */
       :root[data-theme="light"] {
         --bg-top: #f4eada;
@@ -116,27 +120,28 @@ locale: de_DE
         --nav-active-bg: rgba(210, 106, 75, 0.18);
         --nav-active-border: rgba(210, 106, 75, 0.45);
       }
-      :root[data-theme="dark"] {
-        --bg-top: #201b16;
-        --bg-bot: #2a241e;
-        --fg: #efe7da;
-        --muted: #bfb4a6;
-        --panel: rgba(255, 255, 255, 0.06);
-        --panel-b: rgba(255, 255, 255, 0.14);
-
-        --topbar1-bg-start: rgba(32,27,22,.98);
-        --topbar1-bg-end:   rgba(32,27,22,.88);
-        --topbar2-bg-start: rgba(32,27,22,.90);
-        --topbar2-bg-end:   rgba(32,27,22,.80);
-        --topbar-border: rgba(255, 255, 255, 0.09);
-
-        --nav-bg: rgba(255, 255, 255, 0.06);
-        --nav-border: rgba(255, 255, 255, 0.12);
-        --nav-fg: var(--fg);
-        --nav-hover-bg: rgba(210, 106, 75, 0.18);
-        --nav-hover-border: rgba(210, 106, 75, 0.35);
-        --nav-active-bg: rgba(210, 106, 75, 0.28);
-        --nav-active-border: rgba(210, 106, 75, 0.45);
+      +:root[data-theme="dark"] {
+        /* identisch zu obigem System-Dark, damit der Toggle gleich aussieht */
+        --bg-top: #0f172a;
+        --bg-bot: #111827;
+        --fg:     #e6e9ef;
+        --muted:  #a7b0c0;
+        --panel:  rgba(255,255,255,.06);
+        --panel-b:rgba(255,255,255,.16);
+      
+        --topbar1-bg-start: rgba(10,14,23,.98);
+        --topbar1-bg-end:   rgba(10,14,23,.88);
+        --topbar2-bg-start: rgba(14,20,33,.90);
+        --topbar2-bg-end:   rgba(14,20,33,.80);
+        --topbar-border:    rgba(255,255,255,.10);
+      
+        --nav-bg:           rgba(255,255,255,.06);
+        --nav-border:       rgba(255,255,255,.16);
+        --nav-fg:           var(--fg);
+        --nav-hover-bg:     rgba(210,106,75,.16);
+        --nav-hover-border: rgba(210,106,75,.35);
+        --nav-active-bg:    rgba(210,106,75,.26);
+        --nav-active-border:rgba(210,106,75,.45);
       }
 
       /* === BASE ============================================================= */
