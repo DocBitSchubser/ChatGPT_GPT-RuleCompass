@@ -1000,15 +1000,20 @@ locale: de_DE
     background: 'rgba(255,255,255,.45)', color: 'inherit', cursor: 'pointer',
     boxShadow: '0 6px 18px rgba(0,0,0,.25)', display: 'none', zIndex: 999
   });
-  // Verhalten an den Motion-Modus koppeln (AUTO/ON/OFF)
+  // Gleiche Smooth-Scroll-Engine nutzen wie bei Anker-Links
   btn.addEventListener('click', () => {
-    const mode =
-      localStorage.getItem('motion') ||
-      document.documentElement.getAttribute('data-motion') ||
-      'auto';
-    const reduce = (mode === 'off') ||
-                   (mode === 'auto' && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
-    window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
+    if (typeof window.__scrollToY === 'function') {
+      window.__scrollToY(0);
+    } else {
+      // Fallback: Motion-Einstellung respektieren
+      const mode =
+        localStorage.getItem('motion') ||
+        document.documentElement.getAttribute('data-motion') ||
+        'auto';
+      const reduce = (mode === 'off') ||
+                     (mode === 'auto' && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+      window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
+    }
   });
   document.body.appendChild(btn);
   const onScroll = () => { btn.style.display = window.scrollY > 600 ? 'block' : 'none'; };
@@ -1208,6 +1213,9 @@ locale: de_DE
     }
     rafId = requestAnimationFrame(step);
   }
+
+  // Für externe Aufrufer (z. B. Scroll-Up-Button) verfügbar machen
+  window.__scrollToY = scrollToY;  
 
   function focusAfterScroll(el) {
     if (!el) return;
