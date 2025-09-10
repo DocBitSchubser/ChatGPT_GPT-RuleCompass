@@ -35,477 +35,841 @@
     <meta
       name="twitter:image"
       content="https://docbitschubser.github.io/ChatGPT_GPT-RuleCompass/Custom_GPT_unter_ChatGPT_absichern.png" />
-
-    <style>
-/* =====================================================================
+<style>
+  /* =====================================================================
    ChatGPT – GPT‑RuleCompass: konsolidiertes CSS (optimiert)
-   Änderungen:
-   - Doppelte Light-Definition entfernt (:root[data-theme="light"]) 
-   - Zustände via color-mix() (mit Fallbacks)
+   - Theme-Tokens inkl. Paper/Field/Ovrl/Dialog
    - Container Queries & auto-fit Grids
-   - Dialog-Styles vereinheitlicht (Lightbox/Consent)
-   - Einheitliche Fokus-/Kontrast-Tokens, geringere Spezifität
-   - Optionale Feinschliffe integriert (color-scheme, accent-color, Bild-Schatten opt-in)
+   - Vereinheitlichte Dialog-/Overlay-Styles (Theme-aware)
+   - Einheitliche Fokus-/Kontrast-Tokens
+   - Feste Breite für Theme/Scroll/Storage-Switches
    ===================================================================== */
 
-/* === THEME-TOKENS ===================================================== */
-:root {
-  /* Systemfarben & Form-Controls */
-  color-scheme: light dark;
-  accent-color: #d26a4b;
+  /* === THEME-TOKENS ===================================================== */
+  :root {
+    color-scheme: light dark;
+    accent-color: #d26a4b;
 
-  /* Light (Default) */
-  --bg-top: #f4eada;
-  --bg-bot: #e0c392;
-  --fg: #201b16;
-  --muted: #5a5146;
-  --accent: #d26a4b;
-  --accent-2: #a85b41;
-  --panel: rgba(0, 0, 0, 0.04);
-  --panel-b: rgba(0, 0, 0, 0.12);
+    /* Light (Default) */
+    --bg-top: #f4eada;
+    --bg-bot: #e0c392;
+    --fg: #201b16;
+    --muted: #5a5146;
+    --accent: #d26a4b;
+    --accent-2: #a85b41;
+    --panel: rgba(0, 0, 0, 0.04);
+    --panel-b: rgba(0, 0, 0, 0.12);
+    --topbar1-bg-start: rgba(255, 255, 255, 0.86);
+    --topbar1-bg-end: rgba(255, 255, 255, 0.78);
+    --topbar2-bg-start: rgba(255, 255, 255, 0.8);
+    --topbar2-bg-end: rgba(255, 255, 255, 0.72);
+    --topbar-border: rgba(0, 0, 0, 0.08);
+    --nav-bg: var(--panel);
+    --nav-border: var(--panel-b);
+    --nav-fg: var(--fg);
+    --nav-hover-bg: color-mix(in srgb, var(--accent) 14%, transparent);
+    --nav-active-bg: color-mix(in srgb, var(--accent) 28%, transparent);
+    --nav-hover-border: color-mix(in srgb, var(--accent) 45%, var(--panel-b));
+    --nav-active-border: color-mix(in srgb, var(--accent) 65%, var(--panel-b));
+    --maxw: 1100px;
+    --r: 22px;
+    --shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+    --row2-min-h: 52px;
+    --focus: var(--accent);
+    --paper-bg: color-mix(in srgb, var(--bg-top) 68%, var(--bg-bot) 32%);
+    --paper-b: color-mix(in srgb, var(--panel-b) 85%, transparent);
+    --field-bg: color-mix(in srgb, var(--bg-top) 62%, var(--bg-bot) 38%);
+    --field-fg: var(--fg);
+    --field-b: var(--paper-b);
+    --field-bg-hover: color-mix(in srgb, var(--field-bg) 88%, black 12%);
+    --field-bg-focus: color-mix(in srgb, var(--accent) 6%, var(--field-bg));
+    --field-placeholder: color-mix(in srgb, var(--muted) 70%, transparent);
+    --field-focus-ring: 0 0 0 3px color-mix(in srgb, var(--accent) 28%, transparent);
+    --overlay-bg: color-mix(in srgb, var(--bg-bot) 80%, transparent);
+    --dialog-bg: color-mix(in srgb, var(--paper-bg) 90%, white 10%);
+    --dialog-fg: var(--fg);
+    --dialog-b: var(--paper-b);
+  }
 
-  /* Topbar/Nav (Light) – ZWEI ZEILEN */
-  --topbar1-bg-start: rgba(255, 255, 255, 0.86);
-  --topbar1-bg-end: rgba(255, 255, 255, 0.78);
-  --topbar2-bg-start: rgba(255, 255, 255, 0.8);
-  --topbar2-bg-end: rgba(255, 255, 255, 0.72);
-  --topbar-border: rgba(0, 0, 0, 0.08);
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme]) {
+      --bg-top: #0f172a;
+      --bg-bot: #111827;
+      --fg: #e6e9ef;
+      --muted: #a7b0c0;
+      --panel: rgba(255, 255, 255, 0.06);
+      --panel-b: rgba(255, 255, 255, 0.16);
+      --topbar1-bg-start: rgba(10, 14, 23, 0.98);
+      --topbar1-bg-end: rgba(10, 14, 23, 0.88);
+      --topbar2-bg-start: rgba(14, 20, 33, 0.9);
+      --topbar2-bg-end: rgba(14, 20, 33, 0.8);
+      --topbar-border: rgba(255, 255, 255, 0.1);
+      --nav-bg: rgba(255, 255, 255, 0.06);
+      --nav-border: rgba(255, 255, 255, 0.16);
+      --nav-fg: var(--fg);
+      --nav-hover-bg: color-mix(in srgb, var(--accent) 16%, transparent);
+      --nav-active-bg: color-mix(in srgb, var(--accent) 26%, transparent);
+      --nav-hover-border: color-mix(in srgb, var(--accent) 50%, var(--panel-b));
+      --nav-active-border: color-mix(in srgb, var(--accent) 65%, var(--panel-b));
+      --paper-bg: color-mix(in srgb, var(--bg-top) 55%, var(--bg-bot) 45%);
+      --paper-b: color-mix(in srgb, white 18%, transparent);
+      --field-bg: color-mix(in srgb, var(--bg-top) 52%, var(--bg-bot) 48%);
+      --field-fg: var(--fg);
+      --field-b: var(--paper-b);
+      --field-bg-hover: color-mix(in srgb, var(--field-bg) 85%, white 15%);
+      --field-bg-focus: color-mix(in srgb, var(--accent) 10%, var(--field-bg));
+      --field-placeholder: color-mix(in srgb, var(--muted) 60%, transparent);
+      --field-focus-ring: 0 0 0 3px color-mix(in srgb, var(--accent) 35%, transparent);
+      --overlay-bg: color-mix(in srgb, var(--bg-top) 65%, transparent);
+      --dialog-bg: color-mix(in srgb, var(--bg-top) 70%, black 30%);
+      --dialog-fg: var(--fg);
+      --dialog-b: color-mix(in srgb, white 18%, transparent);
+    }
+  }
 
-  /* Nav-Basisfarben */
-  --nav-bg: var(--panel);
-  --nav-border: var(--panel-b);
-  --nav-fg: var(--fg);
-
-  /* Abgeleitete Zustände (Fallback + moderne Variante) */
-  --nav-hover-bg: rgba(210, 106, 75, 0.10);
-  --nav-hover-bg: color-mix(in srgb, var(--accent) 14%, transparent);
-  --nav-active-bg: rgba(210, 106, 75, 0.18);
-  --nav-active-bg: color-mix(in srgb, var(--accent) 28%, transparent);
-  --nav-hover-border: rgba(210, 106, 75, 0.30);
-  --nav-hover-border: color-mix(in srgb, var(--accent) 45%, var(--panel-b));
-  --nav-active-border: rgba(210, 106, 75, 0.45);
-  --nav-active-border: color-mix(in srgb, var(--accent) 65%, var(--panel-b));
-
-  /* Layout Tokens */
-  --maxw: 1100px;
-  --r: 22px;
-  --shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
-
-  /* Row 2 Mindesthöhe */
-  --row2-min-h: 52px;
-
-  /* Fokusfarbe einheitlich */
-  --focus: var(--accent);
-}
-
-/* System Dark, wenn kein explizites data-theme gesetzt ist */
-@media (prefers-color-scheme: dark) {
-  /* greift nur im AUTO-Modus (kein data-theme gesetzt) */
-  :root:not([data-theme]) {
-    --bg-top: #0f172a; /* slate-900 */
-    --bg-bot: #111827; /* gray-900 */
+  :root[data-theme="dark"] {
+    --bg-top: #0f172a;
+    --bg-bot: #111827;
     --fg: #e6e9ef;
     --muted: #a7b0c0;
     --panel: rgba(255, 255, 255, 0.06);
     --panel-b: rgba(255, 255, 255, 0.16);
-
     --topbar1-bg-start: rgba(10, 14, 23, 0.98);
     --topbar1-bg-end: rgba(10, 14, 23, 0.88);
     --topbar2-bg-start: rgba(14, 20, 33, 0.9);
     --topbar2-bg-end: rgba(14, 20, 33, 0.8);
     --topbar-border: rgba(255, 255, 255, 0.1);
-
     --nav-bg: rgba(255, 255, 255, 0.06);
     --nav-border: rgba(255, 255, 255, 0.16);
     --nav-fg: var(--fg);
-
     --nav-hover-bg: color-mix(in srgb, var(--accent) 16%, transparent);
     --nav-active-bg: color-mix(in srgb, var(--accent) 26%, transparent);
     --nav-hover-border: color-mix(in srgb, var(--accent) 50%, var(--panel-b));
     --nav-active-border: color-mix(in srgb, var(--accent) 65%, var(--panel-b));
+    --paper-bg: color-mix(in srgb, var(--bg-top) 55%, var(--bg-bot) 45%);
+    --paper-b: color-mix(in srgb, white 18%, transparent);
+    --field-bg: color-mix(in srgb, var(--bg-top) 52%, var(--bg-bot) 48%);
+    --field-fg: var(--fg);
+    --field-b: var(--paper-b);
+    --field-bg-hover: color-mix(in srgb, var(--field-bg) 85%, white 15%);
+    --field-bg-focus: color-mix(in srgb, var(--accent) 10%, var(--field-bg));
+    --field-placeholder: color-mix(in srgb, var(--muted) 60%, transparent);
+    --field-focus-ring: 0 0 0 3px color-mix(in srgb, var(--accent) 35%, transparent);
+    --overlay-bg: color-mix(in srgb, var(--bg-top) 65%, transparent);
+    --dialog-bg: color-mix(in srgb, var(--bg-top) 70%, black 30%);
+    --dialog-fg: var(--fg);
+    --dialog-b: color-mix(in srgb, white 18%, transparent);
   }
-}
 
-/* Explizite User-Overrides per data-theme (gewinnt gegen Media Query) */
-:root[data-theme="dark"] {
-  --bg-top: #0f172a;
-  --bg-bot: #111827;
-  --fg: #e6e9ef;
-  --muted: #a7b0c0;
-  --panel: rgba(255, 255, 255, 0.06);
-  --panel-b: rgba(255, 255, 255, 0.16);
-
-  --topbar1-bg-start: rgba(10, 14, 23, 0.98);
-  --topbar1-bg-end: rgba(10, 14, 23, 0.88);
-  --topbar2-bg-start: rgba(14, 20, 33, 0.9);
-  --topbar2-bg-end: rgba(14, 20, 33, 0.8);
-  --topbar-border: rgba(255, 255, 255, 0.1);
-
-  --nav-bg: rgba(255, 255, 255, 0.06);
-  --nav-border: rgba(255, 255, 255, 0.16);
-  --nav-fg: var(--fg);
-
-  --nav-hover-bg: color-mix(in srgb, var(--accent) 16%, transparent);
-  --nav-active-bg: color-mix(in srgb, var(--accent) 26%, transparent);
-  --nav-hover-border: color-mix(in srgb, var(--accent) 50%, var(--panel-b));
-  --nav-active-border: color-mix(in srgb, var(--accent) 65%, var(--panel-b));
-}
-
-/* === BASE ============================================================= */
-html,
-body { min-height: 100%; }
-
-html { font-size: 19px; }
-@media (max-width: 680px) { html { font-size: 16px; } }
-
-html {
-  background-image: linear-gradient(to bottom, var(--bg-top) 0%, var(--bg-bot) 100%);
-  background-repeat: no-repeat;
-  background-attachment: fixed;
-  background-size: 100% 100%;
-}
-body {
-  margin: 0;
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial,
-               "Apple Color Emoji", "Segoe UI Emoji";
-  color: var(--fg);
-  background: transparent;
-  line-height: 1.6;
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
-  font-size: 1rem;
-}
-
-:focus-visible {
-  outline: 2px solid var(--focus);
-  outline-offset: 2px;
-  border-radius: 6px;
-}
-
-a { color: var(--accent); text-decoration: none; }
-a:hover { text-decoration: underline; }
-
-/* Bild-Styling – Schatten optional; globaler Shadow entfernt (Performance) */
-img {
-  max-width: 100%;
-  height: auto;
-  border-radius: 12px;
-  margin-bottom: 22px;
-}
-.img-shadow { box-shadow: var(--shadow); }
-
-.container {
-  max-width: var(--maxw);
-  margin-inline: auto;
-  padding: 2rem 1.25rem;
-  /* Container-Queries aktivieren */
-  container-type: inline-size;
-}
-
-.visually-hidden {
-  position: absolute !important;
-  height: 1px; width: 1px;
-  overflow: hidden; clip: rect(1px, 1px, 1px, 1px);
-  white-space: nowrap;
-}
-
-/* === TOPBAR (2 ZEILEN) =============================================== */
-.topbar {
-  position: fixed; inset: 0 0 auto 0; z-index: 1000;
-  backdrop-filter: saturate(140%) blur(8px);
-  border-bottom: 1px solid var(--topbar-border);
-  -webkit-text-size-adjust: 100%; text-size-adjust: 100%;
-}
-.topbar-row { border-bottom: 1px solid var(--topbar-border); }
-.topbar-row.row1 { background: linear-gradient(to bottom, var(--bg-top), var(--bg-top)); }
-.topbar-row.row2 { background: linear-gradient(to bottom, var(--topbar2-bg-start), var(--topbar2-bg-end)); }
-
-.topbar .inner {
-  max-width: var(--maxw); margin-inline: auto;
-  padding: 0.6rem 1.25rem;
-  display: flex; align-items: center; gap: 0.75rem; justify-content: space-between; flex-wrap: wrap;
-}
-
-.brand { display: flex; align-items: center; gap: 0.6rem; font-weight: 750; letter-spacing: 0.2px; }
-/* Fixe Brand-Schriftgröße unabhängig vom Viewport (zusammengeführt) */
-.brand, .brand--row2 { font-size: 19px !important; line-height: 1.2; }
-
-.chip {
-  display: inline-flex; align-items: center; gap: 0.4rem;
-  border: 1px solid var(--panel-b);
-  padding: 0.2rem 0.55rem; border-radius: 999px;
-  color: var(--muted); font-size: 0.85rem; background: var(--panel);
-}
-
-.has-tooltip { position: relative; }
-.has-tooltip::after {
-  content: attr(data-tooltip);
-  position: absolute; left: 50%; top: calc(100% + 10px);
-  transform: translate(-50%, 6px);
-  background: var(--tt-bg, rgba(0, 0, 0, 0.9)); color: var(--tt-fg, #fff);
-  border: 1px solid var(--tt-b, rgba(255, 255, 255, 0.2));
-  border-radius: 8px; padding: 0.35rem 0.55rem; font-size: 0.85rem; line-height: 1.2; white-space: nowrap;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2); opacity: 0; pointer-events: none;
-  transition: opacity 0.12s ease, transform 0.12s ease; z-index: 2000;
-}
-.has-tooltip::before {
-  content: ""; position: absolute; left: 50%; top: calc(100% + 2px);
-  transform: translate(-50%, 6px);
-  border: 6px solid transparent; border-bottom-color: var(--tt-bg, rgba(0,0,0,0.9));
-  opacity: 0; pointer-events: none; transition: opacity 0.12s ease, transform 0.12s ease;
-}
-.has-tooltip:hover::after,
-.has-tooltip:hover::before,
-.has-tooltip:focus-visible::after,
-.has-tooltip:focus-visible::before { opacity: 1; transform: translate(-50%, 0); }
-
-.right { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
-
-/* Desktop-Navigation */
-.topbar .nav { display: flex; gap: 0.5rem; flex-wrap: wrap; }
-.topbar .nav a {
-  padding: 0.35rem 0.7rem; border-radius: 999px;
-  background: var(--nav-bg); border: 1px solid var(--nav-border);
-  color: var(--nav-fg); line-height: 1; box-shadow: 0 1px 0 rgba(0, 0, 0, 0.04);
-  transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.05s ease;
-  text-decoration: none;
-}
-.topbar .nav a:hover {
-  background: var(--nav-hover-bg); border-color: var(--nav-hover-border); transform: translateY(-1px);
-}
-.topbar .nav a:active,
-.topbar .nav a[aria-current="page"],
-.topbar .nav a.active {
-  background: var(--nav-active-bg); border-color: var(--nav-active-border); transform: translateY(0);
-}
-
-/* Buttons */
-.theme-toggle,
-.menu-toggle,
-.mnav-close,
-.consent-dialog .consent-btn {
-  border: 1px solid var(--nav-border);
-  background: var(--nav-bg);
-  color: var(--nav-fg);
-  border-radius: 999px;
-  padding: 0.35rem 0.6rem;
-  cursor: pointer;
-  line-height: 1;
-}
-.theme-toggle:focus-visible,
-.menu-toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
-
-/* === MOBILE NAV ======================================================= */
-.menu-toggle { display: none; }
-.mobile-nav {
-  position: fixed; inset: 0; z-index: 1500; display: none; background: rgba(0, 0, 0, 0.75);
-}
-.mobile-nav.open { display: block; }
-.mnav {
-  position: absolute; top: var(--tb-h, 56px); left: 0; right: 0;
-  background: linear-gradient(to bottom, var(--topbar2-bg-start), var(--topbar2-bg-end));
-  border-bottom: 1px solid var(--topbar-border); box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-}
-.mnav-header { display: flex; align-items: center; justify-content: space-between; padding: 0.6rem 1rem; }
-.mnav-header span { color: var(--muted); font-weight: 600; }
-.mnav-links { display: grid; gap: 0.35rem; padding: 0.25rem 0.6rem 0.8rem; }
-.mnav a {
-  display: block; padding: 0.65rem 0.9rem; margin: 0 0.4rem; border-radius: 12px;
-  background: var(--nav-bg); border: 1px solid var(--nav-border); color: var(--nav-fg); text-decoration: none;
-  font-weight: 600;
-}
-.mnav a:hover { background: var(--nav-hover-bg); border-color: var(--nav-hover-border); }
-
-@media (max-width: 860px) {
-  .topbar .nav { display: none; }
-  .menu-toggle { display: inline-flex; align-items: center; gap: 0.35rem; }
-}
-
-/* === TOC & CODE ======================================================= */
-.toc {
-  border: 1px dashed var(--panel-b); border-radius: 12px; padding: 0.9rem;
-  background: var(--panel); color: var(--muted);
-}
-.toc a { color: var(--accent); }
-.toc ul { margin: 0.2rem 0 0 0.9rem; }
-.toc pre {
-  margin: 0 20px 1rem 20px;
-  background: color-mix(in srgb, var(--panel) 60%, white);
-  border: 1px solid var(--panel-b); border-left: 3px solid var(--accent);
-  padding: 0.85rem 1rem; border-radius: 12px; color: var(--fg);
-  line-height: 1.5; white-space: pre-wrap; overflow-wrap: anywhere; word-break: break-word; overflow-x: hidden;
-}
-.toc pre > code { white-space: inherit; display: block; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; font-size: 0.95rem; }
-.toc :not(pre) > code { background: var(--panel); border: 1px solid var(--panel-b); padding: 0.1rem 0.35rem; border-radius: 6px; }
-
-/* === CONTENT ========================================================== */
-main { /* Abstand via JS ergänzt */ }
-.hero { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 2rem; align-items: center; margin-top: 1.2rem; }
-.hero h1 { font-size: clamp(1.9rem, 1.2rem + 2.2vw, 3rem); line-height: 1.15; margin: 0.25rem 0 0.75rem; }
-.hero .sub { color: var(--muted); margin: 0 0 1rem; }
-.hero .actions { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 0.75rem; }
-
-.badge { display: inline-flex; align-items: center; padding: 0.2rem 0.35rem; border-radius: 999px; background: var(--panel); border: 1px solid var(--panel-b); color: var(--muted); font-size: 0.85rem; margin: 0.5rem 0.175rem; }
-
-.btn { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.7rem 1rem; border-radius: 12px; font-weight: 650; border: 1px solid var(--panel-b); background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02)); color: var(--fg); }
-.btn.primary { background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 18%, transparent), color-mix(in srgb, var(--accent) 12%, transparent)); border-color: color-mix(in srgb, var(--accent) 35%, var(--panel-b)); color: var(--fg); }
-
-section { scroll-margin-top: calc(var(--tb-h, 96px) + 8px); }
-.grid { display: grid; gap: 1rem; }
-/* Responsive ohne Breakpoints */
-.grid.cols-3 { grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr)); }
-.grid.cols-2 { grid-template-columns: repeat(auto-fit, minmax(22rem, 1fr)); }
-/* Hero spaltet bei engem Container */
-@container (max-width: 820px) { .hero { grid-template-columns: 1fr; } }
-
-:where(.card) {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.02));
-  border: 1px solid var(--panel-b); border-radius: var(--r); padding: 1.1rem; box-shadow: var(--shadow);
-  transition: transform 0.2s ease, border-color 0.2s ease;
-}
-:where(.card):hover { transform: translateY(-2px); border-color: color-mix(in srgb, var(--accent) 50%, var(--panel-b)); }
-
-h2 { font-size: 1.45rem; margin-block: 0.7rem 0.6rem; }
-h3 { font-size: 1.15rem; margin-block: 1.15rem 0.35rem; }
-ul { padding-inline-start: 1.5rem; margin-block: 0.4rem; }
-li + li { margin-top: 0.3rem; }
-
-.steps { counter-reset: step; }
-.step { counter-increment: step; position: relative; padding-inline-start: 2.4rem; }
-.step::before {
-  content: counter(step); position: absolute; inset-block-start: 0.1rem; inset-inline-start: 0; width: 1.6rem; height: 1.6rem;
-  border-radius: 50%; display: grid; place-items: center; font-weight: 700;
-  background: color-mix(in srgb, var(--accent) 25%, transparent);
-  border: 1px solid color-mix(in srgb, var(--accent) 55%, var(--panel-b));
-}
-
-.callout { border-inline-start: 3px solid var(--accent); padding: 0.75rem 1rem; margin: 1rem 0; background: color-mix(in srgb, var(--accent) 8%, transparent); border-radius: 8px; }
-
-details { border: 1px solid var(--panel-b); border-radius: 12px; padding: 0.6rem 0.9rem; background: var(--panel); }
-details + details { margin-top: 0.5rem; }
-details > summary { cursor: pointer; font-weight: 600; }
-
-@media (prefers-reduced-motion: reduce) { .card, .btn { transition: none; } }
-
-/* === INLINE LINK-VERBESSERUNG ======================================== */
-main p a,
-main li a {
-  color: var(--accent); font-weight: 600;
-  text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 0.2em;
-  padding: 0.06rem 0.2rem; border-radius: 0.4rem;
-  transition: background-color 0.15s ease, box-shadow 0.15s ease;
-}
-main p a:hover,
-main li a:hover { background: color-mix(in srgb, var(--accent) 12%, transparent); box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 18%, transparent) inset; }
-main p a[href$=".jpg" i],
-main p a[href$=".jpeg" i],
-main p a[href$=".png" i],
-main p a[href$=".webp" i],
-main p a[href$=".gif" i],
-main p a[data-lightbox] { position: relative; padding-right: 0.5rem; }
-main p a[href$=".jpg" i]::after,
-main p a[href$=".jpeg" i]::after,
-main p a[href$=".png" i]::after,
-main p a[href$=".webp" i]::after,
-main p a[href$=".gif" i]::after,
-main p a[data-lightbox]::after { content: "🔍"; margin-left: 0.25rem; opacity: 0.8; font-size: 0.95em; }
-
-/* === LIGHTBOX & CONSENT (vereinheitlicht) ============================= */
-.lb-overlay,
-.consent-overlay { position: fixed; inset: 0; z-index: 2200; display: none; align-items: center; justify-content: center; padding: 1rem; background: #000 !important; backdrop-filter: none !important; }
-.lb-overlay[aria-hidden="false"],
-.consent-overlay[aria-hidden="false"] { display: flex; }
-
-/* Dialoge zusammengeführt */
-.lb-dialog,
-.consent-dialog {
-  width: min(92vw, 680px);
-  border: 1px solid var(--panel-b);
-  border-radius: 16px;
-  background: #111 !important;
-  color: #fff !important;
-  box-shadow: var(--shadow);
-  padding: 1rem 1.1rem;
-  font-size: 1.3em; /* ~+30% */
-}
-.lb-dialog h3,
-.consent-dialog h3 { margin: 0.25rem 0 0.25rem; color: #fff !important; }
-.lb-dialog a,
-.consent-dialog a { color: color-mix(in srgb, var(--accent) 75%, white) !important; text-decoration-thickness: 2px; }
-.lb-dialog :focus-visible,
-.consent-dialog :focus-visible { outline: 2px solid color-mix(in srgb, var(--accent) 65%, white) !important; outline-offset: 2px; border-radius: 8px; }
-
-.lb-caption { color: #fff !important; text-align: center; font-size: 1.3em; line-height: 1.4; max-width: 90vw; }
-.lb-img { max-width: 100%; max-height: 82vh; object-fit: contain; border-radius: 12px; box-shadow: var(--shadow); background: #000; }
-.lb-close { position: absolute; top: clamp(8px, 2vw, 18px); right: clamp(8px, 2vw, 18px); width: 52px !important; height: 52px !important; display: grid; place-items: center; background: #222 !important; color: #fff !important; border: 1px solid rgba(255,255,255,0.6) !important; border-radius: 999px; cursor: pointer; font-size: 26px !important; line-height: 1 !important; }
-
-.consent-actions { display: flex; gap: 0.8rem; justify-content: flex-end; margin-top: 0.8rem; flex-wrap: wrap; }
-.consent-dialog .consent-btn { font-size: 1.3em !important; padding: 0.715rem 1.17rem !important; border-radius: 12px !important; }
-.consent-dialog .consent-btn.primary { background: var(--accent) !important; border-color: color-mix(in srgb, var(--accent) 65%, white) !important; color: #111 !important; }
-.consent-dialog .consent-btn:not(.primary) { background: #2f2f2f !important; color: #fff !important; border-color: rgba(255, 255, 255, 0.65) !important; box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.08) inset; }
-.consent-dialog .consent-btn:not(.primary):hover { background: #3b3b3b !important; border-color: rgba(255, 255, 255, 0.85) !important; }
-.consent-dialog .consent-btn:not(.primary):active { background: #2a2a2a !important; }
-
-/* Kontrast-/Erzwingungs-Modi */
-@media (prefers-contrast: more) {
-  .consent-dialog .consent-btn:not(.primary) {
-    background: #ffffff !important; color: #111111 !important; border-color: #ffffff !important;
+  /* === BASE ============================================================= */
+  html, body {
+    min-height: 100%;
+    margin: 0;
   }
-}
-@media (forced-colors: active) {
-  .consent-dialog .consent-btn,
+
+  html {
+    font-size: 19px;
+    background: linear-gradient(to bottom, var(--bg-top) 0%, var(--bg-bot) 100%) fixed;
+    background-size: 100% 100%;
+  }
+
+  @media (max-width: 680px) {
+    html { font-size: 16px; }
+  }
+
+  body {
+    font: 1rem/1.6 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+    color: var(--fg);
+    background: transparent;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+
+  a {
+    color: var(--accent);
+    text-decoration: none;
+  }
+  a:hover { text-decoration: underline; }
+
+  img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 12px;
+    margin-bottom: 22px;
+  }
+  .img-shadow { box-shadow: var(--shadow); }
+
+  .container {
+    max-width: var(--maxw);
+    margin-inline: auto;
+    padding: 2rem 1.25rem;
+    container-type: inline-size;
+  }
+
+  .visually-hidden {
+    position: absolute !important;
+    height: 1px; width: 1px;
+    overflow: hidden;
+    clip: rect(1px, 1px, 1px, 1px);
+    white-space: nowrap;
+  }
+
+  /* === TOPBAR (2 ZEILEN) =============================================== */
+  .topbar {
+    position: fixed;
+    inset: 0 0 auto 0;
+    z-index: 1000;
+    backdrop-filter: saturate(140%) blur(8px);
+    border-bottom: 1px solid var(--topbar-border);
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+  .topbar-row {
+    border-bottom: 1px solid var(--topbar-border);
+  }
+  .topbar-row.row1 {
+    background: linear-gradient(to bottom, var(--bg-top), var(--bg-top));
+  }
+  .topbar-row.row2 {
+    background: linear-gradient(to bottom, var(--topbar2-bg-start), var(--topbar2-bg-end));
+  }
+
+  .topbar .inner {
+    max-width: var(--maxw);
+    margin-inline: auto;
+    padding: 0.6rem 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    justify-content: space-between;
+    flex-wrap: wrap;
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-weight: 750;
+    letter-spacing: 0.2px;
+  }
+  .brand, .brand--row2 {
+    font-size: 19px !important;
+    line-height: 1.2;
+  }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    border: 1px solid var(--panel-b);
+    padding: 0.2rem 0.55rem;
+    border-radius: 999px;
+    color: var(--muted);
+    font-size: 0.85rem;
+    background: var(--panel);
+  }
+
+  .has-tooltip {
+    position: relative;
+  }
+  .has-tooltip::after,
+  .has-tooltip::before {
+    position: absolute;
+    left: 50%;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.12s ease, transform 0.12s ease;
+  }
+  .has-tooltip::after {
+    content: attr(data-tooltip);
+    top: calc(100% + 10px);
+    transform: translate(-50%, 6px);
+    background: var(--tt-bg, rgba(0, 0, 0, 0.9));
+    color: var(--tt-fg, #fff);
+    border: 1px solid var(--tt-b, rgba(255, 255, 255, 0.2));
+    border-radius: 8px;
+    padding: 0.35rem 0.55rem;
+    font-size: 0.85rem;
+    line-height: 1.2;
+    white-space: nowrap;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+    z-index: 2000;
+  }
+  .has-tooltip::before {
+    content: "";
+    top: calc(100% + 2px);
+    transform: translate(-50%, 6px);
+    border: 6px solid transparent;
+    border-bottom-color: var(--tt-bg, rgba(0, 0, 0, 0.9));
+  }
+  .has-tooltip:hover::after,
+  .has-tooltip:hover::before,
+  .has-tooltip:focus-visible::after,
+  .has-tooltip:focus-visible::before {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+
+  .right {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  /* Desktop-Navigation */
+  .topbar .nav {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+  .topbar .nav a {
+    padding: 0.35rem 0.7rem;
+    border-radius: 999px;
+    background: var(--nav-bg);
+    border: 1px solid var(--nav-border);
+    color: var(--nav-fg);
+    line-height: 1;
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.04);
+    transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.05s ease;
+    text-decoration: none;
+  }
+  .topbar .nav a:hover {
+    background: var(--nav-hover-bg);
+    border-color: var(--nav-hover-border);
+    transform: translateY(-1px);
+  }
+  .topbar .nav a:active,
+  .topbar .nav a[aria-current="page"],
+  .topbar .nav a.active {
+    background: var(--nav-active-bg);
+    border-color: var(--nav-active-border);
+    transform: translateY(0);
+  }
+
+  /* Buttons & Switches */
+  .theme-toggle,
+  .menu-toggle,
+  .mnav-close,
+  .consent-dialog .consent-btn {
+    border: 1px solid var(--nav-border);
+    background: var(--nav-bg);
+    color: var(--nav-fg);
+    border-radius: 999px;
+    padding: 0.35rem 0.6rem;
+    cursor: pointer;
+    line-height: 1;
+  }
+  .theme-toggle:focus-visible,
+  .menu-toggle:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+  }
+
+  /* Feste Breite für die drei Schalter, um Layout-Shift zu vermeiden */
+  #theme-toggle,
+  #motion-toggle,
+  #storage-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-inline-size: 140px;
+    max-inline-size: 140px;
+    white-space: nowrap;
+  }
+
+  /* === MOBILE NAV ======================================================= */
+  .menu-toggle { display: none; }
+  .mobile-nav {
+    position: fixed;
+    inset: 0;
+    z-index: 1500;
+    display: none;
+    background: var(--overlay-bg);
+  }
+  .mobile-nav.open { display: block; }
+  .mnav {
+    position: absolute;
+    top: var(--tb-h, 56px);
+    left: 0;
+    right: 0;
+    background: linear-gradient(to bottom, var(--topbar2-bg-start), var(--topbar2-bg-end));
+    border-bottom: 1px solid var(--topbar-border);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  }
+  .mnav-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.6rem 1rem;
+  }
+  .mnav-header span {
+    color: var(--muted);
+    font-weight: 600;
+  }
+  .mnav-links {
+    display: grid;
+    gap: 0.35rem;
+    padding: 0.25rem 0.6rem 0.8rem;
+  }
+  .mnav a {
+    display: block;
+    padding: 0.65rem 0.9rem;
+    margin: 0 0.4rem;
+    border-radius: 12px;
+    background: var(--nav-bg);
+    border: 1px solid var(--nav-border);
+    color: var(--nav-fg);
+    text-decoration: none;
+    font-weight: 600;
+  }
+  .mnav a:hover {
+    background: var(--nav-hover-bg);
+    border-color: var(--nav-hover-border);
+  }
+
+  @media (max-width: 860px) {
+    .topbar .nav { display: none; }
+    .menu-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+  }
+
+  /* === TOC & CODE ======================================================= */
+  .toc {
+    border: 1px dashed var(--panel-b);
+    border-radius: 12px;
+    padding: 0.9rem;
+    background: var(--panel);
+    color: var(--muted);
+  }
+  .toc a { color: var(--accent); }
+  .toc ul { margin: 0.2rem 0 0 0.9rem; }
+  .toc pre {
+    margin: 0 20px 1rem 20px;
+    background: var(--paper-bg);
+    border: 1px solid var(--paper-b);
+    border-left: 3px solid var(--accent);
+    padding: 0.85rem 1rem;
+    border-radius: 12px;
+    color: var(--fg);
+    line-height: 1.5;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    overflow-x: hidden;
+  }
+  .toc pre > code {
+    white-space: inherit;
+    display: block;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+    font-size: 0.95rem;
+  }
+  .toc :not(pre) > code {
+    background: var(--panel);
+    border: 1px solid var(--panel-b);
+    padding: 0.1rem 0.35rem;
+    border-radius: 6px;
+  }
+
+  /* === CONTENT ========================================================== */
+  main { /* Abstand via JS ergänzt */ }
+  .hero {
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 2rem;
+    align-items: center;
+    margin-top: 1.2rem;
+  }
+  .hero h1 {
+    font-size: clamp(1.9rem, 1.2rem + 2.2vw, 3rem);
+    line-height: 1.15;
+    margin: 0.25rem 0 0.75rem;
+  }
+  .hero .sub {
+    color: var(--muted);
+    margin: 0 0 1rem;
+  }
+  .hero .actions {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin-top: 0.75rem;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.2rem 0.35rem;
+    border-radius: 999px;
+    background: var(--panel);
+    border: 1px solid var(--panel-b);
+    color: var(--muted);
+    font-size: 0.85rem;
+    margin: 0.5rem 0.175rem;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.7rem 1rem;
+    border-radius: 12px;
+    font-weight: 650;
+    border: 1px solid var(--panel-b);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.02));
+    color: var(--fg);
+  }
+  .btn.primary {
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--accent) 18%, transparent),
+      color-mix(in srgb, var(--accent) 12%, transparent)
+    );
+    border-color: color-mix(in srgb, var(--accent) 35%, var(--panel-b));
+    color: var(--fg);
+  }
+
+  section { scroll-margin-top: calc(var(--tb-h, 96px) + 8px); }
+  .grid { display: grid; gap: 1rem; }
+  .grid.cols-3 { grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr)); }
+  .grid.cols-2 { grid-template-columns: repeat(auto-fit, minmax(22rem, 1fr)); }
+  
+  @container (max-width: 820px) {
+    .hero { grid-template-columns: 1fr; }
+  }
+
+  :where(.card) {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.02));
+    border: 1px solid var(--panel-b);
+    border-radius: var(--r);
+    padding: 1.1rem;
+    box-shadow: var(--shadow);
+    transition: transform 0.2s ease, border-color 0.2s ease;
+  }
+  :where(.card):hover {
+    transform: translateY(-2px);
+    border-color: color-mix(in srgb, var(--accent) 50%, var(--panel-b));
+  }
+
+  h2 { font-size: 1.45rem; margin-block: 0.7rem 0.6rem; }
+  h3 { font-size: 1.15rem; margin-block: 1.15rem 0.35rem; }
+  ul { padding-inline-start: 1.5rem; margin-block: 0.4rem; }
+  li + li { margin-top: 0.3rem; }
+
+  .steps { counter-reset: step; }
+  .step {
+    counter-increment: step;
+    position: relative;
+    padding-inline-start: 2.4rem;
+  }
+  .step::before {
+    content: counter(step);
+    position: absolute;
+    inset-block-start: 0.1rem;
+    inset-inline-start: 0;
+    width: 1.6rem;
+    height: 1.6rem;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    font-weight: 700;
+    background: color-mix(in srgb, var(--accent) 25%, transparent);
+    border: 1px solid color-mix(in srgb, var(--accent) 55%, var(--panel-b));
+  }
+
+  .callout {
+    border-inline-start: 3px solid var(--accent);
+    padding: 0.75rem 1rem;
+    margin: 1rem 0;
+    background: color-mix(in srgb, var(--accent) 8%, transparent);
+    border-radius: 8px;
+  }
+
+  details {
+    border: 1px solid var(--panel-b);
+    border-radius: 12px;
+    padding: 0.6rem 0.9rem;
+    background: var(--panel);
+  }
+  details + details { margin-top: 0.5rem; }
+  details > summary {
+    cursor: pointer;
+    font-weight: 600;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .card, .btn { transition: none; }
+  }
+
+  /* === INLINE LINK-VERBESSERUNG ======================================== */
+  main p a, main li a {
+    color: var(--accent);
+    font-weight: 600;
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.2em;
+    padding: 0.06rem 0.2rem;
+    border-radius: 0.4rem;
+    transition: background-color 0.15s ease, box-shadow 0.15s ease;
+  }
+  main p a:hover, main li a:hover {
+    background: color-mix(in srgb, var(--accent) 12%, transparent);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 18%, transparent) inset;
+  }
+  main p a[href$=".jpg" i],
+  main p a[href$=".jpeg" i],
+  main p a[href$=".png" i],
+  main p a[href$=".webp" i],
+  main p a[href$=".gif" i],
+  main p a[data-lightbox] {
+    position: relative;
+    padding-right: 0.5rem;
+  }
+  main p a[href$=".jpg" i]::after,
+  main p a[href$=".jpeg" i]::after,
+  main p a[href$=".png" i]::after,
+  main p a[href$=".webp" i]::after,
+  main p a[href$=".gif" i]::after,
+  main p a[data-lightbox]::after {
+    content: "🔍";
+    margin-left: 0.25rem;
+    opacity: 0.8;
+    font-size: 0.95em;
+  }
+
+  /* === LIGHTBOX & CONSENT (vereinheitlicht, Theme-aware) ================ */
+  .lb-overlay,
+  .consent-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 2200;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    background: var(--overlay-bg) !important;
+    backdrop-filter: none !important;
+  }
+  .lb-overlay[aria-hidden="false"],
+  .consent-overlay[aria-hidden="false"] { display: flex; }
+
+  .lb-dialog,
+  .consent-dialog {
+    width: min(92vw, 680px);
+    border: 1px solid var(--dialog-b);
+    border-radius: 16px;
+    background: var(--dialog-bg) !important;
+    color: var(--dialog-fg) !important;
+    box-shadow: var(--shadow);
+    padding: 1rem 1.1rem;
+    font-size: 1.3em;
+  }
+  .lb-dialog h3,
+  .consent-dialog h3 {
+    margin: 0.25rem 0 0.25rem;
+    color: var(--dialog-fg) !important;
+  }
+  .lb-dialog a,
+  .consent-dialog a {
+    color: color-mix(in srgb, var(--accent) 75%, var(--dialog-fg)) !important;
+    text-decoration-thickness: 2px;
+  }
+  .lb-dialog :focus-visible,
+  .consent-dialog :focus-visible {
+    outline: 2px solid color-mix(in srgb, var(--accent) 65%, var(--dialog-fg)) !important;
+    outline-offset: 2px;
+    border-radius: 8px;
+  }
+
+  .lb-caption {
+    color: var(--dialog-fg) !important;
+    text-align: center;
+    font-size: 1.3em;
+    line-height: 1.4;
+    max-width: 90vw;
+  }
+  .lb-img {
+    max-width: 100%;
+    max-height: 82vh;
+    object-fit: contain;
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    background: transparent;
+  }
+  .lb-close {
+    position: absolute;
+    top: clamp(8px, 2vw, 18px);
+    right: clamp(8px, 2vw, 18px);
+    width: 52px !important;
+    height: 52px !important;
+    display: grid;
+    place-items: center;
+    background: color-mix(in srgb, var(--dialog-bg) 85%, black 15%) !important;
+    color: var(--dialog-fg) !important;
+    border: 1px solid color-mix(in srgb, var(--dialog-fg) 60%, transparent) !important;
+    border-radius: 999px;
+    cursor: pointer;
+    font-size: 26px !important;
+    line-height: 1 !important;
+  }
+
+  .consent-actions {
+    display: flex;
+    gap: 0.8rem;
+    justify-content: flex-end;
+    margin-top: 0.8rem;
+    flex-wrap: wrap;
+  }
+  .consent-dialog .consent-btn {
+    font-size: 1.3em !important;
+    padding: 0.715rem 1.17rem !important;
+    border-radius: 12px !important;
+  }
   .consent-dialog .consent-btn.primary {
-    forced-color-adjust: none; background: ButtonFace; color: ButtonText; border: 1px solid ButtonText;
+    background: var(--accent) !important;
+    border-color: color-mix(in srgb, var(--accent) 65%, var(--dialog-fg)) !important;
+    color: #111 !important;
   }
-  .consent-dialog .consent-btn.primary { background: Highlight; color: HighlightText; border-color: Highlight; }
-}
+  .consent-dialog .consent-btn:not(.primary) {
+    background: color-mix(in srgb, var(--dialog-bg) 75%, black 25%) !important;
+    color: var(--dialog-fg) !important;
+    border-color: color-mix(in srgb, var(--dialog-fg) 45%, transparent) !important;
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--dialog-fg) 12%, transparent) inset;
+  }
+  .consent-dialog .consent-btn:not(.primary):hover {
+    background: color-mix(in srgb, var(--dialog-bg) 65%, black 35%) !important;
+    border-color: color-mix(in srgb, var(--dialog-fg) 70%, transparent) !important;
+  }
+  .consent-dialog .consent-btn:not(.primary):active {
+    background: color-mix(in srgb, var(--dialog-bg) 55%, black 45%) !important;
+  }
 
-/* Dialog per :target anzeigen – identisch zur Lightbox-Logik */
-#storage-on-consent:target,
-#storage-consent:target,
-#storage-disable:target { display: flex; }
+  @media (prefers-contrast: more) {
+    .consent-dialog .consent-btn:not(.primary) {
+      background: #ffffff !important;
+      color: #111111 !important;
+      border-color: #ffffff !important;
+    }
+  }
+  @media (forced-colors: active) {
+    .consent-dialog .consent-btn,
+    .consent-dialog .consent-btn.primary {
+      forced-color-adjust: none;
+      background: ButtonFace;
+      color: ButtonText;
+      border: 1px solid ButtonText;
+    }
+    .consent-dialog .consent-btn.primary {
+      background: Highlight;
+      color: HighlightText;
+      border-color: Highlight;
+    }
+  }
 
-/* Optional: Scroll sperren, solange ein Storage-Dialog offen ist */
-@supports selector(body:has(#storage-on-consent:target, #storage-off-consent:target)) {
-  body:has(#storage-on-consent:target, #storage-off-consent:target) { overflow: hidden; }
-}
+  #storage-on-consent:target,
+  #storage-consent:target,
+  #storage-disable:target { display: flex; }
 
-/* === TOPBAR LAYOUT-SPEZIFIK ========================================== */
-/* Zeile 1: brand links, Switches rechts; kein Umbruch in Controls */
-.topbar-row.row1 .inner { justify-content: space-between; flex-wrap: nowrap !important; gap: 0.5rem; }
-.topbar-row.row1 .brand { min-width: 0; flex: 1 1 auto; }
-.topbar-row.row1 .brand > span:first-child { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.topbar-row.row1 .controls { display: flex; gap: 0.5rem; flex: 0 0 auto; white-space: nowrap; }
-.topbar-row.row1 .controls .theme-toggle { white-space: nowrap; }
-.topbar-row.row1 .inner.no-brand { justify-content: flex-end !important; }
+  @supports selector(body:has(#storage-on-consent:target, #storage-off-consent:target)) {
+    body:has(#storage-on-consent:target, #storage-off-consent:target) { overflow: hidden; }
+  }
 
-/* Zeile 2: Desktop = Nav zentriert, Burger absolut rechts; mobile = Burger links + Brand rechts daneben */
-/* Desktop (Basis) */
-.topbar-row.row2 .inner { position: relative; display: flex; justify-content: center; align-items: center; padding-right: 3.2rem; /* Platz für Burger */ min-height: var(--row2-min-h); }
-.topbar-row.row2 .nav { display: flex; flex-wrap: wrap; justify-content: center; margin: 0 auto; }
-.topbar-row.row2 .menu-toggle { position: absolute; right: 1.25rem; top: 50%; transform: translateY(-50%); }
-.topbar-row.row2 .right { width: 100%; }
+  /* === TOPBAR LAYOUT-SPEZIFIK ========================================== */
+  .topbar-row.row1 .inner {
+    justify-content: space-between;
+    flex-wrap: nowrap !important;
+    gap: 0.5rem;
+  }
+  .topbar-row.row1 .brand {
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+  .topbar-row.row1 .brand > span:first-child {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .topbar-row.row1 .controls {
+    display: flex;
+    gap: 0.5rem;
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+  .topbar-row.row1 .controls .theme-toggle { white-space: nowrap; }
+  .topbar-row.row1 .inner.no-brand { justify-content: flex-end !important; }
 
-/* Mobile */
-@media (max-width: 860px) {
-  .topbar-row.row2 .nav { display: none !important; }
-  .topbar-row.row2 .inner { display: flex; align-items: center; justify-content: flex-start; min-height: var(--row2-min-h); padding-right: 1.25rem; }
-  .topbar-row.row2 .right { width: auto; display: flex; align-items: center; gap: 0.5rem; }
-  .topbar-row.row2 .menu-toggle { position: static; transform: none; display: inline-flex; }
-  .brand--row2 { margin-inline-start: 0.5rem; white-space: nowrap; display: inline-flex; align-items: center; }
-}
+  .topbar-row.row2 .inner {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-right: 3.2rem;
+    min-height: var(--row2-min-h);
+  }
+  .topbar-row.row2 .nav {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin: 0 auto;
+  }
+  .topbar-row.row2 .menu-toggle {
+    position: absolute;
+    right: 1.25rem;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+  .topbar-row.row2 .right { width: 100%; }
 
-/* === EXTERNES LINK-ICON ============================================== */
-a.ext-link::after { content: "↗"; margin-inline-start: 0.25em; font-size: 0.9em; opacity: 0.75; }
+  @media (max-width: 860px) {
+    .topbar-row.row2 .nav { display: none !important; }
+    .topbar-row.row2 .inner {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      min-height: var(--row2-min-h);
+      padding-right: 1.25rem;
+    }
+    .topbar-row.row2 .right {
+      width: auto;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .topbar-row.row2 .menu-toggle {
+      position: static;
+      transform: none;
+      display: inline-flex;
+    }
+    .brand--row2 {
+      margin-inline-start: 0.5rem;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+    }
+  }
 
-/* Steuer-Links nicht unterstreichen */
-.theme-toggle,
-.theme-toggle:hover,
-.menu-toggle,
-.mnav-close { text-decoration: none; }
+  /* === EXTERNES LINK-ICON ============================================== */
+  a.ext-link::after {
+    content: "↗";
+    margin-inline-start: 0.25em;
+    font-size: 0.9em;
+    opacity: 0.75;
+  }
 
-      
-    </style>
+  .theme-toggle,
+  .theme-toggle:hover,
+  .menu-toggle,
+  .mnav-close { text-decoration: none; }
+</style>
 
     <!-- JSON-LD (unverändert) -->
     <script type="application/ld+json">
@@ -611,35 +975,32 @@ a.ext-link::after { content: "↗"; margin-inline-start: 0.25em; font-size: 0.9e
             <span>🔒 Custom&nbsp;GPT&nbsp;Absichern</span>
           </div>
           <div class="controls">
-          <a
-            id="theme-toggle"
-            class="theme-toggle has-tooltip"
-            href="#"
-            role="button"
-            data-tooltip="Theme wechseln"
-            aria-label="Theme wechseln"
-            aria-pressed="false"
-          >🖥️</a>
+            <a
+              id="theme-toggle"
+              class="theme-toggle has-tooltip"
+              href="#"
+              role="button"
+              data-tooltip="Theme wechseln"
+              aria-label="Theme wechseln"
+              aria-pressed="false"></a>
 
-          <a
-            id="motion-toggle"
-            class="theme-toggle has-tooltip"
-            href="#"
-            role="button"
-            data-tooltip="Scroll-Modus wechseln"
-            aria-label="Scroll-Modus wechseln"
-            aria-pressed="false"
-          >🖥️</a>
+            <a
+              id="motion-toggle"
+              class="theme-toggle has-tooltip"
+              href="#"
+              role="button"
+              data-tooltip="Scroll-Modus wechseln"
+              aria-label="Scroll-Modus wechseln"
+              aria-pressed="false"></a>
 
-          <a
-            id="storage-toggle"
-            class="theme-toggle has-tooltip"
-            href="#"
-            role="button"
-            data-tooltip="Lokale Speicherung"
-            aria-label="Lokale Speicherung"
-            aria-pressed="false"
-          >💾</a>
+            <a
+              id="storage-toggle"
+              class="theme-toggle has-tooltip"
+              href="#"
+              role="button"
+              data-tooltip="Lokale Speicherung"
+              aria-label="Lokale Speicherung"
+              aria-pressed="false"></a>
           </div>
         </div>
       </div>
@@ -1133,709 +1494,1018 @@ a.ext-link::after { content: "↗"; margin-inline-start: 0.25em; font-size: 0.9e
       </div>
     </main>
 
-<script>
-'use strict';
-
-/* =====================================================================
-   GPT‑RuleCompass – Modernisiertes JS (ES2018+)
-   Ziele:
-   - Konstante/let statt var, Arrow-Funktionen, for..of
-   - Utility‑Layer (qs/qsa/on/debounce) & modulare Initialisierung
-   - Robustere Storage‑Erkennung (LS/SS/Memory) mit Consent‑Dialog
-   - ResizeObserver für Topbar‑Höhe, passive Listener wo sinnvoll
-   - Konsistentes A11y (aria‑*), Reduced‑Motion respektiert
-   - Abwärtskompatibilität: window.__store & window.__scrollToY
-   ===================================================================== */
-
-(() => {
-  const d = document;
-  const w = window;
-  const de = d.documentElement;
-  const body = d.body;
-
-  // -----------------------------
-  // Utils
-  // -----------------------------
-  const qs = (sel, el = d) => el.querySelector(sel);
-  const qsa = (sel, el = d) => Array.from(el.querySelectorAll(sel));
-  const on = (t, ev, fn, opts) => t && t.addEventListener(ev, fn, opts);
-  const off = (t, ev, fn, opts) => t && t.removeEventListener(ev, fn, opts);
-  const clamp = (v, mi, ma) => Math.max(mi, Math.min(ma, v));
-  const isImagePath = (p) => /\.(png|jpe?g|webp|gif|svg)(\?.*)?$/i.test(p);
-  const isHashLink = (href) => href && (href === '#' || href === '#top' || href.startsWith('#'));
-  const parseURL = (raw) => { try { return new URL(raw, location.href); } catch { return null; } };
-  const raf = (fn) => w.requestAnimationFrame(fn);
-
-  const debounce = (fn, wait = 150) => {
-    let t; return (...args) => { clearTimeout(t); t = setTimeout(() => fn.apply(null, args), wait); };
-  };
-
-  // -----------------------------
-  // Store (LS → SS → Memory) + Consent
-  // -----------------------------
-  const Store = (() => {
-    const PERSIST_KEY = 'persist';
-    const hasLS = () => { try { localStorage.setItem('__probe__', '1'); localStorage.removeItem('__probe__'); return true; } catch { return false; } };
-    const hasSS = () => { try { sessionStorage.setItem('__probe__', '1'); sessionStorage.removeItem('__probe__'); return true; } catch { return false; } };
-    const canPersist = () => { try { return hasLS() && localStorage.getItem(PERSIST_KEY) === 'on'; } catch { return false; } };
-
-    const mem = Object.create(null);
-
-    const backend = () => {
-      const useLS = canPersist() && hasLS();
-      const useSS = !useLS && hasSS();
-      return {
-        get: (k) => { try { return useLS ? localStorage.getItem(k) : useSS ? sessionStorage.getItem(k) : (mem[k] ?? null); } catch { return null; } },
-        set: (k, v) => { try { useLS ? localStorage.setItem(k, v) : useSS ? sessionStorage.setItem(k, v) : (mem[k] = String(v)); } catch {} },
-        del: (k) => { try { localStorage.removeItem(k); } catch {} try { sessionStorage.removeItem(k); } catch {} delete mem[k]; },
-        delLSOnly: (k) => { try { localStorage.removeItem(k); } catch {} delete mem[k]; }
-      };
-    };
-
-    const api = {
-      canPersist,
-      safeGet: (k) => backend().get(k),
-      safeSet: (k, v) => backend().set(k, v),
-      safeDel: (k) => backend().del(k),
-      _delLSOnly: (k) => backend().delLSOnly(k)
-    };
-
-    // Exponieren für Abwärtskompatibilität
-    w.__store = api;
-    return api;
-  })();
-
-  // -----------------------------
-  // Consent Dialog (Lightbox‑ähnlich, programmatisch)
-  // -----------------------------
-  const Consent = (() => {
-    let els = null;
-    const ensure = () => {
-      if (els) return;
-      const overlay = d.createElement('div');
-      overlay.id = 'consent-overlay';
-      overlay.className = 'consent-overlay';
-      overlay.setAttribute('aria-hidden', 'true');
-
-      const dialog = d.createElement('div');
-      dialog.className = 'consent-dialog';
-      dialog.setAttribute('role', 'dialog');
-      dialog.setAttribute('aria-modal', 'true');
-      dialog.setAttribute('aria-label', 'Einwilligung');
-
-      const h3 = d.createElement('h3');
-      const text = d.createElement('div');
-      const actions = d.createElement('div');
-      actions.className = 'consent-actions';
-
-      const btnCancel = d.createElement('button');
-      btnCancel.className = 'consent-btn';
-      btnCancel.textContent = 'Abbrechen';
-
-      const btnOk = d.createElement('button');
-      btnOk.className = 'consent-btn primary';
-      btnOk.textContent = 'Zustimmen';
-
-      actions.append(btnCancel, btnOk);
-      dialog.append(h3, text, actions);
-      overlay.append(dialog);
-      body.append(overlay);
-
-      els = { overlay, dialog, h3, text, btnOk, btnCancel };
-    };
-
-    const open = ({ title = '', messageHTML = '', okText = 'Zustimmen', cancelText = 'Abbrechen' } = {}) => new Promise((resolve) => {
-      ensure();
-      const { overlay, h3, text, btnOk, btnCancel } = els;
-      h3.textContent = title;
-      text.innerHTML = messageHTML;
-      btnOk.textContent = okText;
-      btnCancel.textContent = cancelText;
-
-      const lastFocus = d.activeElement;
-      const close = (result) => {
-        overlay.setAttribute('aria-hidden', 'true');
-        body.classList.remove('lb-lock');
-        resolve(!!result);
-        if (lastFocus && d.contains(lastFocus)) lastFocus.focus({ preventScroll: true });
-        off(d, 'keydown', onKey);
-      };
-      const onKey = (e) => { if (e.key === 'Escape') { e.stopPropagation(); close(false); } };
-
-      on(btnOk, 'click', () => close(true), { once: true });
-      on(btnCancel, 'click', () => close(false), { once: true });
-      on(d, 'keydown', onKey);
-
-      overlay.setAttribute('aria-hidden', 'false');
-      body.classList.add('lb-lock');
-      btnOk.focus();
-    });
-
-    return { open };
-  })();
-
-  // -----------------------------
-  // External Link Marker
-  // -----------------------------
-  const ExternalLinks = (() => {
-    const INTERNAL = new Set([location.hostname]);
-    const mark = () => {
-      for (const a of qsa('a[href]:not([data-no-ext-icon])')) {
-        const raw = a.getAttribute('href') || '';
-        if (raw.startsWith('#') || raw.startsWith('mailto:') || raw.startsWith('tel:') || raw.startsWith('javascript:')) continue;
-        const url = parseURL(raw);
-        if (!url) continue;
-        if (!/^(http|https):$/i.test(url.protocol)) continue;
-        if (INTERNAL.has(url.hostname)) continue;
-        if (a.hasAttribute('data-lightbox')) continue;
-        if (a.querySelector('img')) continue;
-        if (isImagePath(url.pathname)) continue;
-        a.classList.add('ext-link');
-      }
-    };
-    return { init: mark };
-  })();
-
-  // -----------------------------
-  // Images: eager hero, lazy others
-  // -----------------------------
-  const Images = (() => {
-    const init = () => {
-      for (const img of qsa('img')) {
-        if (img.closest('.hero')) {
-          img.loading = 'eager';
-          img.decoding = 'async';
-          img.fetchPriority = 'high';
-        } else {
-          if (!img.hasAttribute('loading')) img.loading = 'lazy';
-          img.decoding = 'async';
-          img.fetchPriority = 'low';
+    <script>
+      /* ==========================
+  Externe Links kennzeichnen
+  ========================== */
+      (function () {
+        var INTERNAL_HOSTS = new Set([location.hostname]);
+        function isImagePath(p) {
+          return /\.(png|jpe?g|webp|gif|svg)(\?.*)?$/i.test(p);
         }
-      }
-    };
-    return { init };
-  })();
+        var as = document.querySelectorAll("a[href]:not([data-no-ext-icon])");
+        for (var i = 0; i < as.length; i++) {
+          var a = as[i];
+          var raw = a.getAttribute("href") || "";
+          if (
+            raw.indexOf("#") === 0 ||
+            raw.indexOf("mailto:") === 0 ||
+            raw.indexOf("tel:") === 0 ||
+            raw.indexOf("javascript:") === 0
+          )
+            continue;
+          var url;
+          try {
+            url = new URL(raw, location.href);
+          } catch (e) {
+            continue;
+          }
+          if (url.protocol !== "http:" && url.protocol !== "https:") continue;
+          if (INTERNAL_HOSTS.has(url.hostname)) continue;
+          if (a.hasAttribute("data-lightbox")) continue;
+          if (a.querySelector("img")) continue;
+          if (isImagePath(url.pathname)) continue;
+          a.classList.add("ext-link");
+        }
+      })();
 
-  // -----------------------------
-  // Footer year
-  // -----------------------------
-  const YearStamp = (() => {
-    const init = () => { const y = qs('#y'); if (y) y.textContent = String(new Date().getFullYear()); };
-    return { init };
-  })();
+      /* =======================
+  Lazy-Loading für Bilder
+  ======================= */
+      (function () {
+        var imgs = document.querySelectorAll("img");
+        for (var i = 0; i < imgs.length; i++) {
+          var img = imgs[i];
+          if (img.closest && img.closest(".hero")) {
+            img.setAttribute("loading", "eager");
+            img.setAttribute("fetchpriority", "high");
+            img.setAttribute("decoding", "async");
+            continue;
+          }
+          if (!img.hasAttribute("loading")) img.setAttribute("loading", "lazy");
+          img.setAttribute("decoding", "async");
+          img.setAttribute("fetchpriority", "low");
+        }
+      })();
 
-  // -----------------------------
-  // Storage Toggle (persist on/off) with consent + __store UI text
-  // -----------------------------
-  const StorageToggle = (() => {
-    const BTN_ID = 'storage-toggle';
-    const PERSIST_KEY = 'persist';
+      /* ============================
+  Jahr im Footer aktualisieren
+  ============================ */
+      (function () {
+        var y = document.getElementById("y");
+        if (y) y.textContent = new Date().getFullYear();
+      })();
 
-    const ui = (isOn) => {
-      const b = qs(`#${BTN_ID}`);
-      if (!b) return;
-      if (isOn) {
-        b.textContent = '💾 Storage ON';
-        b.dataset.tooltip = 'Lokale Speicherung: an';
-        b.setAttribute('aria-pressed', 'true');
-      } else {
-        b.textContent = '💾 Storage OFF';
-        b.dataset.tooltip = 'Lokale Speicherung: aus';
-        b.setAttribute('aria-pressed', 'false');
-      }
-      (w.__uiState ||= {}).persist = isOn ? 'on' : 'off';
-    };
+      /* ==========================================================
+  Storage-Consent & Safe-Storage (persist: on/off, default off)
+  – Session-Write-Through: auch bei ON immer zusätzlich sessionStorage
+  – Overlay-Klick schließt NICHT
+  ========================================================== */
+      (function () {
+        try {
+          var PERSIST_KEY = "persist";
+          var THEME_KEY = "theme";
+          var MOTION_KEY = "motion";
 
-    const enable = async () => {
-      const ok = await Consent.open({
-        title: 'Lokale Speicherung aktivieren',
-        messageHTML: '<p>Diese Seite kann die Zustände der Schalter <em>Theme</em>, <em>Scroll</em> und <em>Storage</em> lokal speichern.</p><p>Es werden ausschließlich diese UI-Zustände gespeichert.</p>',
-        okText: 'Zustimmen',
-        cancelText: 'Ablehnen'
-      });
-      if (!ok) { ui(false); return; }
-      try { localStorage.setItem(PERSIST_KEY, 'on'); } catch {}
-      ui(Store.canPersist());
-      try {
-        localStorage.setItem('theme', (w.__uiState && w.__uiState.theme) ? w.__uiState.theme : 'auto');
-        localStorage.setItem('motion', (w.__uiState && w.__uiState.motion) ? w.__uiState.motion : 'auto');
-      } catch {}
-    };
+          if (!window.__uiState) window.__uiState = { theme: "auto", motion: "auto", persist: "off" };
+          var ui = window.__uiState;
 
-    const disable = async () => {
-      const ok = await Consent.open({
-        title: 'Lokale Speicherung deaktivieren',
-        messageHTML: '<p>Die in <em>localStorage</em> gespeicherten Zustände (Theme/Scroll/Storage) werden gelöscht.</p>',
-        okText: 'Löschen & Deaktivieren',
-        cancelText: 'Abbrechen'
-      });
-      if (!ok) return;
-      try { localStorage.removeItem('theme'); } catch {}
-      try { localStorage.removeItem('motion'); } catch {}
-      try { localStorage.removeItem(PERSIST_KEY); } catch {}
-      ui(false);
-    };
+          function hasLocalStorage() {
+            try {
+              var k = "__rc_probe__";
+              localStorage.setItem(k, "1");
+              localStorage.removeItem(k);
+              return true;
+            } catch (_) {
+              return false;
+            }
+          }
+          function hasSessionStorage() {
+            try {
+              var k = "__rc_sprobe__";
+              sessionStorage.setItem(k, "1");
+              sessionStorage.removeItem(k);
+              return true;
+            } catch (_) {
+              return false;
+            }
+          }
+          function canPersist() {
+            try {
+              return hasLocalStorage() && localStorage.getItem(PERSIST_KEY) === "on";
+            } catch (_) {
+              return false;
+            }
+          }
 
-    const handler = (e) => {
-      const t = e.target.closest(`#${BTN_ID}, a[href="#storage-consent"], [data-action="storage-toggle"]`);
-      if (!t) return;
-      e.preventDefault();
-      e.stopImmediatePropagation?.();
-      Store.canPersist() ? disable() : enable();
-    };
+          // --- Write-Through Multi-Store (SS + optional LS) ---
+          (function initStore() {
+            var mem = Object.create(null);
 
-    const init = () => {
-      ui(Store.canPersist());
-      on(d, 'click', handler, { capture: true });
-    };
+            function rLS(k) {
+              try {
+                return localStorage.getItem(k);
+              } catch (_) {
+                return null;
+              }
+            }
+            function wLS(k, v) {
+              try {
+                localStorage.setItem(k, v);
+              } catch (_) {}
+            }
+            function dLS(k) {
+              try {
+                localStorage.removeItem(k);
+              } catch (_) {}
+            }
 
-    return { init };
-  })();
+            function rSS(k) {
+              try {
+                return sessionStorage.getItem(k);
+              } catch (_) {
+                return null;
+              }
+            }
+            function wSS(k, v) {
+              try {
+                sessionStorage.setItem(k, v);
+              } catch (_) {}
+            }
+            function dSS(k) {
+              try {
+                sessionStorage.removeItem(k);
+              } catch (_) {}
+            }
 
-  // -----------------------------
-  // Theme Toggle (auto → light → dark)
-  // -----------------------------
-  const ThemeToggle = (() => {
-    const KEY = 'theme';
-    const btn = () => qs('#theme-toggle');
+            function _canPersist() {
+              return canPersist();
+            }
 
-    const apply = (theme) => {
-      if (theme === 'light') {
-        de.setAttribute('data-theme', 'light');
-        if (btn()) { btn().textContent = '☀️ Theme LIGHT'; btn().setAttribute('aria-pressed', 'true'); }
-      } else if (theme === 'dark') {
-        de.setAttribute('data-theme', 'dark');
-        if (btn()) { btn().textContent = '🌙 Theme DARK'; btn().setAttribute('aria-pressed', 'true'); }
-      } else {
-        de.removeAttribute('data-theme');
-        if (btn()) { btn().textContent = '🖥️ Theme AUTO'; btn().setAttribute('aria-pressed', 'false'); }
-      }
-      (w.__uiState ||= {}).theme = theme;
-    };
+            function safeGet(k) {
+              var vSS = rSS(k);
+              if (vSS !== null && vSS !== undefined) return vSS;
+              if (_canPersist()) {
+                var vLS = rLS(k);
+                if (vLS !== null && vLS !== undefined) return vLS;
+              }
+              return Object.prototype.hasOwnProperty.call(mem, k) ? mem[k] : null;
+            }
+            function safeSet(k, v) {
+              var sv = String(v);
+              if (hasSessionStorage()) wSS(k, sv);
+              else mem[k] = sv; // immer Session/Memory
+              if (_canPersist()) wLS(k, sv);
+              else dLS(k); // optional zusätzlich LS
+            }
+            function safeDel(k) {
+              dSS(k);
+              dLS(k);
+              delete mem[k];
+            }
 
-    const next = (state) => state === 'auto' ? 'light' : state === 'light' ? 'dark' : 'auto';
+            function hydrateSessionFromLocal(keys) {
+              if (!_canPersist() || !hasSessionStorage()) return;
+              for (var i = 0; i < keys.length; i++) {
+                var k = keys[i];
+                var v = rLS(k);
+                if (v !== null && v !== undefined) wSS(k, v);
+              }
+            }
+            function setPersistMode(on) {
+              if (on) wLS(PERSIST_KEY, "on");
+              else dLS(PERSIST_KEY);
+            }
 
-    const init = () => {
-      let state = Store.safeGet(KEY) || 'auto';
-      apply(state);
-      on(btn(), 'click', (e) => {
-        e.preventDefault();
-        state = next(state);
-        Store.safeSet(KEY, state);
+            window.__store = {
+              canPersist: _canPersist,
+              safeGet: safeGet,
+              safeSet: safeSet,
+              safeDel: safeDel,
+              hydrateSessionFromLocal: hydrateSessionFromLocal,
+              setPersistMode: setPersistMode
+            };
+          })();
+
+          // --- Consent-Overlay bauen ---
+          function ensureConsentOverlay() {
+            if (document.getElementById("consent-overlay")) return;
+            var overlay = document.createElement("div");
+            overlay.id = "consent-overlay";
+            overlay.className = "consent-overlay";
+            overlay.setAttribute("aria-hidden", "true");
+
+            var dialog = document.createElement("div");
+            dialog.className = "consent-dialog";
+            dialog.setAttribute("role", "dialog");
+            dialog.setAttribute("aria-modal", "true");
+            dialog.setAttribute("aria-label", "Einwilligung");
+
+            var h3 = document.createElement("h3");
+            var text = document.createElement("div");
+            var actions = document.createElement("div");
+            actions.className = "consent-actions";
+
+            var btnCancel = document.createElement("button");
+            btnCancel.className = "consent-btn";
+            btnCancel.textContent = "Abbrechen";
+
+            var btnOk = document.createElement("button");
+            btnOk.className = "consent-btn primary";
+            btnOk.textContent = "Zustimmen";
+
+            actions.appendChild(btnCancel);
+            actions.appendChild(btnOk);
+            dialog.appendChild(h3);
+            dialog.appendChild(text);
+            dialog.appendChild(actions);
+            overlay.appendChild(dialog);
+            document.body.appendChild(overlay);
+
+            consentDialog._els = {
+              overlay: overlay,
+              dialog: dialog,
+              h3: h3,
+              text: text,
+              btnOk: btnOk,
+              btnCancel: btnCancel
+            };
+          }
+
+          function consentDialog(opts) {
+            ensureConsentOverlay();
+            var title = opts && opts.title ? opts.title : "";
+            var messageHTML = opts && opts.messageHTML ? opts.messageHTML : "";
+            var okText = opts && opts.okText ? opts.okText : "Zustimmen";
+            var cancelText = opts && opts.cancelText !== undefined ? opts.cancelText : "Abbrechen";
+
+            var resolver;
+            var p = new Promise(function (res) {
+              resolver = res;
+            });
+
+            var els = consentDialog._els;
+            var overlay = els.overlay,
+              h3 = els.h3,
+              text = els.text,
+              btnOk = els.btnOk,
+              btnCancel = els.btnCancel;
+            h3.textContent = title;
+            text.innerHTML = messageHTML;
+            btnOk.textContent = okText;
+            btnCancel.textContent = cancelText;
+
+            var lastFocus = document.activeElement;
+            function open() {
+              overlay.setAttribute("aria-hidden", "false");
+              document.body.classList.add("lb-lock");
+              try {
+                btnOk.focus();
+              } catch (_) {}
+            }
+            function close(result) {
+              overlay.setAttribute("aria-hidden", "true");
+              document.body.classList.remove("lb-lock");
+              if (lastFocus && document.contains(lastFocus)) {
+                try {
+                  lastFocus.focus();
+                } catch (_) {}
+              }
+              resolver(!!result);
+            }
+            function onEsc(e) {
+              if (e.key === "Escape") {
+                e.stopPropagation();
+                close(false);
+              }
+            }
+
+            btnOk.onclick = function () {
+              close(true);
+            };
+            btnCancel.onclick = function () {
+              close(false);
+            };
+            document.addEventListener("keydown", onEsc, { once: true });
+
+            open();
+            return p;
+          }
+
+          // UI-Text aktualisieren
+          var storageBtn = document.getElementById("storage-toggle");
+          function applyPersistUI(isOn) {
+            if (storageBtn) {
+              if (isOn) {
+                storageBtn.textContent = "💾 Storage ON";
+                storageBtn.setAttribute("data-tooltip", "Lokale Speicherung: an");
+                storageBtn.setAttribute("aria-pressed", "true");
+                ui.persist = "on";
+              } else {
+                storageBtn.textContent = "💾 Storage OFF";
+                storageBtn.setAttribute("data-tooltip", "Lokale Speicherung: aus");
+                storageBtn.setAttribute("aria-pressed", "false");
+                ui.persist = "off";
+              }
+            }
+          }
+
+          function isStorageToggleClick(target) {
+            if (!target) return false;
+            var t = target.closest
+              ? target.closest('#storage-toggle, a[href="#storage-consent"], [data-action="storage-toggle"]')
+              : null;
+            return !!t;
+          }
+
+          function handleStorageToggle() {
+            try {
+              if (!canPersist()) {
+                // Aktivieren → Consent
+                consentDialog({
+                  title: "Lokale Speicherung aktivieren",
+                  messageHTML:
+                    "<p>Diese Seite kann die Zustände der Schalter <em>Theme</em>, <em>Scroll</em> und <em>Storage</em> lokal in Ihrem Browser speichern.</p>\
+<p>Es werden ausschließlich diese UI-Zustände gespeichert; keine personenbezogenen Daten.</p>\
+<p>Mit „Zustimmen“ erlauben Sie das Speichern und das Wiederherstellen bei künftigen Besuchen.</p>",
+                  okText: "Zustimmen",
+                  cancelText: "Ablehnen"
+                }).then(function (ok) {
+                  if (!ok) {
+                    applyPersistUI(false);
+                    return;
+                  }
+                  var wrote = false;
+                  try {
+                    localStorage.setItem(PERSIST_KEY, "on");
+                    wrote = localStorage.getItem(PERSIST_KEY) === "on";
+                  } catch (_) {
+                    wrote = false;
+                  }
+
+                  if (wrote && hasLocalStorage()) {
+                    applyPersistUI(true);
+                    // Session sofort mit LS-Werten befüllen
+                    if (window.__store && window.__store.hydrateSessionFromLocal) {
+                      window.__store.hydrateSessionFromLocal([THEME_KEY, MOTION_KEY, PERSIST_KEY]);
+                    }
+                    // Aktuellen UI-State write-through sichern (SS + ggf. LS)
+                    if (window.__store && window.__store.safeSet) {
+                      window.__store.safeSet(
+                        THEME_KEY,
+                        window.__uiState && window.__uiState.theme ? window.__uiState.theme : "auto"
+                      );
+                      window.__store.safeSet(
+                        MOTION_KEY,
+                        window.__uiState && window.__uiState.motion ? window.__uiState.motion : "auto"
+                      );
+                    }
+                  } else {
+                    applyPersistUI(false);
+                    consentDialog({
+                      title: "Speichern blockiert",
+                      messageHTML:
+                        "<p>Der lokale Speicher ist im Browser aktuell nicht verfügbar (z.&nbsp;B. Edge Tracking-Schutz, InPrivate, Website-Berechtigungen).</p>\
+<p><strong>Prüfen in Edge:</strong></p>\
+<ul>\
+<li>Einstellungen → <em>Cookies und Websiteberechtigungen</em> → <em>Cookies und Websitedaten</em>: „Websites erlauben, Daten zu speichern“ aktivieren.</li>\
+<li><em>Tracking-Schutz</em>: „Ausgewogen“ oder „Standard“ verwenden (nicht „Strikt“).</li>\
+<li>Kein InPrivate-/Anwendungs-Guard-Fenster verwenden.</li>\
+</ul>\
+<p>Nach Anpassung die Seite neu laden.</p>",
+                      okText: "OK",
+                      cancelText: "Schließen"
+                    });
+                  }
+                });
+              } else {
+                // Deaktivieren → nur LS leeren; Session bleibt tab-lokal erhalten
+                consentDialog({
+                  title: "Lokale Speicherung deaktivieren",
+                  messageHTML:
+                    "<p>Die in <em>localStorage</em> gespeicherten Zustände (Theme/Scroll/Storage) werden gelöscht.</p>\
+<p>Die Schalter funktionieren weiter; Änderungen werden bis zum Schließen des Tabs in <em>sessionStorage</em> gehalten.</p>",
+                  okText: "Löschen & Deaktivieren",
+                  cancelText: "Abbrechen"
+                }).then(function (ok) {
+                  if (!ok) return;
+                  try {
+                    localStorage.removeItem(THEME_KEY);
+                  } catch (_) {}
+                  try {
+                    localStorage.removeItem(MOTION_KEY);
+                  } catch (_) {}
+                  try {
+                    localStorage.removeItem(PERSIST_KEY);
+                  } catch (_) {}
+                  applyPersistUI(false);
+                });
+              }
+            } catch (err) {
+              var turnOn = !canPersist();
+              var msgOn = "Lokale Speicherung aktivieren?";
+              var msgOff = "Lokale Speicherung deaktivieren und lokale (dauerhafte) Zustände löschen?";
+              if (window.confirm(turnOn ? msgOn : msgOff)) {
+                if (turnOn) {
+                  try {
+                    localStorage.setItem(PERSIST_KEY, "on");
+                  } catch (_) {}
+                  applyPersistUI(canPersist());
+                } else {
+                  try {
+                    localStorage.removeItem(THEME_KEY);
+                  } catch (_) {}
+                  try {
+                    localStorage.removeItem(MOTION_KEY);
+                  } catch (_) {}
+                  try {
+                    localStorage.removeItem(PERSIST_KEY);
+                  } catch (_) {}
+                  applyPersistUI(false);
+                }
+              }
+            }
+          }
+
+          // Delegation mit preventDefault (und kein Hash-Scroll)
+          document.addEventListener(
+            "click",
+            function (e) {
+              if (!isStorageToggleClick(e.target)) return;
+              e.preventDefault();
+              if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+              handleStorageToggle();
+            },
+            true
+          );
+
+          // Initiale UI
+          applyPersistUI(canPersist());
+          // Optional: Session direkt aus LS hydrieren, wenn bereits ON
+          if (window.__store && window.__store.canPersist && window.__store.canPersist()) {
+            if (window.__store.hydrateSessionFromLocal) {
+              window.__store.hydrateSessionFromLocal([THEME_KEY, MOTION_KEY, PERSIST_KEY]);
+            }
+          }
+        } catch (e) {
+          try {
+            var b = document.getElementById("storage-toggle");
+            if (b) {
+              b.textContent = "💾 Storage OFF";
+              b.setAttribute("aria-pressed", "false");
+            }
+          } catch (_) {}
+        }
+      })();
+
+      /* =================================
+  Theme-Toggle: auto → light → dark
+  ================================= */
+      (function () {
+        var KEY = "theme";
+        var $html = document.documentElement;
+        var $btn = document.getElementById("theme-toggle");
+        if (!$btn) return;
+
+        function apply(theme) {
+          if (theme === "light") {
+            $html.setAttribute("data-theme", "light");
+            $btn.textContent = "☀️ Theme LIGHT";
+            $btn.setAttribute("aria-pressed", "true");
+          } else if (theme === "dark") {
+            $html.setAttribute("data-theme", "dark");
+            $btn.textContent = "🌙 Theme DARK";
+            $btn.setAttribute("aria-pressed", "true");
+          } else {
+            $html.removeAttribute("data-theme");
+            $btn.textContent = "🖥️ Theme AUTO";
+            $btn.setAttribute("aria-pressed", "false");
+          }
+          if (!window.__uiState) window.__uiState = {};
+          window.__uiState.theme = theme;
+        }
+        function next(state) {
+          return state === "auto" ? "light" : state === "light" ? "dark" : "auto";
+        }
+
+        var state = window.__store && window.__store.safeGet ? window.__store.safeGet(KEY) : null;
+        if (!state) state = "auto";
         apply(state);
-      });
-      if (w.matchMedia) {
-        const mq = w.matchMedia('(prefers-color-scheme: dark)');
-        const onChange = () => { if (state === 'auto') apply('auto'); };
-        mq.addEventListener ? mq.addEventListener('change', onChange) : mq.addListener(onChange);
-      }
-    };
 
-    return { init };
-  })();
+        $btn.addEventListener("click", function (e) {
+          if (e && e.preventDefault) e.preventDefault();
+          state = next(state);
+          if (window.__store && window.__store.safeSet) window.__store.safeSet(KEY, state);
+          apply(state);
+        });
 
-  // -----------------------------
-  // Motion Toggle (auto → on → off)
-  // -----------------------------
-  const MotionToggle = (() => {
-    const KEY = 'motion';
-    const btn = () => qs('#motion-toggle');
+        if (window.matchMedia) {
+          var mq = window.matchMedia("(prefers-color-scheme: dark)");
+          var onChange = function () {
+            if (state === "auto") apply("auto");
+          };
+          if (mq.addEventListener) mq.addEventListener("change", onChange);
+          else if (mq.addListener) mq.addListener(onChange);
+        }
+      })();
 
-    const apply = (mode) => {
-      if (mode === 'auto') de.removeAttribute('data-motion'); else de.setAttribute('data-motion', mode);
-      if (btn()) {
-        if (mode === 'on') { btn().textContent = '🌀 Scroll ON'; btn().dataset.tooltip = 'Sanftes Scrollen: an'; btn().setAttribute('aria-pressed', 'true'); }
-        else if (mode === 'off') { btn().textContent = '⏩ Scroll OFF'; btn().dataset.tooltip = 'Sanftes Scrollen: aus'; btn().setAttribute('aria-pressed', 'true'); }
-        else { btn().textContent = '🖥️ Scroll AUTO'; btn().dataset.tooltip = 'Sanftes Scrollen: Systemvorgabe'; btn().setAttribute('aria-pressed', 'false'); }
-      }
-      (w.__uiState ||= {}).motion = mode;
-    };
+      /* ==========================================
+  Motion-Toggle: auto → on → off (wie Theme)
+  ========================================== */
+      (function () {
+        var KEY = "motion";
+        var $html = document.documentElement;
+        var $btn = document.getElementById("motion-toggle");
+        if (!$btn) return;
 
-    const next = (m) => m === 'auto' ? 'on' : m === 'on' ? 'off' : 'auto';
+        function apply(mode) {
+          if (mode === "auto") {
+            $html.removeAttribute("data-motion");
+          } else {
+            $html.setAttribute("data-motion", mode);
+          }
 
-    const init = () => {
-      let state = Store.safeGet(KEY) || de.getAttribute('data-motion') || 'auto';
-      apply(state);
-      on(btn(), 'click', (e) => { e.preventDefault(); state = next(state); Store.safeSet(KEY, state); apply(state); });
-      if (w.matchMedia) {
-        const mq = w.matchMedia('(prefers-reduced-motion: reduce)');
-        const onChange = () => { const m = (w.__uiState && w.__uiState.motion) || 'auto'; if (m === 'auto') apply('auto'); };
-        mq.addEventListener ? mq.addEventListener('change', onChange) : mq.addListener(onChange);
-      }
-    };
+          if (mode === "on") {
+            $btn.textContent = "🌀 Scroll ON";
+            $btn.setAttribute("data-tooltip", "Sanftes Scrollen: an");
+            $btn.setAttribute("aria-pressed", "true");
+          } else if (mode === "off") {
+            $btn.textContent = "⏩ Scroll OFF";
+            $btn.setAttribute("data-tooltip", "Sanftes Scrollen: aus");
+            $btn.setAttribute("aria-pressed", "true");
+          } else {
+            $btn.textContent = "🖥️ Scroll AUTO";
+            $btn.setAttribute("data-tooltip", "Sanftes Scrollen: Systemvorgabe");
+            $btn.setAttribute("aria-pressed", "false");
+          }
+          if (!window.__uiState) window.__uiState = {};
+          window.__uiState.motion = mode;
+        }
+        function next(mode) {
+          return mode === "auto" ? "on" : mode === "on" ? "off" : "auto";
+        }
 
-    return { init };
-  })();
+        var state =
+          (window.__store && window.__store.safeGet ? window.__store.safeGet(KEY) : null) ||
+          $html.getAttribute("data-motion") ||
+          "auto";
+        apply(state);
 
-  // -----------------------------
-  // Topbar height → body padding (ResizeObserver)
-  // -----------------------------
-  const TopbarPad = (() => {
-    const pad = () => {
-      const tb = qs('.topbar');
-      const h = tb?.offsetHeight || 0;
-      body.style.paddingTop = `${h}px`;
-      de.style.setProperty('--tb-h', `${h}px`);
-    };
-    const init = () => {
-      pad();
-      if ('ResizeObserver' in w) {
-        const ro = new ResizeObserver(debounce(pad, 16));
-        const tb = qs('.topbar');
-        if (tb) ro.observe(tb);
-      } else {
-        on(w, 'load', pad); on(w, 'resize', debounce(pad, 50));
-      }
-    };
-    return { init };
-  })();
+        $btn.addEventListener("click", function (e) {
+          if (e && e.preventDefault) e.preventDefault();
+          state = next(state);
+          if (window.__store && window.__store.safeSet) window.__store.safeSet(KEY, state);
+          apply(state);
+        });
 
-  // -----------------------------
-  // Scroll‑Up Button
-  // -----------------------------
-  const ScrollUp = (() => {
-    let btn, style;
-    const rootY = () => w.scrollY || d.documentElement.scrollTop || d.body.scrollTop || 0;
+        if (window.matchMedia) {
+          var mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+          var onChange = function () {
+            var m = window.__uiState && window.__uiState.motion ? window.__uiState.motion : "auto";
+            if (m === "auto") apply("auto");
+          };
+          if (mq.addEventListener) mq.addEventListener("change", onChange);
+          else if (mq.addListener) mq.addListener(onChange);
+        }
+      })();
 
-    const click = () => {
-      if (typeof w.__scrollToY === 'function') { w.__scrollToY(0); return; }
-      const mode = (w.__uiState && w.__uiState.motion) || de.getAttribute('data-motion') || 'auto';
-      const reduce = mode === 'off' || (mode === 'auto' && w.matchMedia && w.matchMedia('(prefers-reduced-motion: reduce)').matches);
-      w.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
-    };
+      /* ===================================================
+  Topbar-Höhe → Body-Padding (verhindert Überdeckung)
+  =================================================== */
+      (function () {
+        var tb = document.querySelector(".topbar");
+        function setPad() {
+          var h = tb && tb.offsetHeight ? tb.offsetHeight : 0;
+          document.body.style.paddingTop = h + "px";
+          document.documentElement.style.setProperty("--tb-h", h + "px");
+        }
+        setPad();
+        window.addEventListener("load", setPad);
+        window.addEventListener("resize", setPad);
+      })();
 
-    const onScroll = () => {
-      const overlayLock = body.classList.contains('lb-lock');
-      const y = rootY();
-      style.display = (!overlayLock && y > 300) ? 'block' : 'none';
-    };
+      /* ========================
+  Kleiner Scroll-Up-Button
+  ======================== */
+      (function () {
+        var btn = document.createElement("button");
+        btn.textContent = "↑";
+        btn.type = "button";
+        btn.setAttribute("aria-label", "Nach oben");
+        btn.setAttribute("title", "Nach oben");
+        var style = btn.style;
+        style.position = "fixed";
+        style.right = "16px";
+        style.bottom = "calc(env(safe-area-inset-bottom, 0px) + 16px)";
+        style.width = "42px";
+        style.height = "42px";
+        style.borderRadius = "50%";
+        style.border = "1px solid rgba(0,0,0,.25)";
+        style.background = "rgba(255,255,255,.65)";
+        style.color = "inherit";
+        style.cursor = "pointer";
+        style.boxShadow = "0 6px 18px rgba(0,0,0,.25)";
+        style.display = "none";
+        style.zIndex = 2147483647;
+        try {
+          if (window.matchMedia && window.matchMedia("(pointer: coarse)").matches) {
+            style.width = "48px";
+            style.height = "48px";
+          }
+        } catch (_) {}
 
-    const init = () => {
-      btn = d.createElement('button');
-      btn.type = 'button'; btn.textContent = '↑';
-      btn.setAttribute('aria-label', 'Nach oben'); btn.title = 'Nach oben';
-      style = btn.style;
-      Object.assign(style, {
-        position: 'fixed', right: '16px', bottom: 'calc(env(safe-area-inset-bottom, 0px) + 16px)',
-        width: '42px', height: '42px', borderRadius: '50%', border: '1px solid rgba(0,0,0,.25)',
-        background: 'rgba(255,255,255,.65)', color: 'inherit', cursor: 'pointer',
-        boxShadow: '0 6px 18px rgba(0,0,0,.25)', display: 'none', zIndex: 2147483647
-      });
-      try { if (w.matchMedia && w.matchMedia('(pointer: coarse)').matches) { style.width = '48px'; style.height = '48px'; } } catch {}
-      on(btn, 'click', click);
-      body.append(btn);
-      on(w, 'scroll', onScroll, { passive: true });
-      on(w, 'load', onScroll);
-      on(w, 'orientationchange', onScroll);
-      try { new MutationObserver(onScroll).observe(body, { attributes: true, attributeFilter: ['class'] }); } catch {}
-      onScroll();
-    };
+        function rootScrollTop() {
+          return (
+            (typeof window.scrollY === "number" ? window.scrollY : 0) ||
+            document.documentElement.scrollTop ||
+            document.body.scrollTop ||
+            0
+          );
+        }
 
-    return { init };
-  })();
+        btn.addEventListener("click", function () {
+          if (typeof window.__scrollToY === "function") {
+            window.__scrollToY(0);
+            return;
+          }
+          var mode =
+            (window.__uiState && window.__uiState.motion) ||
+            document.documentElement.getAttribute("data-motion") ||
+            "auto";
+          var reduce =
+            mode === "off" ||
+            (mode === "auto" && window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+          window.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" });
+        });
 
-  // -----------------------------
-  // Active Link Highlight (IntersectionObserver)
-  // -----------------------------
-  const ActiveNav = (() => {
-    let links = [];
-    const map = new Map();
+        document.body.appendChild(btn);
+        var THRESH = 300;
+        function onScroll() {
+          var overlayLock = document.body.classList.contains("lb-lock");
+          var y = rootScrollTop();
+          style.display = !overlayLock && y > THRESH ? "block" : "none";
+        }
 
-    const setActive = (id) => {
-      for (const a of links) a.removeAttribute('aria-current');
-      const active = qs(`.topbar .nav a[href="${id}"]`);
-      if (active) active.setAttribute('aria-current', 'page');
-    };
+        window.addEventListener("scroll", onScroll, { passive: true });
+        window.addEventListener("load", onScroll);
+        window.addEventListener("orientationchange", onScroll);
+        try {
+          var mo = new MutationObserver(onScroll);
+          mo.observe(document.body, { attributes: true, attributeFilter: ["class"] });
+        } catch (_) {}
+        onScroll();
+      })();
 
-    const init = () => {
-      links = qsa('.topbar .nav a[href^="#"]').filter(Boolean);
-      if (!links.length) return;
-      const sections = [];
-      for (const a of links) {
-        const target = qs(a.getAttribute('href'));
-        if (target) { sections.push(target); map.set(target, a.getAttribute('href')); }
-      }
-      const io = new IntersectionObserver((entries) => {
-        for (const e of entries) { if (e.isIntersecting) setActive('#' + e.target.id); }
-      }, { rootMargin: '-30% 0px -60% 0px', threshold: 0 });
+      /* ====================================
+  Active-Link-Markierung (Desktop-Nav)
+  ==================================== */
+      (function () {
+        var links = document.querySelectorAll('.topbar .nav a[href^="#"]');
+        if (!links.length) return;
+        var sections = [];
+        for (var i = 0; i < links.length; i++) {
+          var t = document.querySelector(links[i].getAttribute("href"));
+          if (t) sections.push(t);
+        }
+        function setActive(id) {
+          for (var j = 0; j < links.length; j++) links[j].removeAttribute("aria-current");
+          var active = document.querySelector('.topbar .nav a[href="' + id + '"]');
+          if (active) active.setAttribute("aria-current", "page");
+        }
+        var io = new IntersectionObserver(
+          function (entries) {
+            for (var k = 0; k < entries.length; k++) {
+              var e = entries[k];
+              if (e.isIntersecting) setActive("#" + e.target.id);
+            }
+          },
+          { rootMargin: "-30% 0px -60% 0px", threshold: 0 }
+        );
+        for (var m = 0; m < sections.length; m++) io.observe(sections[m]);
+      })();
 
-      for (const s of sections) io.observe(s);
-    };
+      /* =========================
+  Lightbox (für Bild-Links)
+  – Overlay-Klick schließt NICHT
+  ========================= */
+      (function () {
+        var overlay = document.createElement("div");
+        overlay.className = "lb-overlay";
+        overlay.setAttribute("aria-hidden", "true");
 
-    return { init };
-  })();
+        var dialog = document.createElement("div");
+        dialog.className = "lb-dialog";
+        dialog.setAttribute("role", "dialog");
+        dialog.setAttribute("aria-modal", "true");
+        dialog.setAttribute("aria-label", "Bildanzeige");
 
-  // -----------------------------
-  // Lightbox (for image links)
-  // -----------------------------
-  const Lightbox = (() => {
-    let overlay, dialog, img, caption, closeBtn, lastFocus;
+        var img = document.createElement("img");
+        img.className = "lb-img";
+        img.setAttribute("alt", "");
+        var caption = document.createElement("div");
+        caption.className = "lb-caption";
+        var closeBtn = document.createElement("button");
+        closeBtn.className = "lb-close";
+        closeBtn.setAttribute("aria-label", "Schließen");
+        closeBtn.innerHTML = "&times;";
 
-    const ensure = () => {
-      if (overlay) return;
-      overlay = d.createElement('div'); overlay.className = 'lb-overlay'; overlay.setAttribute('aria-hidden', 'true');
-      dialog = d.createElement('div'); dialog.className = 'lb-dialog'; dialog.setAttribute('role', 'dialog'); dialog.setAttribute('aria-modal', 'true'); dialog.setAttribute('aria-label', 'Bildanzeige');
-      img = d.createElement('img'); img.className = 'lb-img'; img.alt = '';
-      caption = d.createElement('div'); caption.className = 'lb-caption';
-      closeBtn = d.createElement('button'); closeBtn.className = 'lb-close'; closeBtn.setAttribute('aria-label', 'Schließen'); closeBtn.innerHTML = '&times;';
-      dialog.append(closeBtn, img, caption); overlay.append(dialog); body.append(overlay);
-      on(closeBtn, 'click', () => close());
-      on(d, 'keydown', (e) => { if (overlay.getAttribute('aria-hidden') === 'false' && e.key === 'Escape') close(); });
-    };
+        dialog.appendChild(closeBtn);
+        dialog.appendChild(img);
+        dialog.appendChild(caption);
+        overlay.appendChild(dialog);
+        document.body.appendChild(overlay);
 
-    const open = (href, text, alt) => {
-      ensure();
-      lastFocus = d.activeElement;
-      img.src = href; img.alt = alt || text || '';
-      caption.textContent = text || '';
-      overlay.setAttribute('aria-hidden', 'false');
-      body.classList.add('lb-lock');
-      closeBtn.focus();
-    };
+        var lastFocus = null;
+        function openLightbox(href, text, alt) {
+          lastFocus = document.activeElement;
+          img.src = href;
+          img.alt = alt || text || "";
+          caption.textContent = text || "";
+          overlay.setAttribute("aria-hidden", "false");
+          document.body.classList.add("lb-lock");
+          try {
+            closeBtn.focus();
+          } catch (e) {}
+        }
+        function closeLightbox() {
+          overlay.setAttribute("aria-hidden", "true");
+          document.body.classList.remove("lb-lock");
+          img.removeAttribute("src");
+          if (lastFocus && document.contains(lastFocus)) {
+            try {
+              lastFocus.focus();
+            } catch (e) {}
+          }
+        }
 
-    const close = () => {
-      overlay.setAttribute('aria-hidden', 'true');
-      body.classList.remove('lb-lock');
-      img.removeAttribute('src');
-      if (lastFocus && d.contains(lastFocus)) lastFocus.focus({ preventScroll: true });
-    };
+        overlay.addEventListener("click", function (e) {
+          if (e.target === closeBtn) closeLightbox();
+        });
+        document.addEventListener("keydown", function (e) {
+          if (overlay.getAttribute("aria-hidden") === "false" && e.key === "Escape") closeLightbox();
+        });
 
-    const click = (e) => {
-      const a = e.target.closest && e.target.closest('a');
-      if (!a) return;
-      const href = a.getAttribute('href') || '';
-      const wants = a.hasAttribute('data-lightbox') || isImagePath(href);
-      if (!wants) return;
-      e.preventDefault();
-      const imgEl = a.querySelector && a.querySelector('img');
-      const alt = imgEl ? (imgEl.getAttribute('alt') || '') : '';
-      const title = a.getAttribute('title') || a.getAttribute('data-caption') || (a.textContent ? a.textContent.trim() : '');
-      open(a.href || href, title, alt);
-    };
+        document.addEventListener(
+          "click",
+          function (e) {
+            var a = e.target.closest ? e.target.closest("a") : null;
+            if (!a) return;
+            var href = a.getAttribute("href") || "";
+            var isImageHref = /\.(png|jpe?g|webp|gif|svg)(\?.*)?$/i.test(href);
+            var wantsLb = a.hasAttribute("data-lightbox") || isImageHref;
+            if (!wantsLb) return;
+            e.preventDefault();
+            var imgEl = a.querySelector ? a.querySelector("img") : null;
+            var alt = imgEl ? imgEl.getAttribute("alt") || "" : "";
+            var title =
+              a.getAttribute("title") || a.getAttribute("data-caption") || (a.textContent ? a.textContent.trim() : "");
+            openLightbox(a.href || href, title, alt);
+          },
+          { passive: false }
+        );
+      })();
 
-    const init = () => on(d, 'click', click, { passive: false });
-    return { init };
-  })();
+      /* ===========================
+  Mobile Navigation (Overlay)
+  – Overlay-Klick schließt NICHT
+  =========================== */
+      (function () {
+        var btn = document.getElementById("menu-toggle");
+        var overlay = document.getElementById("mobile-nav");
+        var closeBtn = overlay ? overlay.querySelector(".mnav-close") : null;
+        var linksContainer = overlay ? overlay.querySelector(".mnav-links") : null;
+        var desktopNav = document.querySelector(".topbar .nav");
+        var lastFocus = null;
 
-  // -----------------------------
-  // Mobile Navigation Overlay
-  // -----------------------------
-  const MobileNav = (() => {
-    let btn, overlay, closeBtn, linksContainer, desktopNav, lastFocus;
-
-    const syncLinks = () => { if (linksContainer) linksContainer.innerHTML = desktopNav ? desktopNav.innerHTML : ''; };
-    const isMobile = () => w.innerWidth <= 860;
-
-    const moveBrandToRow2 = () => {
-      const brand = qs('.topbar-row.row1 .brand');
-      const row1Inner = qs('.topbar-row.row1 .inner');
-      const row2Inner = qs('.topbar-row.row2 .inner');
-      const burger = btn;
-      if (!brand || !row2Inner || !burger) return;
-      if (row2Inner.contains(brand)) return;
-      row1Inner?.classList.add('no-brand');
-      burger.insertAdjacentElement('afterend', brand);
-    };
-    const restoreBrandToRow1 = () => {
-      const brand = qs('.topbar-row.row1 .brand');
-      const row1Inner = qs('.topbar-row.row1 .inner');
-      const row1Anchor = row1Inner?.querySelector('.controls') || null;
-      if (!brand || !row1Inner) return;
-      if (row1Inner.contains(brand)) return;
-      brand.classList.remove('brand--row2');
-      row1Inner.classList.remove('no-brand');
-      row1Anchor ? row1Inner.insertBefore(brand, row1Anchor) : row1Inner.appendChild(brand);
-    };
-
-    const placeBrand = () => { isMobile() ? moveBrandToRow2() : restoreBrandToRow1(); };
-
-    const open = () => {
-      lastFocus = d.activeElement;
-      overlay?.classList.add('open');
-      overlay?.setAttribute('aria-hidden', 'false');
-      btn?.setAttribute('aria-expanded', 'true');
-      body.classList.add('lb-lock');
-      const firstLink = linksContainer?.querySelector('a');
-      (firstLink || closeBtn)?.focus();
-    };
-    const close = () => {
-      overlay?.classList.remove('open');
-      overlay?.setAttribute('aria-hidden', 'true');
-      btn?.setAttribute('aria-expanded', 'false');
-      body.classList.remove('lb-lock');
-      if (lastFocus && d.contains(lastFocus)) lastFocus.focus({ preventScroll: true });
-    };
-
-    const init = () => {
-      btn = qs('#menu-toggle');
-      overlay = qs('#mobile-nav');
-      closeBtn = overlay?.querySelector('.mnav-close') || null;
-      linksContainer = overlay?.querySelector('.mnav-links') || null;
-      desktopNav = qs('.topbar .nav');
-      syncLinks();
-
-      on(btn, 'click', () => overlay?.classList.contains('open') ? close() : open());
-      on(closeBtn, 'click', close);
-      on(d, 'keydown', (e) => { if (e.key === 'Escape' && overlay?.classList.contains('open')) close(); });
-      on(overlay, 'click', (e) => { const a = e.target.closest?.('a'); if (a) close(); });
-
-      let ww = w.innerWidth;
-      on(w, 'resize', debounce(() => {
-        if (w.innerWidth === ww) return;
-        ww = w.innerWidth;
+        function syncLinks() {
+          if (linksContainer) linksContainer.innerHTML = desktopNav ? desktopNav.innerHTML : "";
+        }
         syncLinks();
-        placeBrand();
-        if (!isMobile() && overlay?.classList.contains('open')) close();
-      }, 80));
 
-      placeBrand();
-    };
+        var brand = document.querySelector(".topbar-row.row1 .brand");
+        var row1Inner = document.querySelector(".topbar-row.row1 .inner");
+        var row2Inner = document.querySelector(".topbar-row.row2 .inner");
+        var burger = document.getElementById("menu-toggle");
+        var row1Anchor = row1Inner ? row1Inner.querySelector(".controls") : null;
 
-    return { init };
-  })();
+        function isMobile() {
+          return window.innerWidth <= 860;
+        }
 
-  // -----------------------------
-  // Smooth Scroll with header offset + reduced‑motion
-  // -----------------------------
-  const SmoothScroll = (() => {
-    let rafId = 0;
+        function moveBrandToRow2() {
+          if (!brand || !row2Inner || !burger) return;
+          if (row2Inner.contains(brand)) return;
+          if (row1Inner) row1Inner.classList.add("no-brand");
+          burger.insertAdjacentElement("afterend", brand);
+        }
+        function restoreBrandToRow1() {
+          if (!brand || !row1Inner) return;
+          if (row1Inner.contains(brand)) return;
+          brand.classList.remove("brand--row2");
+          row1Inner.classList.remove("no-brand");
+          if (row1Anchor) row1Inner.insertBefore(brand, row1Anchor);
+          else row1Inner.appendChild(brand);
+        }
+        function placeBrandForViewport() {
+          if (isMobile()) moveBrandToRow2();
+          else restoreBrandToRow1();
+        }
 
-    const motionMode = () => (w.__uiState && w.__uiState.motion) || de.getAttribute('data-motion') || 'auto';
-    const reduced = () => { const m = motionMode(); return m === 'off' || (m === 'auto' && w.matchMedia && w.matchMedia('(prefers-reduced-motion: reduce)').matches); };
+        function open() {
+          lastFocus = document.activeElement;
+          if (overlay) {
+            overlay.classList.add("open");
+            overlay.setAttribute("aria-hidden", "false");
+          }
+          if (btn) btn.setAttribute("aria-expanded", "true");
+          document.body.classList.add("lb-lock");
+          var firstLink = linksContainer ? linksContainer.querySelector("a") : null;
+          var focusEl = firstLink || closeBtn;
+          try {
+            if (focusEl) focusEl.focus();
+          } catch (e) {}
+        }
+        function close() {
+          if (overlay) {
+            overlay.classList.remove("open");
+            overlay.setAttribute("aria-hidden", "true");
+          }
+          if (btn) btn.setAttribute("aria-expanded", "false");
+          document.body.classList.remove("lb-lock");
+          if (lastFocus && document.contains(lastFocus)) {
+            try {
+              lastFocus.focus();
+            } catch (e) {}
+          }
+        }
 
-    const headerOffset = () => {
-      const v = getComputedStyle(de).getPropertyValue('--tb-h').trim();
-      const h = parseFloat(v);
-      return (Number.isFinite(h) ? h : (qs('.topbar')?.offsetHeight || 0)) + 8;
-    };
+        placeBrandForViewport();
 
-    const easeInOutCubic = (t) => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+        if (btn)
+          btn.addEventListener("click", function () {
+            if (overlay && overlay.classList.contains("open")) close();
+            else open();
+          });
+        if (closeBtn) closeBtn.addEventListener("click", close);
+        document.addEventListener("keydown", function (e) {
+          if (e.key === "Escape" && overlay && overlay.classList.contains("open")) close();
+        });
+        if (overlay)
+          overlay.addEventListener("click", function (e) {
+            var a = e.target.closest ? e.target.closest("a") : null;
+            if (a) close();
+          });
 
-    const scrollToY = (targetY, duration) => {
-      if (reduced()) { w.scrollTo(0, targetY); return; }
-      const startY = w.pageYOffset;
-      const dist = targetY - startY;
-      const start = performance.now();
-      const dur = typeof duration === 'number' ? duration : clamp(Math.abs(dist) * 0.5, 300, 900);
-      cancelAnimationFrame(rafId);
+        var w = window.innerWidth;
+        window.addEventListener("resize", function () {
+          if (window.innerWidth === w) return;
+          w = window.innerWidth;
+          syncLinks();
+          placeBrandForViewport();
+          if (!isMobile() && overlay && overlay.classList.contains("open")) close();
+        });
+      })();
 
-      const cancel = () => cancelAnimationFrame(rafId);
-      on(w, 'wheel', cancel, { passive: true, once: true });
-      on(w, 'keydown', cancel, { once: true });
+      /* =================================
+  Smooth-Scroll mit Offset & Toggle
+  – FIX: ignoriert UI-Toggles/Overlays und respektiert defaultPrevented
+  ================================= */
+      (function () {
+        function motionMode() {
+          if (window.__uiState && window.__uiState.motion) return window.__uiState.motion;
+          var attr = document.documentElement.getAttribute("data-motion");
+          return attr || "auto";
+        }
+        function isReducedMotion() {
+          var m = motionMode();
+          if (m === "on") return false;
+          if (m === "off") return true;
+          return window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        }
+        function headerOffset() {
+          var cs = getComputedStyle(document.documentElement);
+          var v = cs.getPropertyValue("--tb-h").trim();
+          var h = parseFloat(v);
+          return (
+            (isFinite(h)
+              ? h
+              : (document.querySelector(".topbar") && document.querySelector(".topbar").offsetHeight) || 0) + 8
+          );
+        }
+        function easeInOutCubic(t) {
+          return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+        }
 
-      const step = (now) => {
-        const t = Math.min(1, (now - start) / dur);
-        const y = startY + dist * easeInOutCubic(t);
-        w.scrollTo(0, Math.round(y));
-        if (t < 1) rafId = raf(step);
-      };
-      rafId = raf(step);
-    };
+        var rafId = 0;
+        function scrollToY(targetY, duration) {
+          if (isReducedMotion()) {
+            window.scrollTo(0, targetY);
+            return;
+          }
+          var startY = window.pageYOffset;
+          var dist = targetY - startY;
+          var start = performance.now();
+          var dur = typeof duration === "number" ? duration : Math.min(900, Math.max(300, Math.abs(dist) * 0.5));
+          cancelAnimationFrame(rafId);
+          function cancel() {
+            cancelAnimationFrame(rafId);
+          }
+          window.addEventListener("wheel", cancel, { passive: true, once: true });
+          window.addEventListener("keydown", cancel, { once: true });
+          function step(now) {
+            var t = Math.min(1, (now - start) / dur);
+            var y = startY + dist * easeInOutCubic(t);
+            window.scrollTo(0, Math.round(y));
+            if (t < 1) rafId = requestAnimationFrame(step);
+          }
+          rafId = requestAnimationFrame(step);
+        }
+        window.__scrollToY = scrollToY;
 
-    // Exponieren für Scroll‑Up Button (Abwärtskompatibilität)
-    w.__scrollToY = scrollToY;
+        function focusAfterScroll(el) {
+          if (!el) return;
+          var had = el.hasAttribute("tabindex");
+          el.setAttribute("tabindex", "-1");
+          try {
+            el.focus({ preventScroll: true });
+          } catch (e) {}
+          if (!had) el.removeAttribute("tabindex");
+        }
+        function handleTopHashClick(e, a) {
+          var raw = a.getAttribute("href");
+          if (raw === "#" || raw === "#top") {
+            e.preventDefault();
+            scrollToY(0);
+            try {
+              history.pushState(null, "", "#");
+            } catch (e) {}
+            return true;
+          }
+          return false;
+        }
 
-    const focusAfter = (el) => {
-      if (!el) return; const had = el.hasAttribute('tabindex');
-      el.setAttribute('tabindex', '-1');
-      try { el.focus({ preventScroll: true }); } catch {}
-      if (!had) el.removeAttribute('tabindex');
-    };
+        document.addEventListener(
+          "click",
+          function (e) {
+            if (e.defaultPrevented) return;
+            var ignoreSel = "#theme-toggle, #motion-toggle, #storage-toggle, .consent-dialog, .lb-dialog";
+            if (e.target.closest && e.target.closest(ignoreSel)) return;
 
-    const handleTopHash = (e, a) => {
-      const raw = a.getAttribute('href');
-      if (raw === '#' || raw === '#top') {
-        e.preventDefault();
-        scrollToY(0);
-        try { history.pushState(null, '', '#'); } catch {}
-        return true;
-      }
-      return false;
-    };
+            var a = e.target.closest ? e.target.closest('a[href^="#"]') : null;
+            if (!a) return;
+            if (handleTopHashClick(e, a)) return;
 
-    const click = (e) => {
-      if (e.defaultPrevented) return;
-      // UI‑Toggles/Overlays ignorieren
-      if (e.target.closest && e.target.closest('#theme-toggle, #motion-toggle, #storage-toggle, .consent-dialog, .lb-dialog')) return;
+            var href = a.getAttribute("href");
+            var url;
+            try {
+              url = new URL(href, location.href);
+            } catch (err) {
+              return;
+            }
+            if (url.pathname !== location.pathname || !url.hash) return;
 
-      const a = e.target.closest?.('a[href^="#"]');
-      if (!a) return;
-      if (handleTopHash(e, a)) return;
+            var target = document.querySelector(url.hash);
+            if (!target) return;
+            e.preventDefault();
 
-      const href = a.getAttribute('href');
-      const url = parseURL(href);
-      if (!url || url.pathname !== location.pathname || !url.hash) return;
+            var overlay = document.getElementById("mobile-nav");
+            if (overlay && overlay.classList.contains("open")) {
+              overlay.classList.remove("open");
+              overlay.setAttribute("aria-hidden", "true");
+              var mt = document.getElementById("menu-toggle");
+              if (mt) mt.setAttribute("aria-expanded", "false");
+              document.body.classList.remove("lb-lock");
+            }
+            var y = Math.max(0, target.getBoundingClientRect().top + window.pageYOffset - headerOffset());
+            scrollToY(y);
+            try {
+              history.pushState(null, "", url.hash);
+            } catch (e) {}
+            setTimeout(function () {
+              focusAfterScroll(target);
+            }, 10);
+          },
+          true
+        );
 
-      const target = qs(url.hash);
-      if (!target) return;
-      e.preventDefault();
+        window.addEventListener("load", function () {
+          if (location.hash) {
+            var t = document.querySelector(location.hash);
+            if (t) {
+              var y = Math.max(0, t.getBoundingClientRect().top + window.pageYOffset - headerOffset());
+              window.scrollTo(0, y);
+            }
+          }
+        });
 
-      const mob = qs('#mobile-nav');
-      if (mob?.classList.contains('open')) {
-        mob.classList.remove('open');
-        mob.setAttribute('aria-hidden', 'true');
-        qs('#menu-toggle')?.setAttribute('aria-expanded', 'false');
-        body.classList.remove('lb-lock');
-      }
-
-      const y = Math.max(0, target.getBoundingClientRect().top + w.pageYOffset - headerOffset());
-      scrollToY(y);
-      try { history.pushState(null, '', url.hash); } catch {}
-      setTimeout(() => focusAfter(target), 10);
-    };
-
-    const onLoadHash = () => {
-      if (!location.hash) return;
-      const t = qs(location.hash);
-      if (!t) return;
-      const y = Math.max(0, t.getBoundingClientRect().top + w.pageYOffset - headerOffset());
-      w.scrollTo(0, y);
-    };
-
-    const onHashChange = () => {
-      const t = qs(location.hash);
-      if (!t) return;
-      const y = Math.max(0, t.getBoundingClientRect().top + w.pageYOffset - headerOffset());
-      scrollToY(y, 400);
-      focusAfter(t);
-    };
-
-    const init = () => {
-      on(d, 'click', click, true);
-      on(w, 'load', onLoadHash);
-      on(w, 'hashchange', onHashChange);
-    };
-
-    return { init };
-  })();
-
-  // -----------------------------
-  // Init
-  // -----------------------------
-  const App = {
-    init() {
-      (w.__uiState ||= { theme: 'auto', motion: 'auto', persist: 'off' });
-      ExternalLinks.init();
-      Images.init();
-      YearStamp.init();
-      StorageToggle.init();
-      ThemeToggle.init();
-      MotionToggle.init();
-      TopbarPad.init();
-      ScrollUp.init();
-      ActiveNav.init();
-      Lightbox.init();
-      MobileNav.init();
-      SmoothScroll.init();
-    }
-  };
-
-  // Inline Script am Dokumentende – DOM ist i.d.R. bereit;
-  // Fallback auf DOMContentLoaded für Sicherheit
-  if (d.readyState === 'loading') on(d, 'DOMContentLoaded', () => App.init());
-  else App.init();
-})();
-</script>
-
+        window.addEventListener("hashchange", function () {
+          var t = document.querySelector(location.hash);
+          if (!t) return;
+          var y = Math.max(0, t.getBoundingClientRect().top + window.pageYOffset - headerOffset());
+          scrollToY(y, 400);
+          focusAfterScroll(t);
+        });
+      })();
+    </script>
   </body>
 </html>
