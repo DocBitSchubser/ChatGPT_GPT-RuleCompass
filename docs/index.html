@@ -949,6 +949,15 @@
           border-color: Highlight;
         }
       }
+      
+      /* Steuer-Links nicht unterstreichen */
+      .theme-toggle,
+      .theme-toggle:hover,
+      .menu-toggle,
+      .mnav-close {
+        text-decoration: none;
+      }
+      
     </style>
 
     <!-- JSON-LD (unverändert) -->
@@ -1055,30 +1064,35 @@
             <span>🔒 Custom&nbsp;GPT&nbsp;Absichern</span>
           </div>
           <div class="controls">
-            <button
-              id="theme-toggle"
-              class="theme-toggle has-tooltip"
-              data-tooltip="Theme wechseln"
-              aria-label="Theme wechseln"
-              aria-pressed="false">
-              🖥️
-            </button>
-            <button
-              id="motion-toggle"
-              class="theme-toggle has-tooltip"
-              data-tooltip="Scroll-Modus wechseln"
-              aria-label="Scroll-Modus wechseln"
-              aria-pressed="false">
-              🖥️ Scroll AUTO
-            </button>
-            <button
-              id="storage-toggle"
-              class="theme-toggle has-tooltip"
-              data-tooltip="Lokale Speicherung"
-              aria-label="Lokale Speicherung"
-              aria-pressed="false">
-              💾 Storage OFF
-            </button>
+          <a
+            id="theme-toggle"
+            class="theme-toggle has-tooltip"
+            href="#"
+            role="button"
+            data-tooltip="Theme wechseln"
+            aria-label="Theme wechseln"
+            aria-pressed="false"
+          >🖥️</a>
+
+          <a
+            id="motion-toggle"
+            class="theme-toggle has-tooltip"
+            href="#"
+            role="button"
+            data-tooltip="Scroll-Modus wechseln"
+            aria-label="Scroll-Modus wechseln"
+            aria-pressed="false"
+          >🖥️</a>
+
+          <a
+            id="storage-toggle"
+            class="theme-toggle has-tooltip"
+            href="#"
+            role="button"
+            data-tooltip="Lokale Speicherung"
+            aria-label="Lokale Speicherung"
+            aria-pressed="false"
+          >💾</a>
           </div>
         </div>
       </div>
@@ -1572,244 +1586,282 @@
       </div>
     </main>
 
-    <script>
-      /* ==========================
-   Externe Links kennzeichnen
-   ========================== */
-      (function () {
-        var INTERNAL_HOSTS = new Set([location.hostname]);
-        function isImagePath(p) {
-          return /\.(png|jpe?g|webp|gif|svg)(\?.*)?$/i.test(p);
-        }
-        var as = document.querySelectorAll("a[href]:not([data-no-ext-icon])");
-        for (var i = 0; i < as.length; i++) {
-          var a = as[i];
-          var raw = a.getAttribute("href") || "";
-          if (
-            raw.indexOf("#") === 0 ||
-            raw.indexOf("mailto:") === 0 ||
-            raw.indexOf("tel:") === 0 ||
-            raw.indexOf("javascript:") === 0
-          )
-            continue;
-          var url;
-          try {
-            url = new URL(raw, location.href);
-          } catch (e) {
-            continue;
-          }
-          if (url.protocol !== "http:" && url.protocol !== "https:") continue;
-          if (INTERNAL_HOSTS.has(url.hostname)) continue;
-          if (a.hasAttribute("data-lightbox")) continue;
-          if (a.querySelector("img")) continue;
-          if (isImagePath(url.pathname)) continue;
-          a.classList.add("ext-link");
-        }
-      })();
-
-      /* =======================
-   Lazy-Loading für Bilder
-   ======================= */
-      (function () {
-        var imgs = document.querySelectorAll("img");
-        for (var i = 0; i < imgs.length; i++) {
-          var img = imgs[i];
-          if (img.closest && img.closest(".hero")) {
-            img.setAttribute("loading", "eager");
-            img.setAttribute("fetchpriority", "high");
-            img.setAttribute("decoding", "async");
-            continue;
-          }
-          if (!img.hasAttribute("loading")) img.setAttribute("loading", "lazy");
-          img.setAttribute("decoding", "async");
-          img.setAttribute("fetchpriority", "low");
-        }
-      })();
-
-      /* ============================
-   Jahr im Footer aktualisieren
-   ============================ */
-      (function () {
-        var y = document.getElementById("y");
-        if (y) y.textContent = new Date().getFullYear();
-      })();
-
-   /* ==========================================================
-   Storage-Consent & Safe-Storage (persist: on/off, default off)
-   – Edge-sicher: Event-Delegation wie Lightbox (kein Direktlistener)
-   ========================================================== */
-(function () {
-  try {
-    var PERSIST_KEY = "persist";
-    var THEME_KEY = "theme";
-    var MOTION_KEY = "motion";
-
-    if (!window.__uiState) window.__uiState = { theme: "auto", motion: "auto", persist: "off" };
-    var ui = window.__uiState;
-
-    function hasLocalStorage() {
+<script>
+  /* ==========================
+  Externe Links kennzeichnen
+  ========================== */
+  (function () {
+    var INTERNAL_HOSTS = new Set([location.hostname]);
+    function isImagePath(p) {
+      return /\.(png|jpe?g|webp|gif|svg)(\?.*)?$/i.test(p);
+    }
+    var as = document.querySelectorAll("a[href]:not([data-no-ext-icon])");
+    for (var i = 0; i < as.length; i++) {
+      var a = as[i];
+      var raw = a.getAttribute("href") || "";
+      if (
+        raw.indexOf("#") === 0 ||
+        raw.indexOf("mailto:") === 0 ||
+        raw.indexOf("tel:") === 0 ||
+        raw.indexOf("javascript:") === 0
+      )
+        continue;
+      var url;
       try {
-        var k = "__rc_probe__";
-        localStorage.setItem(k, "1");
-        var ok = localStorage.getItem(k) === "1";
-        localStorage.removeItem(k);
-        return ok;
-      } catch (_) { return false; }
-    }
-    function canPersist() {
-      try { return hasLocalStorage() && localStorage.getItem(PERSIST_KEY) === "on"; }
-      catch (_) { return false; }
-    }
-    function safeGet(key) {
-      try { return canPersist() ? localStorage.getItem(key) : null; }
-      catch (_) { return null; }
-    }
-    function safeSet(key, v) {
-      try { if (canPersist()) localStorage.setItem(key, v); } catch (_){}
-    }
-    function safeDel(key) {
-      try { localStorage.removeItem(key); } catch (_){}
-    }
-    window.__store = { canPersist: canPersist, safeGet: safeGet, safeSet: safeSet };
-
-    // --- Consent-Overlay vorab bauen (wie Lightbox) ---
-    function ensureConsentOverlay() {
-      if (document.getElementById("consent-overlay")) return;
-      var overlay = document.createElement("div");
-      overlay.id = "consent-overlay";
-      overlay.className = "consent-overlay";
-      overlay.setAttribute("aria-hidden", "true");
-
-      var dialog = document.createElement("div");
-      dialog.className = "consent-dialog";
-      dialog.setAttribute("role", "dialog");
-      dialog.setAttribute("aria-modal", "true");
-      dialog.setAttribute("aria-label", "Einwilligung");
-
-      var h3 = document.createElement("h3");
-      var text = document.createElement("div");
-      var actions = document.createElement("div");
-      actions.className = "consent-actions";
-
-      var btnCancel = document.createElement("button");
-      btnCancel.className = "consent-btn";
-      btnCancel.textContent = "Abbrechen";
-
-      var btnOk = document.createElement("button");
-      btnOk.className = "consent-btn primary";
-      btnOk.textContent = "Zustimmen";
-
-      actions.appendChild(btnCancel);
-      actions.appendChild(btnOk);
-      dialog.appendChild(h3);
-      dialog.appendChild(text);
-      dialog.appendChild(actions);
-      overlay.appendChild(dialog);
-      document.body.appendChild(overlay);
-
-      consentDialog._els = { overlay: overlay, dialog: dialog, h3: h3, text: text, btnOk: btnOk, btnCancel: btnCancel };
-    }
-
-    function consentDialog(opts) {
-      ensureConsentOverlay();
-      var title = opts && opts.title ? opts.title : "";
-      var messageHTML = opts && opts.messageHTML ? opts.messageHTML : "";
-      var okText = opts && opts.okText ? opts.okText : "Zustimmen";
-      var cancelText = opts && opts.cancelText !== undefined ? opts.cancelText : "Abbrechen";
-
-      var resolver;
-      var p = new Promise(function (res) { resolver = res; });
-
-      var els = consentDialog._els;
-      var overlay = els.overlay, h3 = els.h3, text = els.text, btnOk = els.btnOk, btnCancel = els.btnCancel;
-      h3.textContent = title;
-      text.innerHTML = messageHTML;
-      btnOk.textContent = okText;
-      btnCancel.textContent = cancelText;
-
-      var lastFocus = document.activeElement;
-      function open() {
-        overlay.setAttribute("aria-hidden", "false");
-        document.body.classList.add("lb-lock");
-        try { btnOk.focus(); } catch (_){}
+        url = new URL(raw, location.href);
+      } catch (e) {
+        continue;
       }
-      function close(result) {
+      if (url.protocol !== "http:" && url.protocol !== "https:") continue;
+      if (INTERNAL_HOSTS.has(url.hostname)) continue;
+      if (a.hasAttribute("data-lightbox")) continue;
+      if (a.querySelector("img")) continue;
+      if (isImagePath(url.pathname)) continue;
+      a.classList.add("ext-link");
+    }
+  })();
+
+  /* =======================
+  Lazy-Loading für Bilder
+  ======================= */
+  (function () {
+    var imgs = document.querySelectorAll("img");
+    for (var i = 0; i < imgs.length; i++) {
+      var img = imgs[i];
+      if (img.closest && img.closest(".hero")) {
+        img.setAttribute("loading", "eager");
+        img.setAttribute("fetchpriority", "high");
+        img.setAttribute("decoding", "async");
+        continue;
+      }
+      if (!img.hasAttribute("loading")) img.setAttribute("loading", "lazy");
+      img.setAttribute("decoding", "async");
+      img.setAttribute("fetchpriority", "low");
+    }
+  })();
+
+  /* ============================
+  Jahr im Footer aktualisieren
+  ============================ */
+  (function () {
+    var y = document.getElementById("y");
+    if (y) y.textContent = new Date().getFullYear();
+  })();
+
+  /* ==========================================================
+  Storage-Consent & Safe-Storage (persist: on/off, default off)
+  – Session-Fallback: theme/motion bei OFF in sessionStorage
+  – Overlay-Klick schließt NICHT
+  ========================================================== */
+  (function () {
+    try {
+      var PERSIST_KEY = "persist";
+      var THEME_KEY = "theme";
+      var MOTION_KEY = "motion";
+
+      if (!window.__uiState) window.__uiState = { theme: "auto", motion: "auto", persist: "off" };
+      var ui = window.__uiState;
+
+      function hasLocalStorage() {
+        try {
+          var k = "__rc_probe__";
+          localStorage.setItem(k, "1");
+          var ok = localStorage.getItem(k) === "1";
+          localStorage.removeItem(k);
+          return ok;
+        } catch (_) { return false; }
+      }
+      function hasSessionStorage() {
+        try {
+          var k = "__rc_sprobe__";
+          sessionStorage.setItem(k, "1");
+          var ok = sessionStorage.getItem(k) === "1";
+          sessionStorage.removeItem(k);
+          return ok;
+        } catch (_) { return false; }
+      }
+      function canPersist() {
+        try { return hasLocalStorage() && localStorage.getItem(PERSIST_KEY) === "on"; }
+        catch (_) { return false; }
+      }
+
+      // Universeller Store: LS (persist on) → SS (off) → Memory
+      (function initStore(){
+        var mem = Object.create(null);
+        function getFromLS(k){ try { return localStorage.getItem(k); } catch(_){ return null; } }
+        function setToLS(k,v){ try { localStorage.setItem(k,v); } catch(_){ } }
+        function delFromLS(k){ try { localStorage.removeItem(k); } catch(_){ } }
+        function getFromSS(k){ try { return sessionStorage.getItem(k); } catch(_){ return null; } }
+        function setToSS(k,v){ try { sessionStorage.setItem(k,v); } catch(_){ } }
+        function delFromSS(k){ try { sessionStorage.removeItem(k); } catch(_){ } }
+
+        function backend() {
+          var useLS = canPersist() && hasLocalStorage();
+          var useSS = !useLS && hasSessionStorage();
+          return {
+            get: function(k){
+              if (useLS) return getFromLS(k);
+              if (useSS) return getFromSS(k);
+              return mem[k] || null;
+            },
+            set: function(k,v){
+              if (useLS) { setToLS(k, v); return; }
+              if (useSS) { setToSS(k, v); return; }
+              mem[k] = String(v);
+            },
+            del: function(k){
+              delFromLS(k); delFromSS(k); delete mem[k];
+            },
+            delLSOnly: function(k){
+              delFromLS(k); delete mem[k];
+            }
+          };
+        }
+
+        window.__store = {
+          canPersist: canPersist,
+          safeGet: function(k){ try { return backend().get(k); } catch(_){ return null; } },
+          safeSet: function(k,v){ try { backend().set(k,v); } catch(_){ } },
+          safeDel: function(k){ try { backend().del(k); } catch(_){ } },
+          _delLSOnly: function(k){ try { backend().delLSOnly(k); } catch(_){ } }
+        };
+      })();
+
+      // --- Consent-Overlay bauen ---
+      function ensureConsentOverlay() {
+        if (document.getElementById("consent-overlay")) return;
+        var overlay = document.createElement("div");
+        overlay.id = "consent-overlay";
+        overlay.className = "consent-overlay";
         overlay.setAttribute("aria-hidden", "true");
-        document.body.classList.remove("lb-lock");
-        if (lastFocus && document.contains(lastFocus)) { try { lastFocus.focus(); } catch (_){ } }
-        resolver(!!result);
+
+        var dialog = document.createElement("div");
+        dialog.className = "consent-dialog";
+        dialog.setAttribute("role", "dialog");
+        dialog.setAttribute("aria-modal", "true");
+        dialog.setAttribute("aria-label", "Einwilligung");
+
+        var h3 = document.createElement("h3");
+        var text = document.createElement("div");
+        var actions = document.createElement("div");
+        actions.className = "consent-actions";
+
+        var btnCancel = document.createElement("button");
+        btnCancel.className = "consent-btn";
+        btnCancel.textContent = "Abbrechen";
+
+        var btnOk = document.createElement("button");
+        btnOk.className = "consent-btn primary";
+        btnOk.textContent = "Zustimmen";
+
+        actions.appendChild(btnCancel);
+        actions.appendChild(btnOk);
+        dialog.appendChild(h3);
+        dialog.appendChild(text);
+        dialog.appendChild(actions);
+        overlay.appendChild(dialog);
+        document.body.appendChild(overlay);
+
+        consentDialog._els = { overlay: overlay, dialog: dialog, h3: h3, text: text, btnOk: btnOk, btnCancel: btnCancel };
       }
 
-      function onEsc(e){ if (e.key === "Escape") { e.stopPropagation(); close(false); } }
-      function onOverlay(e){ if (e.target === overlay) close(false); }
+      function consentDialog(opts) {
+        ensureConsentOverlay();
+        var title = opts && opts.title ? opts.title : "";
+        var messageHTML = opts && opts.messageHTML ? opts.messageHTML : "";
+        var okText = opts && opts.okText ? opts.okText : "Zustimmen";
+        var cancelText = opts && opts.cancelText !== undefined ? opts.cancelText : "Abbrechen";
 
-      btnOk.onclick = function(){ close(true); };
-      btnCancel.onclick = function(){ close(false); };
-      document.addEventListener("keydown", onEsc, { once: true });
-      overlay.addEventListener("click", onOverlay, { once: true });
+        var resolver;
+        var p = new Promise(function (res) { resolver = res; });
 
-      open();
-      return p;
-    }
+        var els = consentDialog._els;
+        var overlay = els.overlay, h3 = els.h3, text = els.text, btnOk = els.btnOk, btnCancel = els.btnCancel;
+        h3.textContent = title;
+        text.innerHTML = messageHTML;
+        btnOk.textContent = okText;
+        btnCancel.textContent = cancelText;
 
-    // UI-Text aktualisieren
-    var storageBtn = document.getElementById("storage-toggle");
-    function applyPersistUI(isOn) {
-      if (storageBtn) {
-        if (isOn) {
-          storageBtn.textContent = "💾 Storage ON";
-          storageBtn.setAttribute("data-tooltip", "Lokale Speicherung: an");
-          storageBtn.setAttribute("aria-pressed", "true");
-          ui.persist = "on";
-        } else {
-          storageBtn.textContent = "💾 Storage OFF";
-          storageBtn.setAttribute("data-tooltip", "Lokale Speicherung: aus");
-          storageBtn.setAttribute("aria-pressed", "false");
-          ui.persist = "off";
+        var lastFocus = document.activeElement;
+        function open() {
+          overlay.setAttribute("aria-hidden", "false");
+          document.body.classList.add("lb-lock");
+          try { btnOk.focus(); } catch (_){}
+        }
+        function close(result) {
+          overlay.setAttribute("aria-hidden", "true");
+          document.body.classList.remove("lb-lock");
+          if (lastFocus && document.contains(lastFocus)) { try { lastFocus.focus(); } catch (_){ } }
+          resolver(!!result);
+        }
+
+        function onEsc(e){ if (e.key === "Escape") { e.stopPropagation(); close(false); } }
+
+        btnOk.onclick = function(){ close(true); };
+        btnCancel.onclick = function(){ close(false); };
+        document.addEventListener("keydown", onEsc, { once: true });
+        // kein Overlay-Background-Klick
+
+        open();
+        return p;
+      }
+
+      // UI-Text aktualisieren
+      var storageBtn = document.getElementById("storage-toggle");
+      function applyPersistUI(isOn) {
+        if (storageBtn) {
+          if (isOn) {
+            storageBtn.textContent = "💾 Storage ON";
+            storageBtn.setAttribute("data-tooltip", "Lokale Speicherung: an");
+            storageBtn.setAttribute("aria-pressed", "true");
+            ui.persist = "on";
+          } else {
+            storageBtn.textContent = "💾 Storage OFF";
+            storageBtn.setAttribute("data-tooltip", "Lokale Speicherung: aus");
+            storageBtn.setAttribute("aria-pressed", "false");
+            ui.persist = "off";
+          }
         }
       }
-    }
 
-    // Delegierter Handler – funktioniert für:
-    // 1) #storage-toggle (Button)    2) <a href="#storage-consent">    3) [data-action="storage-toggle"]
-    function isStorageToggleClick(target) {
-      if (!target) return false;
-      var t = target.closest ? target.closest('#storage-toggle, a[href="#storage-consent"], [data-action="storage-toggle"]') : null;
-      return !!t;
-    }
+      function isStorageToggleClick(target) {
+        if (!target) return false;
+        var t = target.closest ? target.closest('#storage-toggle, a[href="#storage-consent"], [data-action="storage-toggle"]') : null;
+        return !!t;
+      }
 
-    function handleStorageToggle(/* event optional */) {
-      try {
-        if (!canPersist()) {
-          // Aktivieren → Consent anzeigen
-          consentDialog({
-            title: "Lokale Speicherung aktivieren",
-            messageHTML:
-              "<p>Diese Seite kann die Zustände der Schalter <em>Theme</em>, <em>Scroll</em> und <em>Storage</em> lokal in Ihrem Browser speichern.</p>\
+      function handleStorageToggle() {
+        try {
+          if (!window.__store.canPersist()) {
+            // Aktivieren → Consent
+            consentDialog({
+              title: "Lokale Speicherung aktivieren",
+              messageHTML:
+                "<p>Diese Seite kann die Zustände der Schalter <em>Theme</em>, <em>Scroll</em> und <em>Storage</em> lokal in Ihrem Browser speichern.</p>\
 <p>Es werden ausschließlich diese UI-Zustände gespeichert; keine personenbezogenen Daten.</p>\
 <p>Mit „Zustimmen“ erlauben Sie das Speichern und das Wiederherstellen bei künftigen Besuchen.</p>",
-            okText: "Zustimmen",
-            cancelText: "Ablehnen"
-          }).then(function (ok) {
-            if (!ok) { applyPersistUI(false); return; }
-            var wrote = false;
-            try {
-              localStorage.setItem(PERSIST_KEY, "on");
-              wrote = localStorage.getItem(PERSIST_KEY) === "on";
-            } catch (_){ wrote = false; }
-
-            if (wrote && hasLocalStorage()) {
-              applyPersistUI(true);
+              okText: "Zustimmen",
+              cancelText: "Ablehnen"
+            }).then(function (ok) {
+              if (!ok) { applyPersistUI(false); return; }
+              var wrote = false;
               try {
-                localStorage.setItem(THEME_KEY, (window.__uiState && window.__uiState.theme) ? window.__uiState.theme : "auto");
-                localStorage.setItem(MOTION_KEY, (window.__uiState && window.__uiState.motion) ? window.__uiState.motion : "auto");
-              } catch (_){}
-            } else {
-              applyPersistUI(false);
-              consentDialog({
-                title: "Speichern blockiert",
-                messageHTML:
-                  "<p>Der lokale Speicher ist im Browser aktuell nicht verfügbar (z.&nbsp;B. Edge Tracking-Schutz, InPrivate, Website-Berechtigungen).</p>\
+                localStorage.setItem(PERSIST_KEY, "on");
+                wrote = localStorage.getItem(PERSIST_KEY) === "on";
+              } catch (_){ wrote = false; }
+
+              if (wrote && hasLocalStorage()) {
+                applyPersistUI(true);
+                try {
+                  localStorage.setItem(THEME_KEY, (window.__uiState && window.__uiState.theme) ? window.__uiState.theme : "auto");
+                  localStorage.setItem(MOTION_KEY, (window.__uiState && window.__uiState.motion) ? window.__uiState.motion : "auto");
+                } catch (_){}
+              } else {
+                applyPersistUI(false);
+                consentDialog({
+                  title: "Speichern blockiert",
+                  messageHTML:
+                    "<p>Der lokale Speicher ist im Browser aktuell nicht verfügbar (z.&nbsp;B. Edge Tracking-Schutz, InPrivate, Website-Berechtigungen).</p>\
 <p><strong>Prüfen in Edge:</strong></p>\
 <ul>\
 <li>Einstellungen → <em>Cookies und Websiteberechtigungen</em> → <em>Cookies und Websitedaten</em>: „Websites erlauben, Daten zu speichern“ aktivieren.</li>\
@@ -1817,603 +1869,605 @@
 <li>Kein InPrivate-/Anwendungs-Guard-Fenster verwenden.</li>\
 </ul>\
 <p>Nach Anpassung die Seite neu laden.</p>",
-                okText: "OK",
-                cancelText: "Schließen"
-              });
+                  okText: "OK",
+                  cancelText: "Schließen"
+                });
+              }
+            });
+          } else {
+            // Deaktivieren → nur LS leeren
+            consentDialog({
+              title: "Lokale Speicherung deaktivieren",
+              messageHTML:
+                "<p>Die in <em>localStorage</em> gespeicherten Zustände (Theme/Scroll/Storage) werden gelöscht.</p>\
+<p>Die Schalter funktionieren weiter; Änderungen werden bis zum Schließen des Tabs in <em>sessionStorage</em> gehalten.</p>",
+              okText: "Löschen & Deaktivieren",
+              cancelText: "Abbrechen"
+            }).then(function (ok) {
+              if (!ok) return;
+              try { localStorage.removeItem(THEME_KEY); } catch(_){}
+              try { localStorage.removeItem(MOTION_KEY); } catch(_){}
+              try { localStorage.removeItem(PERSIST_KEY); } catch(_){}
+              applyPersistUI(false);
+            });
+          }
+        } catch (err) {
+          var turnOn = !window.__store.canPersist();
+          var msgOn = "Lokale Speicherung aktivieren?";
+          var msgOff = "Lokale Speicherung deaktivieren und lokale (dauerhafte) Zustände löschen?";
+          if (window.confirm(turnOn ? msgOn : msgOff)) {
+            if (turnOn) {
+              try { localStorage.setItem(PERSIST_KEY, "on"); } catch (_){}
+              applyPersistUI(window.__store.canPersist());
+            } else {
+              try { localStorage.removeItem(THEME_KEY); } catch(_){}
+              try { localStorage.removeItem(MOTION_KEY); } catch(_){}
+              try { localStorage.removeItem(PERSIST_KEY); } catch(_){}
+              applyPersistUI(false);
             }
-          });
-        } else {
-          // Deaktivieren → bestätigen & löschen
-          consentDialog({
-            title: "Lokale Speicherung deaktivieren",
-            messageHTML:
-              "<p>Die gespeicherten Zustände (Theme/Scroll/Storage) werden aus Ihrem Browser gelöscht.</p>\
-<p>Die Schalter funktionieren weiterhin, werden jedoch nicht mehr dauerhaft gespeichert.</p>",
-            okText: "Löschen & Deaktivieren",
-            cancelText: "Abbrechen"
-          }).then(function (ok) {
-            if (!ok) return;
-            safeDel(THEME_KEY);
-            safeDel(MOTION_KEY);
-            safeDel(PERSIST_KEY);
-            applyPersistUI(false);
-          });
+          }
         }
-      } catch (err) {
-        // Maximal simpler Fallback
-        var turnOn = !canPersist();
-        var msgOn = "Lokale Speicherung aktivieren?";
-        var msgOff = "Lokale Speicherung deaktivieren und gespeicherte Zustände löschen?";
-        if (window.confirm(turnOn ? msgOn : msgOff)) {
-          if (turnOn) { try { localStorage.setItem(PERSIST_KEY, "on"); } catch (_){ } applyPersistUI(canPersist()); }
-          else { safeDel(THEME_KEY); safeDel(MOTION_KEY); safeDel(PERSIST_KEY); applyPersistUI(false); }
+      }
+
+      // Delegation mit preventDefault (und kein Hash-Scroll)
+      document.addEventListener("click", function (e) {
+        if (!isStorageToggleClick(e.target)) return;
+        e.preventDefault();
+        // stoppt übrige Document-Capture-Listener (z. B. Smooth-Scroll)
+        if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+        handleStorageToggle();
+      }, true);
+
+      // Initiale UI
+      applyPersistUI(canPersist());
+    } catch (e) {
+      try {
+        var b = document.getElementById("storage-toggle");
+        if (b) { b.textContent = "💾 Storage OFF"; b.setAttribute("aria-pressed", "false"); }
+      } catch (_){}
+    }
+  })();
+
+  /* =================================
+  Theme-Toggle: auto → light → dark
+  ================================= */
+  (function () {
+    var KEY = "theme";
+    var $html = document.documentElement;
+    var $btn = document.getElementById("theme-toggle");
+    if (!$btn) return;
+
+    function apply(theme) {
+      if (theme === "light") {
+        $html.setAttribute("data-theme", "light");
+        $btn.textContent = "☀️ Theme LIGHT";
+        $btn.setAttribute("aria-pressed", "true");
+      } else if (theme === "dark") {
+        $html.setAttribute("data-theme", "dark");
+        $btn.textContent = "🌙 Theme DARK";
+        $btn.setAttribute("aria-pressed", "true");
+      } else {
+        $html.removeAttribute("data-theme");
+        $btn.textContent = "🖥️ Theme AUTO";
+        $btn.setAttribute("aria-pressed", "false");
+      }
+      if (!window.__uiState) window.__uiState = {};
+      window.__uiState.theme = theme;
+    }
+    function next(state) {
+      return state === "auto" ? "light" : state === "light" ? "dark" : "auto";
+    }
+
+    var state = window.__store && window.__store.safeGet ? window.__store.safeGet(KEY) : null;
+    if (!state) state = "auto";
+    apply(state);
+
+    $btn.addEventListener("click", function (e) {
+      if (e && e.preventDefault) e.preventDefault();
+      state = next(state);
+      if (window.__store && window.__store.safeSet) window.__store.safeSet(KEY, state);
+      apply(state);
+    });
+
+    if (window.matchMedia) {
+      var mq = window.matchMedia("(prefers-color-scheme: dark)");
+      var onChange = function () {
+        if (state === "auto") apply("auto");
+      };
+      if (mq.addEventListener) mq.addEventListener("change", onChange);
+      else if (mq.addListener) mq.addListener(onChange);
+    }
+  })();
+
+  /* ==========================================
+  Motion-Toggle: auto → on → off (wie Theme)
+  ========================================== */
+  (function () {
+    var KEY = "motion";
+    var $html = document.documentElement;
+    var $btn = document.getElementById("motion-toggle");
+    if (!$btn) return;
+
+    function apply(mode) {
+      if (mode === "auto") {
+        $html.removeAttribute("data-motion");
+      } else {
+        $html.setAttribute("data-motion", mode);
+      }
+
+      if (mode === "on") {
+        $btn.textContent = "🌀 Scroll ON";
+        $btn.setAttribute("data-tooltip", "Sanftes Scrollen: an");
+        $btn.setAttribute("aria-pressed", "true");
+      } else if (mode === "off") {
+        $btn.textContent = "⏩ Scroll OFF";
+        $btn.setAttribute("data-tooltip", "Sanftes Scrollen: aus");
+        $btn.setAttribute("aria-pressed", "true");
+      } else {
+        $btn.textContent = "🖥️ Scroll AUTO";
+        $btn.setAttribute("data-tooltip", "Sanftes Scrollen: Systemvorgabe");
+        $btn.setAttribute("aria-pressed", "false");
+      }
+      if (!window.__uiState) window.__uiState = {};
+      window.__uiState.motion = mode;
+    }
+    function next(mode) {
+      return mode === "auto" ? "on" : mode === "on" ? "off" : "auto";
+    }
+
+    var state =
+      (window.__store && window.__store.safeGet ? window.__store.safeGet(KEY) : null) ||
+      $html.getAttribute("data-motion") ||
+      "auto";
+    apply(state);
+
+    $btn.addEventListener("click", function (e) {
+      if (e && e.preventDefault) e.preventDefault();
+      state = next(state);
+      if (window.__store && window.__store.safeSet) window.__store.safeSet(KEY, state);
+      apply(state);
+    });
+
+    if (window.matchMedia) {
+      var mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+      var onChange = function () {
+        var m = window.__uiState && window.__uiState.motion ? window.__uiState.motion : "auto";
+        if (m === "auto") apply("auto");
+      };
+      if (mq.addEventListener) mq.addEventListener("change", onChange);
+      else if (mq.addListener) mq.addListener(onChange);
+    }
+  })();
+
+  /* ===================================================
+  Topbar-Höhe → Body-Padding (verhindert Überdeckung)
+  =================================================== */
+  (function () {
+    var tb = document.querySelector(".topbar");
+    function setPad() {
+      var h = tb && tb.offsetHeight ? tb.offsetHeight : 0;
+      document.body.style.paddingTop = h + "px";
+      document.documentElement.style.setProperty("--tb-h", h + "px");
+    }
+    setPad();
+    window.addEventListener("load", setPad);
+    window.addEventListener("resize", setPad);
+  })();
+
+  /* ========================
+  Kleiner Scroll-Up-Button
+  ======================== */
+  (function () {
+    var btn = document.createElement("button");
+    btn.textContent = "↑";
+    btn.type = "button";
+    btn.setAttribute("aria-label", "Nach oben");
+    btn.setAttribute("title", "Nach oben");
+    var style = btn.style;
+    style.position = "fixed";
+    style.right = "16px";
+    style.bottom = "calc(env(safe-area-inset-bottom, 0px) + 16px)";
+    style.width = "42px";
+    style.height = "42px";
+    style.borderRadius = "50%";
+    style.border = "1px solid rgba(0,0,0,.25)";
+    style.background = "rgba(255,255,255,.65)";
+    style.color = "inherit";
+    style.cursor = "pointer";
+    style.boxShadow = "0 6px 18px rgba(0,0,0,.25)";
+    style.display = "none";
+    style.zIndex = 2147483647;
+    try {
+      if (window.matchMedia && window.matchMedia("(pointer: coarse)").matches) {
+        style.width = "48px";
+        style.height = "48px";
+      }
+    } catch (_) {}
+
+    function rootScrollTop() {
+      return (
+        (typeof window.scrollY === "number" ? window.scrollY : 0) ||
+        document.documentElement.scrollTop ||
+        document.body.scrollTop ||
+        0
+      );
+    }
+
+    btn.addEventListener("click", function () {
+      if (typeof window.__scrollToY === "function") {
+        window.__scrollToY(0);
+        return;
+      }
+      var mode =
+        (window.__uiState && window.__uiState.motion) ||
+        document.documentElement.getAttribute("data-motion") ||
+        "auto";
+      var reduce =
+        mode === "off" ||
+        (mode === "auto" && window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+      window.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" });
+    });
+
+    document.body.appendChild(btn);
+
+    var THRESH = 300;
+    function onScroll() {
+      var overlayLock = document.body.classList.contains("lb-lock");
+      var y = rootScrollTop();
+      style.display = !overlayLock && y > THRESH ? "block" : "none";
+    }
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("load", onScroll);
+    window.addEventListener("orientationchange", onScroll);
+    try {
+      var mo = new MutationObserver(onScroll);
+      mo.observe(document.body, { attributes: true, attributeFilter: ["class"] });
+    } catch (_) {}
+    onScroll();
+  })();
+
+  /* ====================================
+  Active-Link-Markierung (Desktop-Nav)
+  ==================================== */
+  (function () {
+    var links = document.querySelectorAll('.topbar .nav a[href^="#"]');
+    if (!links.length) return;
+    var sections = [];
+    for (var i = 0; i < links.length; i++) {
+      var t = document.querySelector(links[i].getAttribute("href"));
+      if (t) sections.push(t);
+    }
+    function setActive(id) {
+      for (var j = 0; j < links.length; j++) links[j].removeAttribute("aria-current");
+      var active = document.querySelector('.topbar .nav a[href="' + id + '"]');
+      if (active) active.setAttribute("aria-current", "page");
+    }
+    var io = new IntersectionObserver(
+      function (entries) {
+        for (var k = 0; k < entries.length; k++) {
+          var e = entries[k];
+          if (e.isIntersecting) setActive("#" + e.target.id);
         }
+      },
+      { rootMargin: "-30% 0px -60% 0px", threshold: 0 }
+    );
+    for (var m = 0; m < sections.length; m++) io.observe(sections[m]);
+  })();
+
+  /* =========================
+  Lightbox (für Bild-Links)
+  – Overlay-Klick schließt NICHT
+  ========================= */
+  (function () {
+    var overlay = document.createElement("div");
+    overlay.className = "lb-overlay";
+    overlay.setAttribute("aria-hidden", "true");
+
+    var dialog = document.createElement("div");
+    dialog.className = "lb-dialog";
+    dialog.setAttribute("role", "dialog");
+    dialog.setAttribute("aria-modal", "true");
+    dialog.setAttribute("aria-label", "Bildanzeige");
+
+    var img = document.createElement("img");
+    img.className = "lb-img";
+    img.setAttribute("alt", "");
+
+    var caption = document.createElement("div");
+    caption.className = "lb-caption";
+
+    var closeBtn = document.createElement("button");
+    closeBtn.className = "lb-close";
+    closeBtn.setAttribute("aria-label", "Schließen");
+    closeBtn.innerHTML = "&times;";
+
+    dialog.appendChild(closeBtn);
+    dialog.appendChild(img);
+    dialog.appendChild(caption);
+    overlay.appendChild(dialog);
+    document.body.appendChild(overlay);
+
+    var lastFocus = null;
+    function openLightbox(href, text, alt) {
+      lastFocus = document.activeElement;
+      img.src = href;
+      img.alt = alt || text || "";
+      caption.textContent = text || "";
+      overlay.setAttribute("aria-hidden", "false");
+      document.body.classList.add("lb-lock");
+      try {
+        closeBtn.focus();
+      } catch (e) {}
+    }
+    function closeLightbox() {
+      overlay.setAttribute("aria-hidden", "true");
+      document.body.classList.remove("lb-lock");
+      img.removeAttribute("src");
+      if (lastFocus && document.contains(lastFocus)) {
+        try {
+          lastFocus.focus();
+        } catch (e) {}
       }
     }
 
-    // === Event-Delegation wie bei der Lightbox ===
-    document.addEventListener("click", function (e) {
-      if (!isStorageToggleClick(e.target)) return;
-      e.preventDefault();
-      handleStorageToggle();
-    }, true); // capture=true, damit Policies, die Bubbling abbremsen, weniger stören
+    overlay.addEventListener("click", function (e) {
+      if (e.target === closeBtn) closeLightbox();
+    });
+    document.addEventListener("keydown", function (e) {
+      if (overlay.getAttribute("aria-hidden") === "false" && e.key === "Escape") closeLightbox();
+    });
 
-    // Initiale UI
-    ensureConsentOverlay();
-    applyPersistUI(canPersist());
-  } catch (e) {
-    try {
-      var b = document.getElementById("storage-toggle");
-      if (b) { b.textContent = "💾 Storage OFF"; b.setAttribute("aria-pressed", "false"); }
-    } catch (_){}
-  }
-})();
-      /* =================================
-   Theme-Toggle: auto → light → dark
-   ================================= */
-      (function () {
-        var KEY = "theme";
-        var $html = document.documentElement;
-        var $btn = document.getElementById("theme-toggle");
-        if (!$btn) return;
+    document.addEventListener(
+      "click",
+      function (e) {
+        var a = e.target.closest ? e.target.closest("a") : null;
+        if (!a) return;
+        var href = a.getAttribute("href") || "";
+        var isImageHref = /\.(png|jpe?g|webp|gif|svg)(\?.*)?$/i.test(href);
+        var wantsLb = a.hasAttribute("data-lightbox") || isImageHref;
+        if (!wantsLb) return;
+        e.preventDefault();
+        var imgEl = a.querySelector ? a.querySelector("img") : null;
+        var alt = imgEl ? imgEl.getAttribute("alt") || "" : "";
+        var title =
+          a.getAttribute("title") || a.getAttribute("data-caption") || (a.textContent ? a.textContent.trim() : "");
+        openLightbox(a.href || href, title, alt);
+      },
+      { passive: false }
+    );
+  })();
 
-        function apply(theme) {
-          if (theme === "light") {
-            $html.setAttribute("data-theme", "light");
-            $btn.textContent = "☀️ Theme LIGHT";
-            $btn.setAttribute("aria-pressed", "true");
-          } else if (theme === "dark") {
-            $html.setAttribute("data-theme", "dark");
-            $btn.textContent = "🌙 Theme DARK";
-            $btn.setAttribute("aria-pressed", "true");
-          } else {
-            $html.removeAttribute("data-theme");
-            $btn.textContent = "🖥️ Theme AUTO";
-            $btn.setAttribute("aria-pressed", "false");
-          }
-          if (!window.__uiState) window.__uiState = {};
-          window.__uiState.theme = theme;
-        }
-        function next(state) {
-          return state === "auto" ? "light" : state === "light" ? "dark" : "auto";
-        }
+  /* ===========================
+  Mobile Navigation (Overlay)
+  – Overlay-Klick schließt NICHT
+  =========================== */
+  (function () {
+    var btn = document.getElementById("menu-toggle");
+    var overlay = document.getElementById("mobile-nav");
+    var closeBtn = overlay ? overlay.querySelector(".mnav-close") : null;
+    var linksContainer = overlay ? overlay.querySelector(".mnav-links") : null;
+    var desktopNav = document.querySelector(".topbar .nav");
+    var lastFocus = null;
 
-        var state = window.__store && window.__store.safeGet ? window.__store.safeGet(KEY) : null;
-        if (!state) state = "auto";
-        apply(state);
+    function syncLinks() {
+      if (linksContainer) linksContainer.innerHTML = desktopNav ? desktopNav.innerHTML : "";
+    }
+    syncLinks();
 
-        $btn.addEventListener("click", function () {
-          state = next(state);
-          if (window.__store && window.__store.safeSet) window.__store.safeSet(KEY, state);
-          apply(state);
-        });
+    var brand = document.querySelector(".topbar-row.row1 .brand");
+    var row1Inner = document.querySelector(".topbar-row.row1 .inner");
+    var row2Inner = document.querySelector(".topbar-row.row2 .inner");
+    var burger = document.getElementById("menu-toggle");
+    var row1Anchor = row1Inner ? row1Inner.querySelector(".controls") : null;
 
-        if (window.matchMedia) {
-          var mq = window.matchMedia("(prefers-color-scheme: dark)");
-          var onChange = function () {
-            if (state === "auto") apply("auto");
-          };
-          if (mq.addEventListener) mq.addEventListener("change", onChange);
-          else if (mq.addListener) mq.addListener(onChange);
-        }
-      })();
+    function isMobile() {
+      return window.innerWidth <= 860;
+    }
 
-      /* ==========================================
-   Motion-Toggle: auto → on → off (wie Theme)
-   ========================================== */
-      (function () {
-        var KEY = "motion";
-        var $html = document.documentElement;
-        var $btn = document.getElementById("motion-toggle");
-        if (!$btn) return;
+    function moveBrandToRow2() {
+      if (!brand || !row2Inner || !burger) return;
+      if (row2Inner.contains(brand)) return;
+      if (row1Inner) row1Inner.classList.add("no-brand");
+      burger.insertAdjacentElement("afterend", brand);
+    }
+    function restoreBrandToRow1() {
+      if (!brand || !row1Inner) return;
+      if (row1Inner.contains(brand)) return;
+      brand.classList.remove("brand--row2");
+      row1Inner.classList.remove("no-brand");
+      if (row1Anchor) row1Inner.insertBefore(brand, row1Anchor);
+      else row1Inner.appendChild(brand);
+    }
+    function placeBrandForViewport() {
+      if (isMobile()) moveBrandToRow2();
+      else restoreBrandToRow1();
+    }
 
-        function apply(mode) {
-          if (mode === "auto") {
-            $html.removeAttribute("data-motion");
-          } else {
-            $html.setAttribute("data-motion", mode);
-          }
-
-          if (mode === "on") {
-            $btn.textContent = "🌀 Scroll ON";
-            $btn.setAttribute("data-tooltip", "Sanftes Scrollen: an");
-            $btn.setAttribute("aria-pressed", "true");
-          } else if (mode === "off") {
-            $btn.textContent = "⏩ Scroll OFF";
-            $btn.setAttribute("data-tooltip", "Sanftes Scrollen: aus");
-            $btn.setAttribute("aria-pressed", "true");
-          } else {
-            $btn.textContent = "🖥️ Scroll AUTO";
-            $btn.setAttribute("data-tooltip", "Sanftes Scrollen: Systemvorgabe");
-            $btn.setAttribute("aria-pressed", "false");
-          }
-          if (!window.__uiState) window.__uiState = {};
-          window.__uiState.motion = mode;
-        }
-        function next(mode) {
-          return mode === "auto" ? "on" : mode === "on" ? "off" : "auto";
-        }
-
-        var state =
-          (window.__store && window.__store.safeGet ? window.__store.safeGet(KEY) : null) ||
-          $html.getAttribute("data-motion") ||
-          "auto";
-        apply(state);
-
-        $btn.addEventListener("click", function () {
-          state = next(state);
-          if (window.__store && window.__store.safeSet) window.__store.safeSet(KEY, state);
-          apply(state);
-        });
-
-        if (window.matchMedia) {
-          var mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-          var onChange = function () {
-            var m = window.__uiState && window.__uiState.motion ? window.__uiState.motion : "auto";
-            if (m === "auto") apply("auto");
-          };
-          if (mq.addEventListener) mq.addEventListener("change", onChange);
-          else if (mq.addListener) mq.addListener(onChange);
-        }
-      })();
-
-      /* ===================================================
-   Topbar-Höhe → Body-Padding (verhindert Überdeckung)
-   =================================================== */
-      (function () {
-        var tb = document.querySelector(".topbar");
-        function setPad() {
-          var h = tb && tb.offsetHeight ? tb.offsetHeight : 0;
-          document.body.style.paddingTop = h + "px";
-          document.documentElement.style.setProperty("--tb-h", h + "px");
-        }
-        setPad();
-        window.addEventListener("load", setPad);
-        window.addEventListener("resize", setPad);
-      })();
-
-      /* ========================
-   Kleiner Scroll-Up-Button
-   – robustes scrollTop, niedrigerer Schwellwert, sehr hoher z-index
-   ======================== */
-      (function () {
-        var btn = document.createElement("button");
-        btn.textContent = "↑";
-        btn.type = "button";
-        btn.setAttribute("aria-label", "Nach oben");
-        btn.setAttribute("title", "Nach oben");
-        var style = btn.style;
-        style.position = "fixed";
-        style.right = "16px";
-        style.bottom = "calc(env(safe-area-inset-bottom, 0px) + 16px)";
-        style.width = "42px";
-        style.height = "42px";
-        style.borderRadius = "50%";
-        style.border = "1px solid rgba(0,0,0,.25)";
-        style.background = "rgba(255,255,255,.65)"; // etwas sichtbarer
-        style.color = "inherit";
-        style.cursor = "pointer";
-        style.boxShadow = "0 6px 18px rgba(0,0,0,.25)";
-        style.display = "none";
-        style.zIndex = 2147483647; // gewinnt sicher gegen alles
-        try {
-          if (window.matchMedia && window.matchMedia("(pointer: coarse)").matches) {
-            style.width = "48px";
-            style.height = "48px";
-          }
-        } catch (_) {}
-
-        function rootScrollTop() {
-          // Cross-Browser: Edge/IE-Komp.-Modi, iOS Safari, etc.
-          return (
-            (typeof window.scrollY === "number" ? window.scrollY : 0) ||
-            document.documentElement.scrollTop ||
-            document.body.scrollTop ||
-            0
-          );
-        }
-
-        btn.addEventListener("click", function () {
-          if (typeof window.__scrollToY === "function") {
-            window.__scrollToY(0);
-            return;
-          }
-          var mode =
-            (window.__uiState && window.__uiState.motion) ||
-            document.documentElement.getAttribute("data-motion") ||
-            "auto";
-          var reduce =
-            mode === "off" ||
-            (mode === "auto" && window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
-          window.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" });
-        });
-
-        document.body.appendChild(btn);
-
-        var THRESH = 300; // früher zeigen
-        function onScroll() {
-          var overlayLock = document.body.classList.contains("lb-lock");
-          var y = rootScrollTop();
-          style.display = !overlayLock && y > THRESH ? "block" : "none";
-        }
-
-        window.addEventListener("scroll", onScroll, { passive: true });
-        window.addEventListener("load", onScroll);
-        window.addEventListener("orientationchange", onScroll);
-        try {
-          var mo = new MutationObserver(onScroll);
-          mo.observe(document.body, { attributes: true, attributeFilter: ["class"] });
-        } catch (_) {}
-        onScroll();
-      })();
-      /* ====================================
-   Active-Link-Markierung (Desktop-Nav)
-   ==================================== */
-      (function () {
-        var links = document.querySelectorAll('.topbar .nav a[href^="#"]');
-        if (!links.length) return;
-        var sections = [];
-        for (var i = 0; i < links.length; i++) {
-          var t = document.querySelector(links[i].getAttribute("href"));
-          if (t) sections.push(t);
-        }
-        function setActive(id) {
-          for (var j = 0; j < links.length; j++) links[j].removeAttribute("aria-current");
-          var active = document.querySelector('.topbar .nav a[href="' + id + '"]');
-          if (active) active.setAttribute("aria-current", "page");
-        }
-        var io = new IntersectionObserver(
-          function (entries) {
-            for (var k = 0; k < entries.length; k++) {
-              var e = entries[k];
-              if (e.isIntersecting) setActive("#" + e.target.id);
-            }
-          },
-          { rootMargin: "-30% 0px -60% 0px", threshold: 0 }
-        );
-        for (var m = 0; m < sections.length; m++) io.observe(sections[m]);
-      })();
-
-      /* =========================
-   Lightbox (für Bild-Links)
-   ========================= */
-      (function () {
-        var overlay = document.createElement("div");
-        overlay.className = "lb-overlay";
+    function open() {
+      lastFocus = document.activeElement;
+      if (overlay) {
+        overlay.classList.add("open");
+        overlay.setAttribute("aria-hidden", "false");
+      }
+      if (btn) btn.setAttribute("aria-expanded", "true");
+      document.body.classList.add("lb-lock");
+      var firstLink = linksContainer ? linksContainer.querySelector("a") : null;
+      var focusEl = firstLink || closeBtn;
+      try {
+        if (focusEl) focusEl.focus();
+      } catch (e) {}
+    }
+    function close() {
+      if (overlay) {
+        overlay.classList.remove("open");
         overlay.setAttribute("aria-hidden", "true");
+      }
+      if (btn) btn.setAttribute("aria-expanded", "false");
+      document.body.classList.remove("lb-lock");
+      if (lastFocus && document.contains(lastFocus)) {
+        try {
+          lastFocus.focus();
+        } catch (e) {}
+      }
+    }
 
-        var dialog = document.createElement("div");
-        dialog.className = "lb-dialog";
-        dialog.setAttribute("role", "dialog");
-        dialog.setAttribute("aria-modal", "true");
-        dialog.setAttribute("aria-label", "Bildanzeige");
+    placeBrandForViewport();
 
-        var img = document.createElement("img");
-        img.className = "lb-img";
-        img.setAttribute("alt", "");
+    if (btn)
+      btn.addEventListener("click", function () {
+        if (overlay && overlay.classList.contains("open")) close();
+        else open();
+      });
+    if (closeBtn) closeBtn.addEventListener("click", close);
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && overlay && overlay.classList.contains("open")) close();
+    });
+    if (overlay)
+      overlay.addEventListener("click", function (e) {
+        var a = e.target.closest ? e.target.closest("a") : null;
+        if (a) close(); // Link-Klick schließt weiterhin
+      });
 
-        var caption = document.createElement("div");
-        caption.className = "lb-caption";
+    var w = window.innerWidth;
+    window.addEventListener("resize", function () {
+      if (window.innerWidth === w) return;
+      w = window.innerWidth;
+      syncLinks();
+      placeBrandForViewport();
+      if (!isMobile() && overlay && overlay.classList.contains("open")) close();
+    });
+  })();
 
-        var closeBtn = document.createElement("button");
-        closeBtn.className = "lb-close";
-        closeBtn.setAttribute("aria-label", "Schließen");
-        closeBtn.innerHTML = "&times;";
+  /* =================================
+  Smooth-Scroll mit Offset & Toggle
+  – FIX: ignoriert UI-Toggles/Overlays und respektiert defaultPrevented
+  ================================= */
+  (function () {
+    function motionMode() {
+      if (window.__uiState && window.__uiState.motion) return window.__uiState.motion;
+      var attr = document.documentElement.getAttribute("data-motion");
+      return attr || "auto";
+    }
+    function isReducedMotion() {
+      var m = motionMode();
+      if (m === "on") return false;
+      if (m === "off") return true;
+      return window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    }
+    function headerOffset() {
+      var cs = getComputedStyle(document.documentElement);
+      var v = cs.getPropertyValue("--tb-h").trim();
+      var h = parseFloat(v);
+      return (
+        (isFinite(h)
+          ? h
+          : (document.querySelector(".topbar") && document.querySelector(".topbar").offsetHeight) || 0) + 8
+      );
+    }
+    function easeInOutCubic(t) {
+      return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    }
 
-        dialog.appendChild(closeBtn);
-        dialog.appendChild(img);
-        dialog.appendChild(caption);
-        overlay.appendChild(dialog);
-        document.body.appendChild(overlay);
+    var rafId = 0;
+    function scrollToY(targetY, duration) {
+      if (isReducedMotion()) {
+        window.scrollTo(0, targetY);
+        return;
+      }
+      var startY = window.pageYOffset;
+      var dist = targetY - startY;
+      var start = performance.now();
+      var dur = typeof duration === "number" ? duration : Math.min(900, Math.max(300, Math.abs(dist) * 0.5));
+      cancelAnimationFrame(rafId);
+      function cancel() { cancelAnimationFrame(rafId); }
+      window.addEventListener("wheel", cancel, { passive: true, once: true });
+      window.addEventListener("keydown", cancel, { once: true });
+      function step(now) {
+        var t = Math.min(1, (now - start) / dur);
+        var y = startY + dist * easeInOutCubic(t);
+        window.scrollTo(0, Math.round(y));
+        if (t < 1) rafId = requestAnimationFrame(step);
+      }
+      rafId = requestAnimationFrame(step);
+    }
+    window.__scrollToY = scrollToY;
 
-        var lastFocus = null;
-        function openLightbox(href, text, alt) {
-          lastFocus = document.activeElement;
-          img.src = href;
-          img.alt = alt || text || "";
-          caption.textContent = text || "";
-          overlay.setAttribute("aria-hidden", "false");
-          document.body.classList.add("lb-lock");
-          try {
-            closeBtn.focus();
-          } catch (e) {}
-        }
-        function closeLightbox() {
-          overlay.setAttribute("aria-hidden", "true");
-          document.body.classList.remove("lb-lock");
-          img.removeAttribute("src");
-          if (lastFocus && document.contains(lastFocus)) {
-            try {
-              lastFocus.focus();
-            } catch (e) {}
-          }
-        }
+    function focusAfterScroll(el) {
+      if (!el) return;
+      var had = el.hasAttribute("tabindex");
+      el.setAttribute("tabindex", "-1");
+      try { el.focus({ preventScroll: true }); } catch (e) {}
+      if (!had) el.removeAttribute("tabindex");
+    }
+    function handleTopHashClick(e, a) {
+      var raw = a.getAttribute("href");
+      if (raw === "#" || raw === "#top") {
+        e.preventDefault();
+        scrollToY(0);
+        try { history.pushState(null, "", "#"); } catch (e) {}
+        return true;
+      }
+      return false;
+    }
 
-        overlay.addEventListener("click", function (e) {
-          if (e.target === overlay || e.target === closeBtn) closeLightbox();
-        });
-        document.addEventListener("keydown", function (e) {
-          if (overlay.getAttribute("aria-hidden") === "false" && e.key === "Escape") closeLightbox();
-        });
+    document.addEventListener(
+      "click",
+      function (e) {
+        // NEU: respektiere bereits verhinderte Defaults
+        if (e.defaultPrevented) return;
+        // NEU: UI-Toggles und aktive Dialoge ignorieren
+        var ignoreSel = '#theme-toggle, #motion-toggle, #storage-toggle, .consent-dialog, .lb-dialog';
+        if (e.target.closest && e.target.closest(ignoreSel)) return;
 
-        document.addEventListener(
-          "click",
-          function (e) {
-            var a = e.target.closest ? e.target.closest("a") : null;
-            if (!a) return;
-            var href = a.getAttribute("href") || "";
-            var isImageHref = /\.(png|jpe?g|webp|gif|svg)(\?.*)?$/i.test(href);
-            var wantsLb = a.hasAttribute("data-lightbox") || isImageHref;
-            if (!wantsLb) return;
-            e.preventDefault();
-            var imgEl = a.querySelector ? a.querySelector("img") : null;
-            var alt = imgEl ? imgEl.getAttribute("alt") || "" : "";
-            var title =
-              a.getAttribute("title") || a.getAttribute("data-caption") || (a.textContent ? a.textContent.trim() : "");
-            openLightbox(a.href || href, title, alt);
-          },
-          { passive: false }
-        );
-      })();
+        var a = e.target.closest ? e.target.closest('a[href^="#"]') : null;
+        if (!a) return;
+        if (handleTopHashClick(e, a)) return;
 
-      /* ===========================
-   Mobile Navigation (Overlay)
-   =========================== */
-      (function () {
-        var btn = document.getElementById("menu-toggle");
+        var href = a.getAttribute("href");
+        var url;
+        try { url = new URL(href, location.href); } catch (err) { return; }
+        if (url.pathname !== location.pathname || !url.hash) return;
+
+        var target = document.querySelector(url.hash);
+        if (!target) return;
+        e.preventDefault();
+
         var overlay = document.getElementById("mobile-nav");
-        var closeBtn = overlay ? overlay.querySelector(".mnav-close") : null;
-        var linksContainer = overlay ? overlay.querySelector(".mnav-links") : null;
-        var desktopNav = document.querySelector(".topbar .nav");
-        var lastFocus = null;
-
-        function syncLinks() {
-          if (linksContainer) linksContainer.innerHTML = desktopNav ? desktopNav.innerHTML : "";
-        }
-        syncLinks();
-
-        var brand = document.querySelector(".topbar-row.row1 .brand");
-        var row1Inner = document.querySelector(".topbar-row.row1 .inner");
-        var row2Inner = document.querySelector(".topbar-row.row2 .inner");
-        var burger = document.getElementById("menu-toggle");
-        var row1Anchor = row1Inner ? row1Inner.querySelector(".controls") : null;
-
-        function isMobile() {
-          return window.innerWidth <= 860;
-        }
-
-        function moveBrandToRow2() {
-          if (!brand || !row2Inner || !burger) return;
-          if (row2Inner.contains(brand)) return;
-          if (row1Inner) row1Inner.classList.add("no-brand");
-          burger.insertAdjacentElement("afterend", brand);
-        }
-        function restoreBrandToRow1() {
-          if (!brand || !row1Inner) return;
-          if (row1Inner.contains(brand)) return;
-          brand.classList.remove("brand--row2");
-          row1Inner.classList.remove("no-brand");
-          if (row1Anchor) row1Inner.insertBefore(brand, row1Anchor);
-          else row1Inner.appendChild(brand);
-        }
-        function placeBrandForViewport() {
-          if (isMobile()) moveBrandToRow2();
-          else restoreBrandToRow1();
-        }
-
-        function open() {
-          lastFocus = document.activeElement;
-          if (overlay) {
-            overlay.classList.add("open");
-            overlay.setAttribute("aria-hidden", "false");
-          }
-          if (btn) btn.setAttribute("aria-expanded", "true");
-          document.body.classList.add("lb-lock");
-          var firstLink = linksContainer ? linksContainer.querySelector("a") : null;
-          var focusEl = firstLink || closeBtn;
-          try {
-            if (focusEl) focusEl.focus();
-          } catch (e) {}
-        }
-        function close() {
-          if (overlay) {
-            overlay.classList.remove("open");
-            overlay.setAttribute("aria-hidden", "true");
-          }
-          if (btn) btn.setAttribute("aria-expanded", "false");
+        if (overlay && overlay.classList.contains("open")) {
+          overlay.classList.remove("open");
+          overlay.setAttribute("aria-hidden", "true");
+          var mt = document.getElementById("menu-toggle");
+          if (mt) mt.setAttribute("aria-expanded", "false");
           document.body.classList.remove("lb-lock");
-          if (lastFocus && document.contains(lastFocus)) {
-            try {
-              lastFocus.focus();
-            } catch (e) {}
-          }
         }
+        var y = Math.max(0, target.getBoundingClientRect().top + window.pageYOffset - headerOffset());
+        scrollToY(y);
+        try { history.pushState(null, "", url.hash); } catch (e) {}
+        setTimeout(function () { focusAfterScroll(target); }, 10);
+      },
+      true
+    );
 
-        placeBrandForViewport();
-
-        if (btn)
-          btn.addEventListener("click", function () {
-            if (overlay && overlay.classList.contains("open")) close();
-            else open();
-          });
-        if (closeBtn) closeBtn.addEventListener("click", close);
-        if (overlay)
-          overlay.addEventListener("click", function (e) {
-            if (e.target === overlay) close();
-          });
-        document.addEventListener("keydown", function (e) {
-          if (e.key === "Escape" && overlay && overlay.classList.contains("open")) close();
-        });
-        if (overlay)
-          overlay.addEventListener("click", function (e) {
-            var a = e.target.closest ? e.target.closest("a") : null;
-            if (a) close();
-          });
-
-        var w = window.innerWidth;
-        window.addEventListener("resize", function () {
-          if (window.innerWidth === w) return;
-          w = window.innerWidth;
-          syncLinks();
-          placeBrandForViewport();
-          if (!isMobile() && overlay && overlay.classList.contains("open")) close();
-        });
-      })();
-
-      /* =================================
-   Smooth-Scroll mit Offset & Toggle
-   ================================= */
-      (function () {
-        function motionMode() {
-          if (window.__uiState && window.__uiState.motion) return window.__uiState.motion;
-          var attr = document.documentElement.getAttribute("data-motion");
-          return attr || "auto";
-        }
-        function isReducedMotion() {
-          var m = motionMode();
-          if (m === "on") return false;
-          if (m === "off") return true;
-          return window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-        }
-        function headerOffset() {
-          var cs = getComputedStyle(document.documentElement);
-          var v = cs.getPropertyValue("--tb-h").trim();
-          var h = parseFloat(v);
-          return (
-            (isFinite(h)
-              ? h
-              : (document.querySelector(".topbar") && document.querySelector(".topbar").offsetHeight) || 0) + 8
-          );
-        }
-        function easeInOutCubic(t) {
-          return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-        }
-
-        var rafId = 0;
-        function scrollToY(targetY, duration) {
-          if (isReducedMotion()) {
-            window.scrollTo(0, targetY);
-            return;
-          }
-          var startY = window.pageYOffset;
-          var dist = targetY - startY;
-          var start = performance.now();
-          var dur = typeof duration === "number" ? duration : Math.min(900, Math.max(300, Math.abs(dist) * 0.5));
-          cancelAnimationFrame(rafId);
-          function cancel() {
-            cancelAnimationFrame(rafId);
-          }
-          window.addEventListener("wheel", cancel, { passive: true, once: true });
-          window.addEventListener("keydown", cancel, { once: true });
-          function step(now) {
-            var t = Math.min(1, (now - start) / dur);
-            var y = startY + dist * easeInOutCubic(t);
-            window.scrollTo(0, Math.round(y));
-            if (t < 1) {
-              rafId = requestAnimationFrame(step);
-            }
-          }
-          rafId = requestAnimationFrame(step);
-        }
-        window.__scrollToY = scrollToY;
-
-        function focusAfterScroll(el) {
-          if (!el) return;
-          var had = el.hasAttribute("tabindex");
-          el.setAttribute("tabindex", "-1");
-          try {
-            el.focus({ preventScroll: true });
-          } catch (e) {}
-          if (!had) el.removeAttribute("tabindex");
-        }
-        function handleTopHashClick(e, a) {
-          var raw = a.getAttribute("href");
-          if (raw === "#" || raw === "#top") {
-            e.preventDefault();
-            scrollToY(0);
-            try {
-              history.pushState(null, "", "#");
-            } catch (e) {}
-            return true;
-          }
-          return false;
-        }
-
-        document.addEventListener(
-          "click",
-          function (e) {
-            var a = e.target.closest ? e.target.closest('a[href^="#"]') : null;
-            if (!a) return;
-            if (handleTopHashClick(e, a)) return;
-            var href = a.getAttribute("href");
-            var url;
-            try {
-              url = new URL(href, location.href);
-            } catch (err) {
-              return;
-            }
-            if (url.pathname !== location.pathname || !url.hash) return;
-            var target = document.querySelector(url.hash);
-            if (!target) return;
-            e.preventDefault();
-            var overlay = document.getElementById("mobile-nav");
-            if (overlay && overlay.classList.contains("open")) {
-              overlay.classList.remove("open");
-              overlay.setAttribute("aria-hidden", "true");
-              var mt = document.getElementById("menu-toggle");
-              if (mt) mt.setAttribute("aria-expanded", "false");
-              document.body.classList.remove("lb-lock");
-            }
-            var y = Math.max(0, target.getBoundingClientRect().top + window.pageYOffset - headerOffset());
-            scrollToY(y);
-            try {
-              history.pushState(null, "", url.hash);
-            } catch (e) {}
-            setTimeout(function () {
-              focusAfterScroll(target);
-            }, 10);
-          },
-          true
-        );
-
-        window.addEventListener("load", function () {
-          if (location.hash) {
-            var t = document.querySelector(location.hash);
-            if (t) {
-              var y = Math.max(0, t.getBoundingClientRect().top + window.pageYOffset - headerOffset());
-              window.scrollTo(0, y);
-            }
-          }
-        });
-
-        window.addEventListener("hashchange", function () {
-          var t = document.querySelector(location.hash);
-          if (!t) return;
+    window.addEventListener("load", function () {
+      if (location.hash) {
+        var t = document.querySelector(location.hash);
+        if (t) {
           var y = Math.max(0, t.getBoundingClientRect().top + window.pageYOffset - headerOffset());
-          scrollToY(y, 400);
-          focusAfterScroll(t);
-        });
-      })();
-    </script>
+          window.scrollTo(0, y);
+        }
+      }
+    });
+
+    window.addEventListener("hashchange", function () {
+      var t = document.querySelector(location.hash);
+      if (!t) return;
+      var y = Math.max(0, t.getBoundingClientRect().top + window.pageYOffset - headerOffset());
+      scrollToY(y, 400);
+      focusAfterScroll(t);
+    });
+  })();
+</script>
+
   </body>
 </html>
