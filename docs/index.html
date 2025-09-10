@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta name="color-scheme" content="light dark" />
 
-    <!-- NEU === MANUELLER SEO-BLOCK ========================= -->
+    <!-- === MANUELLER SEO-BLOCK ========================= NEU -->
     <title>Custom GPT unter ChatGPT absichern | ChatGPT – GPT-RuleCompass</title>
     <meta
       name="description"
@@ -796,7 +796,8 @@
 
       /* Dialog per :target anzeigen – identisch zur Lightbox-Logik */
       #storage-on-consent:target,
-      #storage-off-consent:target {
+      #storage-consent:target,
+      #storage-disable:target {
         display: flex;
       }
 
@@ -1669,7 +1670,7 @@
 
       /* ==========================================================
    Storage-Consent & Safe-Storage (Button bleibt Button)
-   Overlay-Öffnen via :target (wie Lightbox), Persistenz erst im Dialog
+   Overlay via :target (#storage-consent / #storage-disable)
    ========================================================== */
       (function () {
         var PERSIST_KEY = "persist";
@@ -1715,7 +1716,7 @@
           } catch (_) {}
         }
 
-        // Exponieren für Theme/Motion
+        // für Theme/Motion
         window.__store = { canPersist: canPersist, safeGet: safeGet, safeSet: safeSet };
 
         var toggle = document.getElementById("storage-toggle");
@@ -1735,38 +1736,36 @@
           }
         }
 
+        function storageHashOpen() {
+          return location.hash === "#storage-consent" || location.hash === "#storage-disable";
+        }
         function updateLockClass() {
-          var storageTarget = location.hash === "#storage-on-consent" || location.hash === "#storage-off-consent";
           try {
             var lbOpen = document.querySelector(".lb-overlay[aria-hidden='false']");
             var mOpen = document.getElementById("mobile-nav");
             var mIsOpen = mOpen && mOpen.classList.contains("open");
-            if (storageTarget || lbOpen || mIsOpen) document.body.classList.add("lb-lock");
+            if (storageHashOpen() || lbOpen || mIsOpen) document.body.classList.add("lb-lock");
             else document.body.classList.remove("lb-lock");
           } catch (_) {}
         }
         function openConsent(which) {
+          // "on" | "off"
           try {
-            location.hash = which === "on" ? "#storage-on-consent" : "#storage-off-consent";
+            location.hash = which === "on" ? "#storage-consent" : "#storage-disable";
           } catch (_) {}
           updateLockClass();
         }
         function closeConsent() {
           try {
-            if (location.hash === "#storage-on-consent" || location.hash === "#storage-off-consent") {
-              if (history.length > 1) {
-                try {
-                  history.back();
-                } catch (_) {}
-              } else {
-                location.hash = "";
-              }
+            if (storageHashOpen()) {
+              // Hash zurücksetzen; hashchange feuert -> updateLockClass()
+              location.hash = "";
             }
           } catch (_) {}
           updateLockClass();
         }
 
-        // Button klick: entscheidet NUR per UI-Flag, kein Storage-Zugriff nötig
+        // Button klick: nur UI-Flag entscheidet
         if (toggle) {
           toggle.addEventListener("click", function (e) {
             e.preventDefault();
@@ -1774,14 +1773,14 @@
           });
         }
 
-        // Dialog-Buttons
+        // OK-Buttons in den Dialogen (enable/disable)
         document.addEventListener(
           "click",
           function (e) {
-            var onOk = e.target.closest ? e.target.closest('#storage-on-consent  [data-consent="ok"]') : null;
-            var offOk = e.target.closest ? e.target.closest('#storage-off-consent [data-consent="ok"]') : null;
+            var enableOk = e.target.closest ? e.target.closest('#storage-consent  [data-action="enable"]') : null;
+            var disableOk = e.target.closest ? e.target.closest('#storage-disable [data-action="disable"]') : null;
 
-            if (onOk) {
+            if (enableOk) {
               e.preventDefault();
               var wrote = false;
               try {
@@ -1798,22 +1797,22 @@
                 } catch (_) {}
                 closeConsent();
               } else {
-                // Sichtbarer Hinweis im Dialog
+                // Hinweis im Dialog anzeigen
                 try {
-                  var box = document.querySelector("#storage-on-consent .consent-text");
+                  var box = document.querySelector("#storage-consent .consent-text");
                   if (box && !box.querySelector(".edge-hint")) {
                     var p = document.createElement("p");
                     p.className = "edge-hint";
                     p.style.marginTop = ".6rem";
                     p.innerHTML =
-                      "<strong>Speichern blockiert.</strong> Prüfe in Edge: Einstellungen → <em>Cookies &amp; Websiteberechtigungen</em> → <em>Cookies und Websitedaten</em> („Websites erlauben, Daten zu speichern“) und kein InPrivate/Application Guard.";
+                      "<strong>Speichern blockiert.</strong> Prüfe in Edge: Einstellungen → <em>Cookies &amp; Websiteberechtigungen</em> → <em>Cookies und Websitedaten</em> („Websites erlauben, Daten zu speichern“) sowie kein InPrivate/Application Guard.";
                     box.appendChild(p);
                   }
                 } catch (_) {}
               }
             }
 
-            if (offOk) {
+            if (disableOk) {
               e.preventDefault();
               try {
                 safeDel(THEME_KEY);
@@ -1821,6 +1820,35 @@
                 safeDel(PERSIST_KEY);
               } catch (_) {}
               applyPersistUI(false);
+              closeConsent();
+            }
+          },
+          true
+        );
+
+        // Abbrechen-Buttons (href="#") explizit schließen, damit lb-lock immer sauber fällt
+        document.addEventListener(
+          "click",
+          function (e) {
+            var cancel = e.target.closest
+              ? e.target.closest('#storage-consent .consent-btn[href="#"], #storage-disable .consent-btn[href="#"]')
+              : null;
+            if (cancel) {
+              e.preventDefault();
+              closeConsent();
+            }
+          },
+          true
+        );
+
+        // Hintergrundklick schließt den Dialog (wie Lightbox)
+        document.addEventListener(
+          "click",
+          function (e) {
+            var t = e.target;
+            if (!t) return;
+            if (t.id === "storage-consent" || t.id === "storage-disable") {
+              e.preventDefault();
               closeConsent();
             }
           },
