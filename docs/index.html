@@ -1220,54 +1220,62 @@
    Storage-Consent & Safe-Storage (persist: on/off, default off)
    ========================================================== */
       (function () {
-        const PERSIST_KEY = "persist";
-        const THEME_KEY = "theme";
-        const MOTION_KEY = "motion";
+        try {
+          const PERSIST_KEY = "persist";
+          const THEME_KEY = "theme";
+          const MOTION_KEY = "motion";
 
-        // Globale UI-State-Spiegelung
-        const ui = (window.__uiState = window.__uiState || { theme: "auto", motion: "auto", persist: "off" });
+          // Globale UI-State-Spiegelung
+          const ui = (window.__uiState = window.__uiState || { theme: "auto", motion: "auto", persist: "off" });
 
-        // Helper für Consent-Status
-        const canPersist = () => {
-          try {
-            return localStorage.getItem(PERSIST_KEY) === "on";
-          } catch (_) {
-            return false;
+          // Verlässlicher Schreib-/Lesetest für Edge & strikte Einstellungen
+          function hasLocalStorage() {
+            try {
+              const k = "__rc_probe__";
+              localStorage.setItem(k, "1");
+              const ok = localStorage.getItem(k) === "1";
+              localStorage.removeItem(k);
+              return ok;
+            } catch (_) {
+              return false;
+            }
           }
-        };
 
-        // Safe-Getter/-Setter respektieren Consent
-        function safeGet(key) {
-          try {
-            return canPersist() ? localStorage.getItem(key) : null;
-          } catch (_) {
-            return null;
+          // Consent-Status: nur "on", wenn localStorage verfügbar UND Flag gesetzt
+          const canPersist = () => {
+            try {
+              return hasLocalStorage() && localStorage.getItem(PERSIST_KEY) === "on";
+            } catch (_) {
+              return false;
+            }
+          };
+
+          // Safe-Getter/-Setter respektieren Consent
+          function safeGet(key) {
+            try {
+              return canPersist() ? localStorage.getItem(key) : null;
+            } catch (_) {
+              return null;
+            }
           }
-        }
-        function safeSet(key, v) {
-          try {
-            if (canPersist()) localStorage.setItem(key, v);
-          } catch (_) {}
-        }
-        function safeDel(key) {
-          try {
-            localStorage.removeItem(key);
-          } catch (_) {}
-        }
+          function safeSet(key, v) {
+            try {
+              if (canPersist()) localStorage.setItem(key, v);
+            } catch (_) {}
+          }
+          function safeDel(key) {
+            try {
+              localStorage.removeItem(key);
+            } catch (_) {}
+          }
 
-        // Export minimaler Store
-        window.__store = { canPersist, safeGet, safeSet };
+          // Export minimaler Store
+          window.__store = { canPersist, safeGet, safeSet };
 
-        // Consent-Dialog (Promise<boolean>)
-        function consentDialog(opts) {
-          const { title, messageHTML, okText, cancelText } = opts;
-          let resolver;
-          const p = new Promise((res) => (resolver = res));
-
-          // Overlay erstellen (einmalig)
-          let overlay = document.getElementById("consent-overlay");
-          if (!overlay) {
-            overlay = document.createElement("div");
+          // Consent-Overlay vorab bauen → sichert Edge-Fälle, in denen Click-Flow früh abbricht
+          function ensureConsentOverlay() {
+            if (document.getElementById("consent-overlay")) return;
+            const overlay = document.createElement("div");
             overlay.id = "consent-overlay";
             overlay.className = "consent-overlay";
             overlay.setAttribute("aria-hidden", "true");
@@ -1283,121 +1291,196 @@
             const actions = document.createElement("div");
             actions.className = "consent-actions";
 
-            const btnOk = document.createElement("button");
-            btnOk.className = "consent-btn primary";
             const btnCancel = document.createElement("button");
             btnCancel.className = "consent-btn";
+            btnCancel.textContent = "Abbrechen";
+            const btnOk = document.createElement("button");
+            btnOk.className = "consent-btn primary";
+            btnOk.textContent = "Zustimmen";
 
             actions.append(btnCancel, btnOk);
             dialog.append(h3, text, actions);
             overlay.append(dialog);
             document.body.appendChild(overlay);
-
             consentDialog._els = { overlay, dialog, h3, text, btnOk, btnCancel };
           }
-          const { h3, text, btnOk, btnCancel } = consentDialog._els;
 
-          // Inhalte setzen
-          h3.textContent = title;
-          text.innerHTML = messageHTML;
-          btnOk.textContent = okText || "Zustimmen";
-          btnCancel.textContent = cancelText ?? "Abbrechen";
+          // Consent-Dialog (Promise<boolean>)
+          function consentDialog(opts) {
+            ensureConsentOverlay();
+            const { title, messageHTML, okText, cancelText } = opts;
+            let resolver;
+            const p = new Promise((res) => (resolver = res));
 
-          // Fokus-Handling
-          let lastFocus = document.activeElement;
-          function open() {
-            consentDialog._els.overlay.setAttribute("aria-hidden", "false");
-            document.body.classList.add("lb-lock");
-            btnOk.focus();
-          }
-          function close(result) {
-            consentDialog._els.overlay.setAttribute("aria-hidden", "true");
-            document.body.classList.remove("lb-lock");
-            if (lastFocus && document.contains(lastFocus)) lastFocus.focus();
-            resolver(!!result);
-          }
+            const { overlay, h3, text, btnOk, btnCancel } = consentDialog._els;
 
-          const onEsc = (e) => {
-            if (e.key === "Escape") {
-              e.stopPropagation();
-              close(false);
+            // Inhalte setzen
+            h3.textContent = title;
+            text.innerHTML = messageHTML;
+            btnOk.textContent = okText || "Zustimmen";
+            btnCancel.textContent = cancelText ?? "Abbrechen";
+
+            // Fokus-Handling
+            let lastFocus = document.activeElement;
+            function open() {
+              overlay.setAttribute("aria-hidden", "false");
+              document.body.classList.add("lb-lock");
+              btnOk.focus();
             }
-          };
-          const onOverlay = (e) => {
-            if (e.target === consentDialog._els.overlay) close(false);
-          };
+            function close(result) {
+              overlay.setAttribute("aria-hidden", "true");
+              document.body.classList.remove("lb-lock");
+              if (lastFocus && document.contains(lastFocus)) lastFocus.focus();
+              resolver(!!result);
+            }
 
-          btnOk.onclick = () => close(true);
-          btnCancel.onclick = () => close(false);
-          document.addEventListener("keydown", onEsc, { once: true });
-          consentDialog._els.overlay.addEventListener("click", onOverlay, { once: true });
+            const onEsc = (e) => {
+              if (e.key === "Escape") {
+                e.stopPropagation();
+                close(false);
+              }
+            };
+            const onOverlay = (e) => {
+              if (e.target === overlay) close(false);
+            };
 
-          open();
-          return p;
-        }
+            btnOk.onclick = () => close(true);
+            btnCancel.onclick = () => close(false);
+            document.addEventListener("keydown", onEsc, { once: true });
+            overlay.addEventListener("click", onOverlay, { once: true });
 
-        // Button-UI
-        const $btn = document.getElementById("storage-toggle");
-        function applyPersistUI(isOn) {
-          if (!$btn) return;
-          if (isOn) {
-            $btn.textContent = "💾 Storage ON";
-            $btn.dataset.tooltip = "Lokale Speicherung: an";
-            $btn.setAttribute("aria-pressed", "true");
-            ui.persist = "on";
-          } else {
-            $btn.textContent = "💾 Storage OFF";
-            $btn.dataset.tooltip = "Lokale Speicherung: aus";
-            $btn.setAttribute("aria-pressed", "false");
-            ui.persist = "off";
+            open();
+            return p;
           }
-        }
-        applyPersistUI(canPersist());
 
-        // Click-Handler
-        $btn?.addEventListener("click", async () => {
-          if (!canPersist()) {
-            // Aktivieren
-            const ok = await consentDialog({
-              title: "Lokale Speicherung aktivieren",
-              messageHTML: `
-          <p>Diese Seite kann die Zustände der Schalter <em>Theme</em>, <em>Scroll</em> und <em>Storage</em> lokal in Ihrem Browser speichern.</p>
-          <p>Es werden ausschließlich diese UI-Zustände gespeichert; keine personenbezogenen Daten.</p>
-          <p>Mit „Zustimmen“ erlauben Sie das Speichern und das Wiederherstellen bei künftigen Besuchen.</p>`,
-              okText: "Zustimmen",
-              cancelText: "Ablehnen"
-            });
-            if (ok) {
-              try {
-                localStorage.setItem(PERSIST_KEY, "on");
-              } catch (_) {}
-              applyPersistUI(true);
-              // Aktuelle Zustände sofort persistieren
-              try {
-                localStorage.setItem(THEME_KEY, window.__uiState.theme || "auto");
-                localStorage.setItem(MOTION_KEY, window.__uiState.motion || "auto");
-              } catch (_) {}
+          // Button-UI
+          const $btn = document.getElementById("storage-toggle");
+          function applyPersistUI(isOn) {
+            if (!$btn) return;
+            if (isOn) {
+              $btn.textContent = "💾 Storage ON";
+              $btn.dataset.tooltip = "Lokale Speicherung: an";
+              $btn.setAttribute("aria-pressed", "true");
+              ui.persist = "on";
             } else {
-              applyPersistUI(false);
-            }
-          } else {
-            // Deaktivieren
-            const ok = await consentDialog({
-              title: "Lokale Speicherung deaktivieren",
-              messageHTML: `
-          <p>Die gespeicherten Zustände (Theme/Scroll/Storage) werden aus Ihrem Browser gelöscht.</p>
-          <p>Die Schalter funktionieren weiterhin, werden jedoch nicht mehr dauerhaft gespeichert.</p>`,
-              okText: "Löschen & Deaktivieren",
-              cancelText: "Abbrechen"
-            });
-            if (ok) {
-              safeDel(THEME_KEY);
-              safeDel(MOTION_KEY);
-              safeDel(PERSIST_KEY);
-              applyPersistUI(false);
+              $btn.textContent = "💾 Storage OFF";
+              $btn.dataset.tooltip = "Lokale Speicherung: aus";
+              $btn.setAttribute("aria-pressed", "false");
+              ui.persist = "off";
             }
           }
-        });
+
+          // Native Fallback bei kaputtem Overlay/Click-Flow
+          function nativeFallback(turnOn) {
+            const msgOn =
+              "Lokale Speicherung aktivieren?\n(Hinweis: Edge kann localStorage durch Einstellungen/Policies blockieren.)";
+            const msgOff = "Lokale Speicherung deaktivieren und gespeicherte Zustände löschen?";
+            return window.confirm(turnOn ? msgOn : msgOff);
+          }
+
+          // Click-Handler (robust + Fallback)
+          $btn?.addEventListener("click", async () => {
+            try {
+              if (!canPersist()) {
+                // Aktivieren
+                const ok = await consentDialog({
+                  title: "Lokale Speicherung aktivieren",
+                  messageHTML: `
+              <p>Diese Seite kann die Zustände der Schalter <em>Theme</em>, <em>Scroll</em> und <em>Storage</em> lokal in Ihrem Browser speichern.</p>
+              <p>Es werden ausschließlich diese UI-Zustände gespeichert; keine personenbezogenen Daten.</p>
+              <p>Mit „Zustimmen“ erlauben Sie das Speichern und das Wiederherstellen bei künftigen Besuchen.</p>`,
+                  okText: "Zustimmen",
+                  cancelText: "Ablehnen"
+                });
+                if (ok) {
+                  // Versuch, Persist-Flag zu setzen und zu verifizieren
+                  let wrote = false;
+                  try {
+                    localStorage.setItem(PERSIST_KEY, "on");
+                    wrote = localStorage.getItem(PERSIST_KEY) === "on";
+                  } catch (_) {
+                    wrote = false;
+                  }
+
+                  if (wrote && hasLocalStorage()) {
+                    applyPersistUI(true);
+                    // Aktuelle Zustände sofort persistieren
+                    try {
+                      localStorage.setItem(THEME_KEY, window.__uiState.theme || "auto");
+                      localStorage.setItem(MOTION_KEY, window.__uiState.motion || "auto");
+                    } catch (_) {}
+                  } else {
+                    // Edge/Policy blockiert Speicherung → Hinweis
+                    applyPersistUI(false);
+                    await consentDialog({
+                      title: "Speichern blockiert",
+                      messageHTML: `
+                  <p>Der lokale Speicher ist im Browser aktuell nicht verfügbar (z.&nbsp;B. Edge Tracking-Schutz, InPrivate, Website-Berechtigungen).</p>
+                  <p><strong>Prüfen in Edge:</strong></p>
+                  <ul>
+                    <li>Einstellungen → <em>Cookies und Websiteberechtigungen</em> → <em>Cookies und Websitedaten</em>:
+                      „Websites erlauben, Daten zu speichern“ aktivieren.</li>
+                    <li><em>Tracking-Schutz</em>: „Ausgewogen“ oder „Standard“ verwenden (nicht „Strikt“).</li>
+                    <li>Kein InPrivate-/Anwendungs-Guard-Fenster verwenden.</li>
+                  </ul>
+                  <p>Nach Anpassung die Seite neu laden.</p>`,
+                      okText: "OK",
+                      cancelText: "Schließen"
+                    });
+                  }
+                } else {
+                  applyPersistUI(false);
+                }
+              } else {
+                // Deaktivieren
+                const ok = await consentDialog({
+                  title: "Lokale Speicherung deaktivieren",
+                  messageHTML: `
+              <p>Die gespeicherten Zustände (Theme/Scroll/Storage) werden aus Ihrem Browser gelöscht.</p>
+              <p>Die Schalter funktionieren weiterhin, werden jedoch nicht mehr dauerhaft gespeichert.</p>`,
+                  okText: "Löschen & Deaktivieren",
+                  cancelText: "Abbrechen"
+                });
+                if (ok) {
+                  safeDel(THEME_KEY);
+                  safeDel(MOTION_KEY);
+                  safeDel(PERSIST_KEY);
+                  applyPersistUI(false);
+                }
+              }
+            } catch (err) {
+              // Harte Fallback-Schiene (z. B. wenn Overlay-Bau blockiert)
+              if (!canPersist()) {
+                if (nativeFallback(true)) {
+                  try {
+                    localStorage.setItem(PERSIST_KEY, "on");
+                  } catch {}
+                  applyPersistUI(canPersist());
+                }
+              } else {
+                if (nativeFallback(false)) {
+                  safeDel(THEME_KEY);
+                  safeDel(MOTION_KEY);
+                  safeDel(PERSIST_KEY);
+                  applyPersistUI(false);
+                }
+              }
+            }
+          });
+
+          // Initiale UI nach Listener-Bindung setzen
+          ensureConsentOverlay();
+          applyPersistUI(canPersist());
+        } catch (e) {
+          // Letzte Sicherung: UI als OFF markieren, ohne die Seite zu „brechen“
+          try {
+            const b = document.getElementById("storage-toggle");
+            if (b) {
+              b.textContent = "💾 Storage OFF";
+              b.setAttribute("aria-pressed", "false");
+            }
+          } catch {}
+        }
       })();
 
       /* =================================
@@ -1525,10 +1608,13 @@
       (function () {
         const btn = document.createElement("button");
         btn.textContent = "↑";
+        btn.type = "button";
+        btn.setAttribute("aria-label", "Nach oben");
+        btn.setAttribute("title", "Nach oben");
         Object.assign(btn.style, {
           position: "fixed",
           right: "16px",
-          bottom: "16px",
+          bottom: "calc(env(safe-area-inset-bottom, 0px) + 16px)",
           width: "42px",
           height: "42px",
           borderRadius: "50%",
@@ -1540,6 +1626,14 @@
           display: "none",
           zIndex: 999
         });
+        // Größerer Hit-Target bei Touch-Geräten
+        try {
+          if (window.matchMedia && window.matchMedia("(pointer: coarse)").matches) {
+            btn.style.width = "48px";
+            btn.style.height = "48px";
+          }
+        } catch {}
+
         btn.addEventListener("click", () => {
           // Einheitlich dieselbe Logik wie Anker-Scroll: nutzt __scrollToY, wenn vorhanden
           if (typeof window.__scrollToY === "function") {
@@ -1557,9 +1651,15 @@
         });
         document.body.appendChild(btn);
         const onScroll = () => {
-          btn.style.display = window.scrollY > 600 ? "block" : "none";
+          const overlayLock = document.body.classList.contains("lb-lock"); // Lightbox/Mobile-Nav offen
+          btn.style.display = !overlayLock && window.scrollY > 600 ? "block" : "none";
         };
         window.addEventListener("scroll", onScroll, { passive: true });
+        // Reagiere auch auf Overlay-Öffnen/Schließen (klassenbasiert)
+        try {
+          const mo = new MutationObserver(onScroll);
+          mo.observe(document.body, { attributes: true, attributeFilter: ["class"] });
+        } catch {}
         onScroll();
       })();
 
