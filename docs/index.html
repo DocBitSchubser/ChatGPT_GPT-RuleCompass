@@ -1560,12 +1560,12 @@
 
     <script>
       /* ==========================
-   Externe Links kennzeichen
+   Externe Links kennzeichnen
    ========================== */
       (function () {
         var INTERNAL_HOSTS = new Set([location.hostname]);
         function isImagePath(p) {
-          return /(\.png|\.jpe?g|\.webp|\.gif|\.svg)(\?.*)?$/i.test(p);
+          return /\.(png|jpe?g|webp|gif|svg)(\?.*)?$/i.test(p);
         }
         var as = document.querySelectorAll("a[href]:not([data-no-ext-icon])");
         for (var i = 0; i < as.length; i++) {
@@ -1622,7 +1622,6 @@
 
       /* ==========================================================
    Storage-Consent & Safe-Storage (persist: on/off, default off)
-   (Edge-kompatibel – ohne ?. / ?? / ||=)
    ========================================================== */
       (function () {
         try {
@@ -1630,8 +1629,8 @@
           var THEME_KEY = "theme";
           var MOTION_KEY = "motion";
 
-          // globaler UI-State (ohne ||=)
-          window.__uiState = window.__uiState || { theme: "auto", motion: "auto", persist: "off" };
+          if (!window.__uiState) window.__uiState = { theme: "auto", motion: "auto", persist: "off" };
+          var ui = window.__uiState;
 
           function hasLocalStorage() {
             try {
@@ -1640,7 +1639,7 @@
               var ok = localStorage.getItem(k) === "1";
               localStorage.removeItem(k);
               return ok;
-            } catch (e) {
+            } catch (_) {
               return false;
             }
           }
@@ -1648,7 +1647,7 @@
           function canPersist() {
             try {
               return hasLocalStorage() && localStorage.getItem(PERSIST_KEY) === "on";
-            } catch (e) {
+            } catch (_) {
               return false;
             }
           }
@@ -1656,67 +1655,65 @@
           function safeGet(key) {
             try {
               return canPersist() ? localStorage.getItem(key) : null;
-            } catch (e) {
+            } catch (_) {
               return null;
             }
           }
           function safeSet(key, v) {
             try {
               if (canPersist()) localStorage.setItem(key, v);
-            } catch (e) {}
+            } catch (_) {}
           }
           function safeDel(key) {
             try {
               localStorage.removeItem(key);
-            } catch (e) {}
+            } catch (_) {}
           }
           window.__store = { canPersist: canPersist, safeGet: safeGet, safeSet: safeSet };
 
-          // Consent-Overlay Elemente (einmalig gebaut)
-          var consentEls = null;
+          // --- Consent-Overlay vorab bauen ---
           function ensureConsentOverlay() {
-            if (consentEls) return;
-            var overlay = document.getElementById("consent-overlay");
-            if (!overlay) {
-              overlay = document.createElement("div");
-              overlay.id = "consent-overlay";
-              overlay.className = "consent-overlay";
-              overlay.setAttribute("aria-hidden", "true");
+            if (document.getElementById("consent-overlay")) return;
+            var overlay = document.createElement("div");
+            overlay.id = "consent-overlay";
+            overlay.className = "consent-overlay";
+            overlay.setAttribute("aria-hidden", "true");
 
-              var dialog = document.createElement("div");
-              dialog.className = "consent-dialog";
-              dialog.setAttribute("role", "dialog");
-              dialog.setAttribute("aria-modal", "true");
-              dialog.setAttribute("aria-label", "Einwilligung");
+            var dialog = document.createElement("div");
+            dialog.className = "consent-dialog";
+            dialog.setAttribute("role", "dialog");
+            dialog.setAttribute("aria-modal", "true");
+            dialog.setAttribute("aria-label", "Einwilligung");
 
-              var h3 = document.createElement("h3");
-              var text = document.createElement("div");
-              var actions = document.createElement("div");
-              actions.className = "consent-actions";
+            var h3 = document.createElement("h3");
+            var text = document.createElement("div");
+            var actions = document.createElement("div");
+            actions.className = "consent-actions";
 
-              var btnCancel = document.createElement("button");
-              btnCancel.className = "consent-btn";
-              btnCancel.textContent = "Abbrechen";
-              var btnOk = document.createElement("button");
-              btnOk.className = "consent-btn primary";
-              btnOk.textContent = "Zustimmen";
+            var btnCancel = document.createElement("button");
+            btnCancel.className = "consent-btn";
+            btnCancel.textContent = "Abbrechen";
 
-              actions.appendChild(btnCancel);
-              actions.appendChild(btnOk);
-              dialog.appendChild(h3);
-              dialog.appendChild(text);
-              dialog.appendChild(actions);
-              overlay.appendChild(dialog);
-              document.body.appendChild(overlay);
-            }
-            var els = {
+            var btnOk = document.createElement("button");
+            btnOk.className = "consent-btn primary";
+            btnOk.textContent = "Zustimmen";
+
+            actions.appendChild(btnCancel);
+            actions.appendChild(btnOk);
+            dialog.appendChild(h3);
+            dialog.appendChild(text);
+            dialog.appendChild(actions);
+            overlay.appendChild(dialog);
+            document.body.appendChild(overlay);
+
+            consentDialog._els = {
               overlay: overlay,
-              h3: overlay.querySelector("h3"),
-              text: overlay.querySelector("div:nth-of-type(2)") || overlay.querySelector("div"),
-              btnOk: overlay.querySelector(".consent-btn.primary"),
-              btnCancel: overlay.querySelector(".consent-btn:not(.primary)")
+              dialog: dialog,
+              h3: h3,
+              text: text,
+              btnOk: btnOk,
+              btnCancel: btnCancel
             };
-            consentEls = els;
           }
 
           function consentDialog(opts) {
@@ -1724,67 +1721,61 @@
             var title = opts && opts.title ? opts.title : "";
             var messageHTML = opts && opts.messageHTML ? opts.messageHTML : "";
             var okText = opts && opts.okText ? opts.okText : "Zustimmen";
-            var cancelText = opts && opts.cancelText ? opts.cancelText : "Abbrechen";
-
-            consentEls.h3.textContent = title;
-            consentEls.text.innerHTML = messageHTML;
-            consentEls.btnOk.textContent = okText;
-            consentEls.btnCancel.textContent = cancelText;
+            var cancelText = opts && opts.cancelText !== undefined ? opts.cancelText : "Abbrechen";
 
             var resolver;
             var p = new Promise(function (res) {
               resolver = res;
             });
 
+            var els = consentDialog._els;
+            var overlay = els.overlay;
+            var h3 = els.h3;
+            var text = els.text;
+            var btnOk = els.btnOk;
+            var btnCancel = els.btnCancel;
+            h3.textContent = title;
+            text.innerHTML = messageHTML;
+            btnOk.textContent = okText;
+            btnCancel.textContent = cancelText;
+
             var lastFocus = document.activeElement;
             function open() {
-              consentEls.overlay.setAttribute("aria-hidden", "false");
+              overlay.setAttribute("aria-hidden", "false");
               document.body.classList.add("lb-lock");
               try {
-                consentEls.btnOk.focus();
+                btnOk.focus();
               } catch (e) {}
             }
             function close(result) {
-              consentEls.overlay.setAttribute("aria-hidden", "true");
+              overlay.setAttribute("aria-hidden", "true");
               document.body.classList.remove("lb-lock");
-              try {
-                if (lastFocus && document.contains(lastFocus)) lastFocus.focus();
-              } catch (e) {}
+              if (lastFocus && document.contains(lastFocus)) {
+                try {
+                  lastFocus.focus();
+                } catch (e) {}
+              }
               resolver(!!result);
             }
 
             function onEsc(e) {
               if (e.key === "Escape") {
                 e.stopPropagation();
-                cleanup();
                 close(false);
               }
             }
             function onOverlay(e) {
-              if (e.target === consentEls.overlay) {
-                cleanup();
-                close(false);
-              }
-            }
-            function onOk() {
-              cleanup();
-              close(true);
-            }
-            function onCancel() {
-              cleanup();
-              close(false);
-            }
-            function cleanup() {
-              document.removeEventListener("keydown", onEsc, true);
-              consentEls.overlay.removeEventListener("click", onOverlay, true);
-              consentEls.btnOk.removeEventListener("click", onOk, true);
-              consentEls.btnCancel.removeEventListener("click", onCancel, true);
+              if (e.target === overlay) close(false);
             }
 
-            document.addEventListener("keydown", onEsc, true);
-            consentEls.overlay.addEventListener("click", onOverlay, true);
-            consentEls.btnOk.addEventListener("click", onOk, true);
-            consentEls.btnCancel.addEventListener("click", onCancel, true);
+            btnOk.onclick = function () {
+              close(true);
+            };
+            btnCancel.onclick = function () {
+              close(false);
+            };
+            document.addEventListener("keydown", onEsc, { once: true });
+            overlay.addEventListener("click", onOverlay, { once: true });
 
             open();
             return p;
@@ -1797,84 +1788,109 @@
               btn.textContent = "💾 Storage ON";
               btn.setAttribute("data-tooltip", "Lokale Speicherung: an");
               btn.setAttribute("aria-pressed", "true");
-              window.__uiState.persist = "on";
+              ui.persist = "on";
             } else {
               btn.textContent = "💾 Storage OFF";
               btn.setAttribute("data-tooltip", "Lokale Speicherung: aus");
               btn.setAttribute("aria-pressed", "false");
-              window.__uiState.persist = "off";
+              ui.persist = "off";
             }
           }
 
-          function showBlockedHint() {
-            return consentDialog({
-              title: "Speichern blockiert",
-              messageHTML:
-                "<p>Der lokale Speicher ist im Browser aktuell nicht verfügbar (z.\u00A0B. Edge Tracking-Schutz, InPrivate, Website-Berechtigungen).</p>" +
-                "<p><strong>Pr\u00FCfen in Edge:</strong></p>" +
-                "<ul>" +
-                "<li>Einstellungen \u2192 <em>Cookies und Websiteberechtigungen</em> \u2192 <em>Cookies und Websitedaten</em>: 'Websites erlauben, Daten zu speichern' aktivieren.</li>" +
-                "<li><em>Tracking-Schutz</em>: \u201EAusgewogen\u201C oder \u201EStandard\u201C verwenden (nicht \u201EStrikt\u201C).</li>" +
-                "<li>Kein InPrivate-/Anwendungs-Guard-Fenster verwenden.</li>" +
-                "</ul>" +
-                "<p>Nach Anpassung die Seite neu laden.</p>",
-              okText: "OK",
-              cancelText: "Schließen"
-            });
+          function nativeFallback(turnOn) {
+            var msgOn =
+              "Lokale Speicherung aktivieren?\n(Hinweis: Edge kann localStorage durch Einstellungen/Policies blockieren.)";
+            var msgOff = "Lokale Speicherung deaktivieren und gespeicherte Zustände löschen?";
+            return window.confirm(turnOn ? msgOn : msgOff);
           }
 
           if (btn) {
             btn.addEventListener("click", function () {
-              if (!canPersist()) {
-                // Aktivieren
-                consentDialog({
-                  title: "Lokale Speicherung aktivieren",
-                  messageHTML:
-                    "<p>Diese Seite kann die Zust\u00E4nde der Schalter <em>Theme</em>, <em>Scroll</em> und <em>Storage</em> lokal in Ihrem Browser speichern.</p>" +
-                    "<p>Es werden ausschlie\u00DFlich diese UI-Zust\u00E4nde gespeichert; keine personenbezogenen Daten.</p>" +
-                    "<p>Mit \u201EZustimmen\u201C erlauben Sie das Speichern und das Wiederherstellen bei k\u00FCnftigen Besuchen.</p>",
-                  okText: "Zustimmen",
-                  cancelText: "Ablehnen"
-                }).then(function (ok) {
-                  if (ok) {
-                    var wrote = false;
-                    try {
-                      localStorage.setItem(PERSIST_KEY, "on");
-                      wrote = localStorage.getItem(PERSIST_KEY) === "on";
-                    } catch (e) {
-                      wrote = false;
-                    }
-                    if (wrote && hasLocalStorage()) {
-                      applyPersistUI(true);
+              try {
+                if (!canPersist()) {
+                  consentDialog({
+                    title: "Lokale Speicherung aktivieren",
+                    messageHTML:
+                      "<p>Diese Seite kann die Zustände der Schalter <em>Theme</em>, <em>Scroll</em> und <em>Storage</em> lokal in Ihrem Browser speichern.</p>\
+<p>Es werden ausschließlich diese UI-Zustände gespeichert; keine personenbezogenen Daten.</p>\
+<p>Mit „Zustimmen“ erlauben Sie das Speichern und das Wiederherstellen bei künftigen Besuchen.</p>",
+                    okText: "Zustimmen",
+                    cancelText: "Ablehnen"
+                  }).then(function (ok) {
+                    if (ok) {
+                      var wrote = false;
                       try {
-                        localStorage.setItem(THEME_KEY, (window.__uiState && window.__uiState.theme) || "auto");
-                        localStorage.setItem(MOTION_KEY, (window.__uiState && window.__uiState.motion) || "auto");
-                      } catch (e) {}
+                        localStorage.setItem(PERSIST_KEY, "on");
+                        wrote = localStorage.getItem(PERSIST_KEY) === "on";
+                      } catch (_) {
+                        wrote = false;
+                      }
+                      if (wrote && hasLocalStorage()) {
+                        applyPersistUI(true);
+                        try {
+                          localStorage.setItem(
+                            THEME_KEY,
+                            window.__uiState && window.__uiState.theme ? window.__uiState.theme : "auto"
+                          );
+                          localStorage.setItem(
+                            MOTION_KEY,
+                            window.__uiState && window.__uiState.motion ? window.__uiState.motion : "auto"
+                          );
+                        } catch (_) {}
+                      } else {
+                        applyPersistUI(false);
+                        consentDialog({
+                          title: "Speichern blockiert",
+                          messageHTML:
+                            "<p>Der lokale Speicher ist im Browser aktuell nicht verfügbar (z.&nbsp;B. Edge Tracking-Schutz, InPrivate, Website-Berechtigungen).</p>\
+<p><strong>Prüfen in Edge:</strong></p>\
+<ul>\
+<li>Einstellungen → <em>Cookies und Websiteberechtigungen</em> → <em>Cookies und Websitedaten</em>: „Websites erlauben, Daten zu speichern“ aktivieren.</li>\
+<li><em>Tracking-Schutz</em>: „Ausgewogen“ oder „Standard“ verwenden (nicht „Strikt“).</li>\
+<li>Kein InPrivate-/Anwendungs-Guard-Fenster verwenden.</li>\
+</ul>\
+<p>Nach Anpassung die Seite neu laden.</p>",
+                          okText: "OK",
+                          cancelText: "Schließen"
+                        });
+                      }
                     } else {
                       applyPersistUI(false);
-                      showBlockedHint();
                     }
-                  } else {
-                    applyPersistUI(false);
+                  });
+                } else {
+                  consentDialog({
+                    title: "Lokale Speicherung deaktivieren",
+                    messageHTML:
+                      "<p>Die gespeicherten Zustände (Theme/Scroll/Storage) werden aus Ihrem Browser gelöscht.</p>\
+<p>Die Schalter funktionieren weiterhin, werden jedoch nicht mehr dauerhaft gespeichert.</p>",
+                    okText: "Löschen & Deaktivieren",
+                    cancelText: "Abbrechen"
+                  }).then(function (ok) {
+                    if (ok) {
+                      safeDel(THEME_KEY);
+                      safeDel(MOTION_KEY);
+                      safeDel(PERSIST_KEY);
+                      applyPersistUI(false);
+                    }
+                  });
+                }
+              } catch (err) {
+                if (!canPersist()) {
+                  if (nativeFallback(true)) {
+                    try {
+                      localStorage.setItem(PERSIST_KEY, "on");
+                    } catch (e) {}
+                    applyPersistUI(canPersist());
                   }
-                });
-              } else {
-                // Deaktivieren
-                consentDialog({
-                  title: "Lokale Speicherung deaktivieren",
-                  messageHTML:
-                    "<p>Die gespeicherten Zust\u00E4nde (Theme/Scroll/Storage) werden aus Ihrem Browser gel\u00F6scht.</p>" +
-                    "<p>Die Schalter funktionieren weiterhin, werden jedoch nicht mehr dauerhaft gespeichert.</p>",
-                  okText: "Löschen & Deaktivieren",
-                  cancelText: "Abbrechen"
-                }).then(function (ok) {
-                  if (ok) {
+                } else {
+                  if (nativeFallback(false)) {
                     safeDel(THEME_KEY);
                     safeDel(MOTION_KEY);
                     safeDel(PERSIST_KEY);
                     applyPersistUI(false);
                   }
-                });
+                }
               }
             });
           }
@@ -1915,14 +1931,15 @@
             $btn.textContent = "🖥️ Theme AUTO";
             $btn.setAttribute("aria-pressed", "false");
           }
-          window.__uiState = window.__uiState || {};
+          if (!window.__uiState) window.__uiState = {};
           window.__uiState.theme = theme;
         }
         function next(state) {
           return state === "auto" ? "light" : state === "light" ? "dark" : "auto";
         }
 
-        var state = (window.__store && window.__store.safeGet ? window.__store.safeGet(KEY) : null) || "auto";
+        var state = window.__store && window.__store.safeGet ? window.__store.safeGet(KEY) : null;
+        if (!state) state = "auto";
         apply(state);
 
         $btn.addEventListener("click", function () {
@@ -1970,7 +1987,7 @@
             $btn.setAttribute("data-tooltip", "Sanftes Scrollen: Systemvorgabe");
             $btn.setAttribute("aria-pressed", "false");
           }
-          window.__uiState = window.__uiState || {};
+          if (!window.__uiState) window.__uiState = {};
           window.__uiState.motion = mode;
         }
         function next(mode) {
@@ -1992,7 +2009,7 @@
         if (window.matchMedia) {
           var mq = window.matchMedia("(prefers-reduced-motion: reduce)");
           var onChange = function () {
-            var m = (window.__uiState && window.__uiState.motion) || "auto";
+            var m = window.__uiState && window.__uiState.motion ? window.__uiState.motion : "auto";
             if (m === "auto") apply("auto");
           };
           if (mq.addEventListener) mq.addEventListener("change", onChange);
@@ -2005,14 +2022,14 @@
    =================================================== */
       (function () {
         var tb = document.querySelector(".topbar");
-        function set() {
-          var h = (tb && tb.offsetHeight) || 0;
+        function setPad() {
+          var h = tb && tb.offsetHeight ? tb.offsetHeight : 0;
           document.body.style.paddingTop = h + "px";
           document.documentElement.style.setProperty("--tb-h", h + "px");
         }
-        set();
-        window.addEventListener("load", set);
-        window.addEventListener("resize", set);
+        setPad();
+        window.addEventListener("load", setPad);
+        window.addEventListener("resize", setPad);
       })();
 
       /* ========================
@@ -2024,35 +2041,36 @@
         btn.type = "button";
         btn.setAttribute("aria-label", "Nach oben");
         btn.setAttribute("title", "Nach oben");
-        var s = btn.style;
-        s.position = "fixed";
-        s.right = "16px";
-        s.bottom = "calc(env(safe-area-inset-bottom, 0px) + 16px)";
-        s.width = "42px";
-        s.height = "42px";
-        s.borderRadius = "50%";
-        s.border = "1px solid rgba(0,0,0,.25)";
-        s.background = "rgba(255,255,255,.45)";
-        s.color = "inherit";
-        s.cursor = "pointer";
-        s.boxShadow = "0 6px 18px rgba(0,0,0,.25)";
-        s.display = "none";
-        s.zIndex = 999;
+        var style = btn.style;
+        style.position = "fixed";
+        style.right = "16px";
+        style.bottom = "calc(env(safe-area-inset-bottom, 0px) + 16px)";
+        style.width = "42px";
+        style.height = "42px";
+        style.borderRadius = "50%";
+        style.border = "1px solid rgba(0,0,0,.25)";
+        style.background = "rgba(255,255,255,.45)";
+        style.color = "inherit";
+        style.cursor = "pointer";
+        style.boxShadow = "0 6px 18px rgba(0,0,0,.25)";
+        style.display = "none";
+        style.zIndex = 999;
         try {
           if (window.matchMedia && window.matchMedia("(pointer: coarse)").matches) {
-            s.width = "48px";
-            s.height = "48px";
+            style.width = "48px";
+            style.height = "48px";
           }
         } catch (e) {}
+
         btn.addEventListener("click", function () {
           if (typeof window.__scrollToY === "function") {
             window.__scrollToY(0);
             return;
           }
           var mode =
-            (window.__uiState && window.__uiState.motion) ||
-            document.documentElement.getAttribute("data-motion") ||
-            "auto";
+            window.__uiState && window.__uiState.motion
+              ? window.__uiState.motion
+              : document.documentElement.getAttribute("data-motion") || "auto";
           var reduce =
             mode === "off" ||
             (mode === "auto" && window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
@@ -2061,7 +2079,7 @@
         document.body.appendChild(btn);
         function onScroll() {
           var overlayLock = document.body.classList.contains("lb-lock");
-          btn.style.display = !overlayLock && window.scrollY > 600 ? "block" : "none";
+          style.display = !overlayLock && window.scrollY > 600 ? "block" : "none";
         }
         window.addEventListener("scroll", onScroll, { passive: true });
         try {
@@ -2079,25 +2097,24 @@
         if (!links.length) return;
         var sections = [];
         for (var i = 0; i < links.length; i++) {
-          var sel = links[i].getAttribute("href");
-          var el = document.querySelector(sel);
-          if (el) sections.push(el);
+          var t = document.querySelector(links[i].getAttribute("href"));
+          if (t) sections.push(t);
         }
         function setActive(id) {
-          for (var i = 0; i < links.length; i++) links[i].removeAttribute("aria-current");
+          for (var j = 0; j < links.length; j++) links[j].removeAttribute("aria-current");
           var active = document.querySelector('.topbar .nav a[href="' + id + '"]');
           if (active) active.setAttribute("aria-current", "page");
         }
         var io = new IntersectionObserver(
           function (entries) {
-            for (var i = 0; i < entries.length; i++) {
-              var e = entries[i];
+            for (var k = 0; k < entries.length; k++) {
+              var e = entries[k];
               if (e.isIntersecting) setActive("#" + e.target.id);
             }
           },
           { rootMargin: "-30% 0px -60% 0px", threshold: 0 }
         );
-        for (var j = 0; j < sections.length; j++) io.observe(sections[j]);
+        for (var m = 0; m < sections.length; m++) io.observe(sections[m]);
       })();
 
       /* =========================
@@ -2148,9 +2165,11 @@
           overlay.setAttribute("aria-hidden", "true");
           document.body.classList.remove("lb-lock");
           img.removeAttribute("src");
-          try {
-            if (lastFocus && document.contains(lastFocus)) lastFocus.focus();
-          } catch (e) {}
+          if (lastFocus && document.contains(lastFocus)) {
+            try {
+              lastFocus.focus();
+            } catch (e) {}
+          }
         }
 
         overlay.addEventListener("click", function (e) {
@@ -2166,17 +2185,17 @@
             var a = e.target.closest ? e.target.closest("a") : null;
             if (!a) return;
             var href = a.getAttribute("href") || "";
-            var isImageHref = /(\.png|\.jpe?g|\.webp|\.gif|\.svg)(\?.*)?$/i.test(href);
+            var isImageHref = /\.(png|jpe?g|webp|gif|svg)(\?.*)?$/i.test(href);
             var wantsLb = a.hasAttribute("data-lightbox") || isImageHref;
             if (!wantsLb) return;
             e.preventDefault();
-            var imgEl = a.querySelector("img");
-            var alt = imgEl ? imgEl.getAttribute("alt") : "";
+            var imgEl = a.querySelector ? a.querySelector("img") : null;
+            var alt = imgEl ? imgEl.getAttribute("alt") || "" : "";
             var title =
               a.getAttribute("title") || a.getAttribute("data-caption") || (a.textContent ? a.textContent.trim() : "");
             openLightbox(a.href || href, title, alt);
           },
-          true
+          { passive: false }
         );
       })();
 
@@ -2201,6 +2220,7 @@
         var row2Inner = document.querySelector(".topbar-row.row2 .inner");
         var burger = document.getElementById("menu-toggle");
         var row1Anchor = row1Inner ? row1Inner.querySelector(".controls") : null;
+
         function isMobile() {
           return window.innerWidth <= 860;
         }
@@ -2209,7 +2229,7 @@
           if (!brand || !row2Inner || !burger) return;
           if (row2Inner.contains(brand)) return;
           if (row1Inner) row1Inner.classList.add("no-brand");
-          burger.parentNode.insertBefore(brand, burger.nextSibling);
+          burger.insertAdjacentElement("afterend", brand);
         }
         function restoreBrandToRow1() {
           if (!brand || !row1Inner) return;
@@ -2226,21 +2246,30 @@
 
         function open() {
           lastFocus = document.activeElement;
-          if (overlay) overlay.classList.add("open");
-          if (overlay) overlay.setAttribute("aria-hidden", "false");
+          if (overlay) {
+            overlay.classList.add("open");
+            overlay.setAttribute("aria-hidden", "false");
+          }
           if (btn) btn.setAttribute("aria-expanded", "true");
           document.body.classList.add("lb-lock");
-          var first = linksContainer ? linksContainer.querySelector("a") : null;
-          (first || closeBtn || btn || document.body).focus();
+          var firstLink = linksContainer ? linksContainer.querySelector("a") : null;
+          var focusEl = firstLink || closeBtn;
+          try {
+            if (focusEl) focusEl.focus();
+          } catch (e) {}
         }
         function close() {
-          if (overlay) overlay.classList.remove("open");
-          if (overlay) overlay.setAttribute("aria-hidden", "true");
+          if (overlay) {
+            overlay.classList.remove("open");
+            overlay.setAttribute("aria-hidden", "true");
+          }
           if (btn) btn.setAttribute("aria-expanded", "false");
           document.body.classList.remove("lb-lock");
-          try {
-            if (lastFocus && document.contains(lastFocus)) lastFocus.focus();
-          } catch (e) {}
+          if (lastFocus && document.contains(lastFocus)) {
+            try {
+              lastFocus.focus();
+            } catch (e) {}
+          }
         }
 
         placeBrandForViewport();
@@ -2279,23 +2308,25 @@
    ================================= */
       (function () {
         function motionMode() {
-          var s =
-            (window.__uiState && window.__uiState.motion) ||
-            document.documentElement.getAttribute("data-motion") ||
-            "auto";
-          return s;
+          if (window.__uiState && window.__uiState.motion) return window.__uiState.motion;
+          var attr = document.documentElement.getAttribute("data-motion");
+          return attr || "auto";
         }
         function isReducedMotion() {
           var m = motionMode();
           if (m === "on") return false;
           if (m === "off") return true;
-          return !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+          return window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
         }
         function headerOffset() {
           var cs = getComputedStyle(document.documentElement);
           var v = cs.getPropertyValue("--tb-h").trim();
           var h = parseFloat(v);
-          return (isFinite(h) ? h : (document.querySelector(".topbar") || {}).offsetHeight || 0) + 8;
+          return (
+            (isFinite(h)
+              ? h
+              : (document.querySelector(".topbar") && document.querySelector(".topbar").offsetHeight) || 0) + 8
+          );
         }
         function easeInOutCubic(t) {
           return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
@@ -2310,7 +2341,7 @@
           var startY = window.pageYOffset;
           var dist = targetY - startY;
           var start = performance.now();
-          var dur = duration || Math.min(900, Math.max(300, Math.abs(dist) * 0.5));
+          var dur = typeof duration === "number" ? duration : Math.min(900, Math.max(300, Math.abs(dist) * 0.5));
           cancelAnimationFrame(rafId);
           function cancel() {
             cancelAnimationFrame(rafId);
@@ -2321,7 +2352,9 @@
             var t = Math.min(1, (now - start) / dur);
             var y = startY + dist * easeInOutCubic(t);
             window.scrollTo(0, Math.round(y));
-            if (t < 1) rafId = requestAnimationFrame(step);
+            if (t < 1) {
+              rafId = requestAnimationFrame(step);
+            }
           }
           rafId = requestAnimationFrame(step);
         }
@@ -2333,11 +2366,7 @@
           el.setAttribute("tabindex", "-1");
           try {
             el.focus({ preventScroll: true });
-          } catch (e) {
-            try {
-              el.focus();
-            } catch (_) {}
-          }
+          } catch (e) {}
           if (!had) el.removeAttribute("tabindex");
         }
         function handleTopHashClick(e, a) {
@@ -2370,16 +2399,14 @@
             var target = document.querySelector(url.hash);
             if (!target) return;
             e.preventDefault();
-
-            var mnav = document.getElementById("mobile-nav");
-            if (mnav && mnav.classList.contains("open")) {
-              mnav.classList.remove("open");
-              mnav.setAttribute("aria-hidden", "true");
-              var menuBtn = document.getElementById("menu-toggle");
-              if (menuBtn) menuBtn.setAttribute("aria-expanded", "false");
+            var overlay = document.getElementById("mobile-nav");
+            if (overlay && overlay.classList.contains("open")) {
+              overlay.classList.remove("open");
+              overlay.setAttribute("aria-hidden", "true");
+              var mt = document.getElementById("menu-toggle");
+              if (mt) mt.setAttribute("aria-expanded", "false");
               document.body.classList.remove("lb-lock");
             }
-
             var y = Math.max(0, target.getBoundingClientRect().top + window.pageYOffset - headerOffset());
             scrollToY(y);
             try {
@@ -2401,6 +2428,7 @@
             }
           }
         });
+
         window.addEventListener("hashchange", function () {
           var t = document.querySelector(location.hash);
           if (!t) return;
