@@ -1560,23 +1560,17 @@
 
     <script>
       /* ==========================
-   Externe Links kennzeichnen
+   Externe Links kennzeichen
    ========================== */
       (function () {
-        // Optional: interne Hosts Whitelist (zusätzlich zum aktuellen Host)
         var INTERNAL_HOSTS = new Set([location.hostname]);
-        // INTERNAL_HOSTS.add("beispiel.dev");
-        // INTERNAL_HOSTS.add("beispiel.github.io");
-
         function isImagePath(p) {
-          return /\.(png|jpe?g|webp|gif|svg)(\?.*)?$/i.test(p);
+          return /(\.png|\.jpe?g|\.webp|\.gif|\.svg)(\?.*)?$/i.test(p);
         }
-
-        var links = document.querySelectorAll("a[href]:not([data-no-ext-icon])");
-        for (var i = 0; i < links.length; i++) {
-          var a = links[i];
+        var as = document.querySelectorAll("a[href]:not([data-no-ext-icon])");
+        for (var i = 0; i < as.length; i++) {
+          var a = as[i];
           var raw = a.getAttribute("href") || "";
-          // In-Page, Sonderprotokolle auslassen
           if (
             raw.indexOf("#") === 0 ||
             raw.indexOf("mailto:") === 0 ||
@@ -1584,21 +1578,17 @@
             raw.indexOf("javascript:") === 0
           )
             continue;
-
           var url;
           try {
             url = new URL(raw, location.href);
-          } catch (err) {
+          } catch (e) {
             continue;
           }
-
           if (url.protocol !== "http:" && url.protocol !== "https:") continue;
           if (INTERNAL_HOSTS.has(url.hostname)) continue;
-
           if (a.hasAttribute("data-lightbox")) continue;
           if (a.querySelector("img")) continue;
           if (isImagePath(url.pathname)) continue;
-
           a.classList.add("ext-link");
         }
       })();
@@ -1632,6 +1622,7 @@
 
       /* ==========================================================
    Storage-Consent & Safe-Storage (persist: on/off, default off)
+   (Edge-kompatibel – ohne ?. / ?? / ||=)
    ========================================================== */
       (function () {
         try {
@@ -1639,10 +1630,9 @@
           var THEME_KEY = "theme";
           var MOTION_KEY = "motion";
 
-          // Globale UI-State-Spiegelung
-          if (!window.__uiState) window.__uiState = { theme: "auto", motion: "auto", persist: "off" };
+          // globaler UI-State (ohne ||=)
+          window.__uiState = window.__uiState || { theme: "auto", motion: "auto", persist: "off" };
 
-          // Verlässlicher Schreib-/Lesetest
           function hasLocalStorage() {
             try {
               var k = "__rc_probe__";
@@ -1680,158 +1670,173 @@
               localStorage.removeItem(key);
             } catch (e) {}
           }
-
-          // Export minimaler Store
           window.__store = { canPersist: canPersist, safeGet: safeGet, safeSet: safeSet };
 
-          // Consent-Overlay bauen (einmalig)
+          // Consent-Overlay Elemente (einmalig gebaut)
+          var consentEls = null;
           function ensureConsentOverlay() {
-            if (document.getElementById("consent-overlay")) return;
-            var overlay = document.createElement("div");
-            overlay.id = "consent-overlay";
-            overlay.className = "consent-overlay";
-            overlay.setAttribute("aria-hidden", "true");
+            if (consentEls) return;
+            var overlay = document.getElementById("consent-overlay");
+            if (!overlay) {
+              overlay = document.createElement("div");
+              overlay.id = "consent-overlay";
+              overlay.className = "consent-overlay";
+              overlay.setAttribute("aria-hidden", "true");
 
-            var dialog = document.createElement("div");
-            dialog.className = "consent-dialog";
-            dialog.setAttribute("role", "dialog");
-            dialog.setAttribute("aria-modal", "true");
-            dialog.setAttribute("aria-label", "Einwilligung");
+              var dialog = document.createElement("div");
+              dialog.className = "consent-dialog";
+              dialog.setAttribute("role", "dialog");
+              dialog.setAttribute("aria-modal", "true");
+              dialog.setAttribute("aria-label", "Einwilligung");
 
-            var h3 = document.createElement("h3");
-            var text = document.createElement("div");
-            var actions = document.createElement("div");
-            actions.className = "consent-actions";
+              var h3 = document.createElement("h3");
+              var text = document.createElement("div");
+              var actions = document.createElement("div");
+              actions.className = "consent-actions";
 
-            var btnCancel = document.createElement("button");
-            btnCancel.className = "consent-btn";
-            btnCancel.textContent = "Abbrechen";
-            var btnOk = document.createElement("button");
-            btnOk.className = "consent-btn primary";
-            btnOk.textContent = "Zustimmen";
+              var btnCancel = document.createElement("button");
+              btnCancel.className = "consent-btn";
+              btnCancel.textContent = "Abbrechen";
+              var btnOk = document.createElement("button");
+              btnOk.className = "consent-btn primary";
+              btnOk.textContent = "Zustimmen";
 
-            actions.appendChild(btnCancel);
-            actions.appendChild(btnOk);
-            dialog.appendChild(h3);
-            dialog.appendChild(text);
-            dialog.appendChild(actions);
-            overlay.appendChild(dialog);
-            document.body.appendChild(overlay);
-            consentDialog._els = {
+              actions.appendChild(btnCancel);
+              actions.appendChild(btnOk);
+              dialog.appendChild(h3);
+              dialog.appendChild(text);
+              dialog.appendChild(actions);
+              overlay.appendChild(dialog);
+              document.body.appendChild(overlay);
+            }
+            var els = {
               overlay: overlay,
-              dialog: dialog,
-              h3: h3,
-              text: text,
-              btnOk: btnOk,
-              btnCancel: btnCancel
+              h3: overlay.querySelector("h3"),
+              text: overlay.querySelector("div:nth-of-type(2)") || overlay.querySelector("div"),
+              btnOk: overlay.querySelector(".consent-btn.primary"),
+              btnCancel: overlay.querySelector(".consent-btn:not(.primary)")
             };
+            consentEls = els;
           }
 
-          // Consent-Dialog (Promise<boolean>)
           function consentDialog(opts) {
             ensureConsentOverlay();
-            var title = opts.title;
-            var messageHTML = opts.messageHTML;
-            var okText = opts.okText;
-            var cancelText = opts.cancelText != null ? opts.cancelText : "Abbrechen";
+            var title = opts && opts.title ? opts.title : "";
+            var messageHTML = opts && opts.messageHTML ? opts.messageHTML : "";
+            var okText = opts && opts.okText ? opts.okText : "Zustimmen";
+            var cancelText = opts && opts.cancelText ? opts.cancelText : "Abbrechen";
+
+            consentEls.h3.textContent = title;
+            consentEls.text.innerHTML = messageHTML;
+            consentEls.btnOk.textContent = okText;
+            consentEls.btnCancel.textContent = cancelText;
 
             var resolver;
             var p = new Promise(function (res) {
               resolver = res;
             });
 
-            var overlay = consentDialog._els.overlay;
-            var h3 = consentDialog._els.h3;
-            var text = consentDialog._els.text;
-            var btnOk = consentDialog._els.btnOk;
-            var btnCancel = consentDialog._els.btnCancel;
-
-            h3.textContent = title;
-            text.innerHTML = messageHTML;
-            btnOk.textContent = okText || "Zustimmen";
-            btnCancel.textContent = cancelText;
-
             var lastFocus = document.activeElement;
             function open() {
-              overlay.setAttribute("aria-hidden", "false");
+              consentEls.overlay.setAttribute("aria-hidden", "false");
               document.body.classList.add("lb-lock");
-              if (btnOk.focus) btnOk.focus();
+              try {
+                consentEls.btnOk.focus();
+              } catch (e) {}
             }
             function close(result) {
-              overlay.setAttribute("aria-hidden", "true");
+              consentEls.overlay.setAttribute("aria-hidden", "true");
               document.body.classList.remove("lb-lock");
-              if (lastFocus && document.contains(lastFocus) && lastFocus.focus) lastFocus.focus();
+              try {
+                if (lastFocus && document.contains(lastFocus)) lastFocus.focus();
+              } catch (e) {}
               resolver(!!result);
             }
 
             function onEsc(e) {
               if (e.key === "Escape") {
                 e.stopPropagation();
+                cleanup();
                 close(false);
               }
             }
             function onOverlay(e) {
-              if (e.target === overlay) close(false);
+              if (e.target === consentEls.overlay) {
+                cleanup();
+                close(false);
+              }
+            }
+            function onOk() {
+              cleanup();
+              close(true);
+            }
+            function onCancel() {
+              cleanup();
+              close(false);
+            }
+            function cleanup() {
+              document.removeEventListener("keydown", onEsc, true);
+              consentEls.overlay.removeEventListener("click", onOverlay, true);
+              consentEls.btnOk.removeEventListener("click", onOk, true);
+              consentEls.btnCancel.removeEventListener("click", onCancel, true);
             }
 
-            btnOk.onclick = function () {
-              close(true);
-            };
-            btnCancel.onclick = function () {
-              close(false);
-            };
-            document.addEventListener("keydown", onEsc, { once: true });
-            overlay.addEventListener("click", onOverlay, { once: true });
+            document.addEventListener("keydown", onEsc, true);
+            consentEls.overlay.addEventListener("click", onOverlay, true);
+            consentEls.btnOk.addEventListener("click", onOk, true);
+            consentEls.btnCancel.addEventListener("click", onCancel, true);
 
             open();
             return p;
           }
 
-          // Button-UI
-          var storageBtn = document.getElementById("storage-toggle");
+          var btn = document.getElementById("storage-toggle");
           function applyPersistUI(isOn) {
-            if (!storageBtn) return;
+            if (!btn) return;
             if (isOn) {
-              storageBtn.textContent = "💾 Storage ON";
-              storageBtn.setAttribute("data-tooltip", "Lokale Speicherung: an");
-              storageBtn.setAttribute("aria-pressed", "true");
+              btn.textContent = "💾 Storage ON";
+              btn.setAttribute("data-tooltip", "Lokale Speicherung: an");
+              btn.setAttribute("aria-pressed", "true");
               window.__uiState.persist = "on";
             } else {
-              storageBtn.textContent = "💾 Storage OFF";
-              storageBtn.setAttribute("data-tooltip", "Lokale Speicherung: aus");
-              storageBtn.setAttribute("aria-pressed", "false");
+              btn.textContent = "💾 Storage OFF";
+              btn.setAttribute("data-tooltip", "Lokale Speicherung: aus");
+              btn.setAttribute("aria-pressed", "false");
               window.__uiState.persist = "off";
             }
           }
 
-          function nativeFallback(turnOn) {
-            var msgOn =
-              "Lokale Speicherung aktivieren?\n(Hinweis: Edge kann localStorage durch Einstellungen/Policies blockieren.)";
-            var msgOff = "Lokale Speicherung deaktivieren und gespeicherte Zustände löschen?";
-            return window.confirm(turnOn ? msgOn : msgOff);
+          function showBlockedHint() {
+            return consentDialog({
+              title: "Speichern blockiert",
+              messageHTML:
+                "<p>Der lokale Speicher ist im Browser aktuell nicht verfügbar (z.\u00A0B. Edge Tracking-Schutz, InPrivate, Website-Berechtigungen).</p>" +
+                "<p><strong>Pr\u00FCfen in Edge:</strong></p>" +
+                "<ul>" +
+                "<li>Einstellungen \u2192 <em>Cookies und Websiteberechtigungen</em> \u2192 <em>Cookies und Websitedaten</em>: 'Websites erlauben, Daten zu speichern' aktivieren.</li>" +
+                "<li><em>Tracking-Schutz</em>: \u201EAusgewogen\u201C oder \u201EStandard\u201C verwenden (nicht \u201EStrikt\u201C).</li>" +
+                "<li>Kein InPrivate-/Anwendungs-Guard-Fenster verwenden.</li>" +
+                "</ul>" +
+                "<p>Nach Anpassung die Seite neu laden.</p>",
+              okText: "OK",
+              cancelText: "Schließen"
+            });
           }
 
-          if (storageBtn)
-            storageBtn.addEventListener("click", function () {
-              // Async-Flow via Promises – keine arrow functions für Kompatibilität nötig
-              (function () {
-                if (!canPersist()) {
-                  // Aktivieren
-                  consentDialog({
-                    title: "Lokale Speicherung aktivieren",
-                    messageHTML: [
-                      "<p>Diese Seite kann die Zustände der Schalter <em>Theme</em>, <em>Scroll</em> und <em>Storage</em> lokal in Ihrem Browser speichern.</p>",
-                      "<p>Es werden ausschließlich diese UI-Zustände gespeichert; keine personenbezogenen Daten.</p>",
-                      "<p>Mit „Zustimmen“ erlauben Sie das Speichern und das Wiederherstellen bei künftigen Besuchen.</p>"
-                    ].join(""),
-                    okText: "Zustimmen",
-                    cancelText: "Ablehnen"
-                  }).then(function (ok) {
-                    if (!ok) {
-                      applyPersistUI(false);
-                      return;
-                    }
-
+          if (btn) {
+            btn.addEventListener("click", function () {
+              if (!canPersist()) {
+                // Aktivieren
+                consentDialog({
+                  title: "Lokale Speicherung aktivieren",
+                  messageHTML:
+                    "<p>Diese Seite kann die Zust\u00E4nde der Schalter <em>Theme</em>, <em>Scroll</em> und <em>Storage</em> lokal in Ihrem Browser speichern.</p>" +
+                    "<p>Es werden ausschlie\u00DFlich diese UI-Zust\u00E4nde gespeichert; keine personenbezogenen Daten.</p>" +
+                    "<p>Mit \u201EZustimmen\u201C erlauben Sie das Speichern und das Wiederherstellen bei k\u00FCnftigen Besuchen.</p>",
+                  okText: "Zustimmen",
+                  cancelText: "Ablehnen"
+                }).then(function (ok) {
+                  if (ok) {
                     var wrote = false;
                     try {
                       localStorage.setItem(PERSIST_KEY, "on");
@@ -1839,7 +1844,6 @@
                     } catch (e) {
                       wrote = false;
                     }
-
                     if (wrote && hasLocalStorage()) {
                       applyPersistUI(true);
                       try {
@@ -1848,86 +1852,72 @@
                       } catch (e) {}
                     } else {
                       applyPersistUI(false);
-                      consentDialog({
-                        title: "Speichern blockiert",
-                        messageHTML: [
-                          "<p>Der lokale Speicher ist im Browser aktuell nicht verfügbar (z.&nbsp;B. Edge Tracking-Schutz, InPrivate, Website-Berechtigungen).</p>",
-                          "<p><strong>Prüfen in Edge:</strong></p>",
-                          "<ul>",
-                          "<li>Einstellungen → <em>Cookies und Websiteberechtigungen</em> → <em>Cookies und Websitedaten</em>: „Websites erlauben, Daten zu speichern“ aktivieren.</li>",
-                          "<li><em>Tracking-Schutz</em>: „Ausgewogen“ oder „Standard“ verwenden (nicht „Strikt“).</li>",
-                          "<li>Kein InPrivate-/Anwendungs-Guard-Fenster verwenden.</li>",
-                          "</ul>",
-                          "<p>Nach Anpassung die Seite neu laden.</p>"
-                        ].join(""),
-                        okText: "OK",
-                        cancelText: "Schließen"
-                      });
+                      showBlockedHint();
                     }
-                  });
-                } else {
-                  // Deaktivieren
-                  consentDialog({
-                    title: "Lokale Speicherung deaktivieren",
-                    messageHTML: [
-                      "<p>Die gespeicherten Zustände (Theme/Scroll/Storage) werden aus Ihrem Browser gelöscht.</p>",
-                      "<p>Die Schalter funktionieren weiterhin, werden jedoch nicht mehr dauerhaft gespeichert.</p>"
-                    ].join(""),
-                    okText: "Löschen & Deaktivieren",
-                    cancelText: "Abbrechen"
-                  }).then(function (ok) {
-                    if (!ok) return;
+                  } else {
+                    applyPersistUI(false);
+                  }
+                });
+              } else {
+                // Deaktivieren
+                consentDialog({
+                  title: "Lokale Speicherung deaktivieren",
+                  messageHTML:
+                    "<p>Die gespeicherten Zust\u00E4nde (Theme/Scroll/Storage) werden aus Ihrem Browser gel\u00F6scht.</p>" +
+                    "<p>Die Schalter funktionieren weiterhin, werden jedoch nicht mehr dauerhaft gespeichert.</p>",
+                  okText: "Löschen & Deaktivieren",
+                  cancelText: "Abbrechen"
+                }).then(function (ok) {
+                  if (ok) {
                     safeDel(THEME_KEY);
                     safeDel(MOTION_KEY);
                     safeDel(PERSIST_KEY);
                     applyPersistUI(false);
-                  });
-                }
-              })();
+                  }
+                });
+              }
             });
+          }
 
-          // Initial
           ensureConsentOverlay();
           applyPersistUI(canPersist());
         } catch (e) {
-          // Letzte Sicherung: UI als OFF markieren, ohne die Seite zu „brechen“
           try {
             var b = document.getElementById("storage-toggle");
             if (b) {
               b.textContent = "💾 Storage OFF";
               b.setAttribute("aria-pressed", "false");
             }
-          } catch (err) {}
+          } catch (_) {}
         }
       })();
 
-      /* ================================
+      /* =================================
    Theme-Toggle: auto → light → dark
-   ================================ */
+   ================================= */
       (function () {
         var KEY = "theme";
-        var html = document.documentElement;
-        var btn = document.getElementById("theme-toggle");
-        if (!btn) return;
+        var $html = document.documentElement;
+        var $btn = document.getElementById("theme-toggle");
+        if (!$btn) return;
 
         function apply(theme) {
           if (theme === "light") {
-            html.setAttribute("data-theme", "light");
-            btn.textContent = "☀️ Theme LIGHT";
-            btn.setAttribute("aria-pressed", "true");
+            $html.setAttribute("data-theme", "light");
+            $btn.textContent = "☀️ Theme LIGHT";
+            $btn.setAttribute("aria-pressed", "true");
           } else if (theme === "dark") {
-            html.setAttribute("data-theme", "dark");
-            btn.textContent = "🌙 Theme DARK";
-            btn.setAttribute("aria-pressed", "true");
+            $html.setAttribute("data-theme", "dark");
+            $btn.textContent = "🌙 Theme DARK";
+            $btn.setAttribute("aria-pressed", "true");
           } else {
-            html.removeAttribute("data-theme");
-            btn.textContent = "🖥️ Theme AUTO";
-            btn.setAttribute("aria-pressed", "false");
+            $html.removeAttribute("data-theme");
+            $btn.textContent = "🖥️ Theme AUTO";
+            $btn.setAttribute("aria-pressed", "false");
           }
-          if (!window.__uiState) window.__uiState = {};
+          window.__uiState = window.__uiState || {};
           window.__uiState.theme = theme;
         }
-
         function next(state) {
           return state === "auto" ? "light" : state === "light" ? "dark" : "auto";
         }
@@ -1935,7 +1925,7 @@
         var state = (window.__store && window.__store.safeGet ? window.__store.safeGet(KEY) : null) || "auto";
         apply(state);
 
-        btn.addEventListener("click", function () {
+        $btn.addEventListener("click", function () {
           state = next(state);
           if (window.__store && window.__store.safeSet) window.__store.safeSet(KEY, state);
           apply(state);
@@ -1956,31 +1946,31 @@
    ========================================== */
       (function () {
         var KEY = "motion";
-        var html = document.documentElement;
-        var btn = document.getElementById("motion-toggle");
-        if (!btn) return;
+        var $html = document.documentElement;
+        var $btn = document.getElementById("motion-toggle");
+        if (!$btn) return;
 
         function apply(mode) {
           if (mode === "auto") {
-            html.removeAttribute("data-motion");
+            $html.removeAttribute("data-motion");
           } else {
-            html.setAttribute("data-motion", mode);
+            $html.setAttribute("data-motion", mode);
           }
 
           if (mode === "on") {
-            btn.textContent = "🌀 Scroll ON";
-            btn.setAttribute("data-tooltip", "Sanftes Scrollen: an");
-            btn.setAttribute("aria-pressed", "true");
+            $btn.textContent = "🌀 Scroll ON";
+            $btn.setAttribute("data-tooltip", "Sanftes Scrollen: an");
+            $btn.setAttribute("aria-pressed", "true");
           } else if (mode === "off") {
-            btn.textContent = "⏩ Scroll OFF";
-            btn.setAttribute("data-tooltip", "Sanftes Scrollen: aus");
-            btn.setAttribute("aria-pressed", "true");
+            $btn.textContent = "⏩ Scroll OFF";
+            $btn.setAttribute("data-tooltip", "Sanftes Scrollen: aus");
+            $btn.setAttribute("aria-pressed", "true");
           } else {
-            btn.textContent = "🖥️ Scroll AUTO";
-            btn.setAttribute("data-tooltip", "Sanftes Scrollen: Systemvorgabe");
-            btn.setAttribute("aria-pressed", "false");
+            $btn.textContent = "🖥️ Scroll AUTO";
+            $btn.setAttribute("data-tooltip", "Sanftes Scrollen: Systemvorgabe");
+            $btn.setAttribute("aria-pressed", "false");
           }
-          if (!window.__uiState) window.__uiState = {};
+          window.__uiState = window.__uiState || {};
           window.__uiState.motion = mode;
         }
         function next(mode) {
@@ -1989,11 +1979,11 @@
 
         var state =
           (window.__store && window.__store.safeGet ? window.__store.safeGet(KEY) : null) ||
-          html.getAttribute("data-motion") ||
+          $html.getAttribute("data-motion") ||
           "auto";
         apply(state);
 
-        btn.addEventListener("click", function () {
+        $btn.addEventListener("click", function () {
           state = next(state);
           if (window.__store && window.__store.safeSet) window.__store.safeSet(KEY, state);
           apply(state);
@@ -2002,8 +1992,8 @@
         if (window.matchMedia) {
           var mq = window.matchMedia("(prefers-reduced-motion: reduce)");
           var onChange = function () {
-            var cur = (window.__uiState && window.__uiState.motion) || "auto";
-            if (cur === "auto") apply("auto");
+            var m = (window.__uiState && window.__uiState.motion) || "auto";
+            if (m === "auto") apply("auto");
           };
           if (mq.addEventListener) mq.addEventListener("change", onChange);
           else if (mq.addListener) mq.addListener(onChange);
@@ -2016,7 +2006,7 @@
       (function () {
         var tb = document.querySelector(".topbar");
         function set() {
-          var h = tb && tb.offsetHeight ? tb.offsetHeight : 0;
+          var h = (tb && tb.offsetHeight) || 0;
           document.body.style.paddingTop = h + "px";
           document.documentElement.style.setProperty("--tb-h", h + "px");
         }
@@ -2034,28 +2024,26 @@
         btn.type = "button";
         btn.setAttribute("aria-label", "Nach oben");
         btn.setAttribute("title", "Nach oben");
-        var style = btn.style;
-        style.position = "fixed";
-        style.right = "16px";
-        style.bottom = "calc(env(safe-area-inset-bottom, 0px) + 16px)";
-        style.width = "42px";
-        style.height = "42px";
-        style.borderRadius = "50%";
-        style.border = "1px solid rgba(0,0,0,.25)";
-        style.background = "rgba(255,255,255,.45)";
-        style.color = "inherit";
-        style.cursor = "pointer";
-        style.boxShadow = "0 6px 18px rgba(0,0,0,.25)";
-        style.display = "none";
-        style.zIndex = 999;
-
+        var s = btn.style;
+        s.position = "fixed";
+        s.right = "16px";
+        s.bottom = "calc(env(safe-area-inset-bottom, 0px) + 16px)";
+        s.width = "42px";
+        s.height = "42px";
+        s.borderRadius = "50%";
+        s.border = "1px solid rgba(0,0,0,.25)";
+        s.background = "rgba(255,255,255,.45)";
+        s.color = "inherit";
+        s.cursor = "pointer";
+        s.boxShadow = "0 6px 18px rgba(0,0,0,.25)";
+        s.display = "none";
+        s.zIndex = 999;
         try {
           if (window.matchMedia && window.matchMedia("(pointer: coarse)").matches) {
-            style.width = "48px";
-            style.height = "48px";
+            s.width = "48px";
+            s.height = "48px";
           }
         } catch (e) {}
-
         btn.addEventListener("click", function () {
           if (typeof window.__scrollToY === "function") {
             window.__scrollToY(0);
@@ -2070,9 +2058,7 @@
             (mode === "auto" && window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
           window.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" });
         });
-
         document.body.appendChild(btn);
-
         function onScroll() {
           var overlayLock = document.body.classList.contains("lb-lock");
           btn.style.display = !overlayLock && window.scrollY > 600 ? "block" : "none";
@@ -2091,50 +2077,28 @@
       (function () {
         var links = document.querySelectorAll('.topbar .nav a[href^="#"]');
         if (!links.length) return;
-        var arr = Array.prototype.slice.call(links);
-        var sections = arr
-          .map(function (a) {
-            return document.querySelector(a.getAttribute("href"));
-          })
-          .filter(Boolean);
-
+        var sections = [];
+        for (var i = 0; i < links.length; i++) {
+          var sel = links[i].getAttribute("href");
+          var el = document.querySelector(sel);
+          if (el) sections.push(el);
+        }
         function setActive(id) {
           for (var i = 0; i < links.length; i++) links[i].removeAttribute("aria-current");
           var active = document.querySelector('.topbar .nav a[href="' + id + '"]');
           if (active) active.setAttribute("aria-current", "page");
         }
-
         var io = new IntersectionObserver(
           function (entries) {
-            entries.forEach(function (e) {
+            for (var i = 0; i < entries.length; i++) {
+              var e = entries[i];
               if (e.isIntersecting) setActive("#" + e.target.id);
-            });
+            }
           },
           { rootMargin: "-30% 0px -60% 0px", threshold: 0 }
         );
-
-        sections.forEach(function (s) {
-          io.observe(s);
-        });
+        for (var j = 0; j < sections.length; j++) io.observe(sections[j]);
       })();
-
-      /* ===== Helpers für ältere Browser (closest-Polyfill) ================= */
-      function __closest(el, selector) {
-        if (!el) return null;
-        if (el.closest) return el.closest(selector);
-        while (el && el.nodeType === 1) {
-          if (
-            el.matches
-              ? el.matches(selector)
-              : el.msMatchesSelector
-                ? el.msMatchesSelector(selector)
-                : el.webkitMatchesSelector && el.webkitMatchesSelector(selector)
-          )
-            return el;
-          el = el.parentNode;
-        }
-        return null;
-      }
 
       /* =========================
    Lightbox (für Bild-Links)
@@ -2176,13 +2140,17 @@
           caption.textContent = text || "";
           overlay.setAttribute("aria-hidden", "false");
           document.body.classList.add("lb-lock");
-          if (closeBtn.focus) closeBtn.focus();
+          try {
+            closeBtn.focus();
+          } catch (e) {}
         }
         function closeLightbox() {
           overlay.setAttribute("aria-hidden", "true");
           document.body.classList.remove("lb-lock");
           img.removeAttribute("src");
-          if (lastFocus && document.contains(lastFocus) && lastFocus.focus) lastFocus.focus();
+          try {
+            if (lastFocus && document.contains(lastFocus)) lastFocus.focus();
+          } catch (e) {}
         }
 
         overlay.addEventListener("click", function (e) {
@@ -2195,15 +2163,15 @@
         document.addEventListener(
           "click",
           function (e) {
-            var a = __closest(e.target, "a");
+            var a = e.target.closest ? e.target.closest("a") : null;
             if (!a) return;
             var href = a.getAttribute("href") || "";
-            var isImageHref = /\.(png|jpe?g|webp|gif|svg)(\?.*)?$/i.test(href);
+            var isImageHref = /(\.png|\.jpe?g|\.webp|\.gif|\.svg)(\?.*)?$/i.test(href);
             var wantsLb = a.hasAttribute("data-lightbox") || isImageHref;
             if (!wantsLb) return;
             e.preventDefault();
             var imgEl = a.querySelector("img");
-            var alt = imgEl && imgEl.getAttribute("alt") ? imgEl.getAttribute("alt") : "";
+            var alt = imgEl ? imgEl.getAttribute("alt") : "";
             var title =
               a.getAttribute("title") || a.getAttribute("data-caption") || (a.textContent ? a.textContent.trim() : "");
             openLightbox(a.href || href, title, alt);
@@ -2233,7 +2201,6 @@
         var row2Inner = document.querySelector(".topbar-row.row2 .inner");
         var burger = document.getElementById("menu-toggle");
         var row1Anchor = row1Inner ? row1Inner.querySelector(".controls") : null;
-
         function isMobile() {
           return window.innerWidth <= 860;
         }
@@ -2242,7 +2209,7 @@
           if (!brand || !row2Inner || !burger) return;
           if (row2Inner.contains(brand)) return;
           if (row1Inner) row1Inner.classList.add("no-brand");
-          burger.insertAdjacentElement("afterend", brand);
+          burger.parentNode.insertBefore(brand, burger.nextSibling);
         }
         function restoreBrandToRow1() {
           if (!brand || !row1Inner) return;
@@ -2263,16 +2230,17 @@
           if (overlay) overlay.setAttribute("aria-hidden", "false");
           if (btn) btn.setAttribute("aria-expanded", "true");
           document.body.classList.add("lb-lock");
-          var firstLink = linksContainer ? linksContainer.querySelector("a") : null;
-          var focusEl = firstLink || closeBtn;
-          if (focusEl && focusEl.focus) focusEl.focus();
+          var first = linksContainer ? linksContainer.querySelector("a") : null;
+          (first || closeBtn || btn || document.body).focus();
         }
         function close() {
           if (overlay) overlay.classList.remove("open");
           if (overlay) overlay.setAttribute("aria-hidden", "true");
           if (btn) btn.setAttribute("aria-expanded", "false");
           document.body.classList.remove("lb-lock");
-          if (lastFocus && document.contains(lastFocus) && lastFocus.focus) lastFocus.focus();
+          try {
+            if (lastFocus && document.contains(lastFocus)) lastFocus.focus();
+          } catch (e) {}
         }
 
         placeBrandForViewport();
@@ -2292,8 +2260,8 @@
         });
         if (overlay)
           overlay.addEventListener("click", function (e) {
-            var link = __closest(e.target, "a");
-            if (link) close();
+            var a = e.target.closest ? e.target.closest("a") : null;
+            if (a) close();
           });
 
         var w = window.innerWidth;
@@ -2311,11 +2279,11 @@
    ================================= */
       (function () {
         function motionMode() {
-          return (
+          var s =
             (window.__uiState && window.__uiState.motion) ||
             document.documentElement.getAttribute("data-motion") ||
-            "auto"
-          );
+            "auto";
+          return s;
         }
         function isReducedMotion() {
           var m = motionMode();
@@ -2327,11 +2295,7 @@
           var cs = getComputedStyle(document.documentElement);
           var v = cs.getPropertyValue("--tb-h").trim();
           var h = parseFloat(v);
-          return (
-            (isFinite(h)
-              ? h
-              : (document.querySelector(".topbar") && document.querySelector(".topbar").offsetHeight) || 0) + 8
-          );
+          return (isFinite(h) ? h : (document.querySelector(".topbar") || {}).offsetHeight || 0) + 8;
         }
         function easeInOutCubic(t) {
           return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
@@ -2346,15 +2310,13 @@
           var startY = window.pageYOffset;
           var dist = targetY - startY;
           var start = performance.now();
-          var dur = duration != null ? duration : Math.min(900, Math.max(300, Math.abs(dist) * 0.5));
-
+          var dur = duration || Math.min(900, Math.max(300, Math.abs(dist) * 0.5));
           cancelAnimationFrame(rafId);
-          var cancel = function () {
+          function cancel() {
             cancelAnimationFrame(rafId);
-          };
+          }
           window.addEventListener("wheel", cancel, { passive: true, once: true });
           window.addEventListener("keydown", cancel, { once: true });
-
           function step(now) {
             var t = Math.min(1, (now - start) / dur);
             var y = startY + dist * easeInOutCubic(t);
@@ -2363,23 +2325,29 @@
           }
           rafId = requestAnimationFrame(step);
         }
-
         window.__scrollToY = scrollToY;
 
         function focusAfterScroll(el) {
           if (!el) return;
           var had = el.hasAttribute("tabindex");
           el.setAttribute("tabindex", "-1");
-          if (el.focus) el.focus({ preventScroll: true });
+          try {
+            el.focus({ preventScroll: true });
+          } catch (e) {
+            try {
+              el.focus();
+            } catch (_) {}
+          }
           if (!had) el.removeAttribute("tabindex");
         }
-
         function handleTopHashClick(e, a) {
           var raw = a.getAttribute("href");
           if (raw === "#" || raw === "#top") {
             e.preventDefault();
             scrollToY(0);
-            history.pushState(null, "", "#");
+            try {
+              history.pushState(null, "", "#");
+            } catch (e) {}
             return true;
           }
           return false;
@@ -2388,30 +2356,35 @@
         document.addEventListener(
           "click",
           function (e) {
-            var a = __closest(e.target, 'a[href^="#"]');
+            var a = e.target.closest ? e.target.closest('a[href^="#"]') : null;
             if (!a) return;
-
             if (handleTopHashClick(e, a)) return;
-
-            var url = new URL(a.getAttribute("href"), location.href);
+            var href = a.getAttribute("href");
+            var url;
+            try {
+              url = new URL(href, location.href);
+            } catch (err) {
+              return;
+            }
             if (url.pathname !== location.pathname || !url.hash) return;
-
             var target = document.querySelector(url.hash);
             if (!target) return;
             e.preventDefault();
 
-            var mobileOverlay = document.getElementById("mobile-nav");
-            if (mobileOverlay && mobileOverlay.classList.contains("open")) {
-              mobileOverlay.classList.remove("open");
-              mobileOverlay.setAttribute("aria-hidden", "true");
-              var mt = document.getElementById("menu-toggle");
-              if (mt) mt.setAttribute("aria-expanded", "false");
+            var mnav = document.getElementById("mobile-nav");
+            if (mnav && mnav.classList.contains("open")) {
+              mnav.classList.remove("open");
+              mnav.setAttribute("aria-hidden", "true");
+              var menuBtn = document.getElementById("menu-toggle");
+              if (menuBtn) menuBtn.setAttribute("aria-expanded", "false");
               document.body.classList.remove("lb-lock");
             }
 
             var y = Math.max(0, target.getBoundingClientRect().top + window.pageYOffset - headerOffset());
             scrollToY(y);
-            history.pushState(null, "", url.hash);
+            try {
+              history.pushState(null, "", url.hash);
+            } catch (e) {}
             setTimeout(function () {
               focusAfterScroll(target);
             }, 10);
@@ -2428,7 +2401,6 @@
             }
           }
         });
-
         window.addEventListener("hashchange", function () {
           var t = document.querySelector(location.hash);
           if (!t) return;
